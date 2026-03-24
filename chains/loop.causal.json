@@ -4,7 +4,7 @@
     "name": "Loop",
     "domain": "custom",
     "created_at": "2026-03-24T11:59:38.598468",
-    "updated_at": "2026-03-24T13:38:18.683141",
+    "updated_at": "2026-03-24T14:47:16.270574",
     "version": 1,
     "author": "",
     "description": "Created from text decomposition."
@@ -189,6 +189,19 @@
       "confidence": 0.7,
       "created_at": "2026-03-24T12:38:18.663Z",
       "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "2132a576",
+      "label": "ddd",
+      "description": "",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T13:47:04.189Z",
+      "source": "user",
       "deprecated": false,
       "flagged": false
     }
@@ -513,6 +526,22 @@
       "version": 1,
       "created_at": "2026-03-24T12:38:18.663Z",
       "source": "llm"
+    },
+    {
+      "id": "20170b22",
+      "from": "2132a576",
+      "to": "85325696",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T13:47:14.103Z",
+      "source": "user"
     }
   ],
   "history": [
@@ -568,6 +597,22 @@
       "payload": {
         "type": "gap",
         "node_id": "075f9e67"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T13:47:04.189Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "2132a576"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T13:47:14.103Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "20170b22"
       }
     }
   ]
