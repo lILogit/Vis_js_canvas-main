@@ -1,0 +1,185 @@
+/* decompose.css — styles exclusive to the Knowledge Decomposer page */
+
+#decompose-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#deco-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+#deco-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 12px;
+  gap: 0;
+}
+
+.deco-section {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+.deco-section:last-child { border-bottom: none; }
+
+.deco-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+#deco-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 8px;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 120px;
+}
+#deco-input:focus { outline: none; border-color: var(--accent); }
+
+/* ── Metrics ────────────────────────────────────────────────────── */
+#deco-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.deco-metric {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  text-align: center;
+}
+.deco-metric-val {
+  font-size: 18px;
+  font-weight: bold;
+  display: block;
+}
+.deco-metric-lbl {
+  font-size: 9px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+#deco-causal-prompt {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 10px;
+  color: #a78bfa;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* ── Legend ─────────────────────────────────────────────────────── */
+.deco-legend-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+/* ── Inspector ──────────────────────────────────────────────────── */
+#deco-inspector-content {
+  font-size: 11px;
+}
+
+.deco-node-label {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.deco-field {
+  margin-bottom: 6px;
+}
+.deco-field label {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+.deco-field select,
+.deco-field input[type=text],
+.deco-field textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+.deco-field textarea { resize: vertical; min-height: 60px; }
+
+/* ── Canvas area ────────────────────────────────────────────────── */
+#deco-graph-wrap {
+  flex: 1;
+  position: relative;
+  background: var(--bg);
+}
+
+#deco-graph {
+  width: 100%;
+  height: 100%;
+}
+
+#deco-status {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 14px;
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+#deco-status.visible { opacity: 1; }
+
+/* ── Back button ────────────────────────────────────────────────── */
+#btn-back {
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+}
+#btn-back:hover { border-color: var(--accent); color: var(--accent); }

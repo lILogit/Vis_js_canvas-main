@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Causal Editor</title>
+  <script src="https://unpkg.com/vis-network@9.1.9/dist/vis-network.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ── Toolbar ──────────────────────────────────────────────────────────── -->
+<div id="toolbar">
+  <button id="btn-switch-chain" title="Switch chain">⎇ Chain</button>
+  <span id="chain-name" class="chain-name">Loading...</span>
+  <button id="btn-reset-demo" class="danger-dim" title="Restore demo chain to its initial seed state">↺ Reset demo</button>
+  <div class="sep"></div>
+  <button id="btn-add-node">+ Node</button>
+  <button id="btn-add-edge">+ Edge</button>
+  <div class="sep"></div>
+  <button id="btn-fit">Fit</button>
+  <button id="btn-hierarchical">Layout ↕</button>
+  <div class="sep"></div>
+  <button id="btn-enrich">Find gaps</button>
+  <button id="btn-suggest">Suggest</button>
+  <button id="btn-critique">Critique</button>
+  <a href="/decompose" id="btn-decompose" class="btn-toolbar" target="_blank">⊕ Decompose</a>
+  <button id="btn-note">📝 Note</button>
+  <div class="sep"></div>
+  <button id="btn-lasso">⬡ Polygon</button>
+  <div class="spacer"></div>
+  <button id="btn-save" class="success">Save  ⌘S</button>
+</div>
+
+<!-- ── Main area ─────────────────────────────────────────────────────────── -->
+<div id="main">
+
+  <!-- Graph canvas -->
+  <div id="graph-wrap">
+    <div id="graph"></div>
+    <canvas id="lasso-canvas"></canvas>
+    <div id="graph-loading">Computing layout…</div>
+  </div>
+
+  <!-- Info panel -->
+  <div id="info-panel">
+    <h3>Inspector</h3>
+    <div id="info-content">
+      <p style="color:#666;font-size:12px;padding:8px 0">Click a node or edge to inspect.</p>
+    </div>
+    <div id="llm-response"></div>
+  </div>
+
+</div>
+
+<!-- ── Filter bar ─────────────────────────────────────────────────────────── -->
+<div id="filter-bar">
+  <label>Type</label>
+  <select id="filter-type">
+    <option value="all">All</option>
+    <option value="state">state</option>
+    <option value="event">event</option>
+    <option value="decision">decision</option>
+    <option value="concept">concept</option>
+    <option value="question">question</option>
+    <option value="blackbox">blackbox</option>
+    <option value="goal">goal</option>
+    <option value="task">task</option>
+    <option value="asset">asset</option>
+    <option value="gate">gate</option>
+  </select>
+
+  <label>Min confidence</label>
+  <input type="range" id="filter-conf" min="0" max="1" step="0.1" value="0">
+  <span id="filter-conf-val">0.0</span>
+
+  <label>Source</label>
+  <select id="filter-source">
+    <option value="all">All</option>
+    <option value="user">user</option>
+    <option value="llm">llm</option>
+    <option value="import">import</option>
+  </select>
+
+  <label><input type="checkbox" id="filter-flagged"> Flagged only</label>
+</div>
+
+<!-- ── Status bar ────────────────────────────────────────────────────────── -->
+<div id="status-bar">
+  <div class="status-item">
+    <div class="dot" id="status-dot"></div>
+    <span id="status-saved">loading...</span>
+  </div>
+  <div class="status-item"><span id="status-nodes">0 nodes</span></div>
+  <div class="status-item"><span id="status-edges">0 edges</span></div>
+</div>
+
+<!-- ── Suggestions overlay ─────────────────────────────────────────────── -->
+<div id="suggestions-overlay">
+  <div id="suggestions-panel">
+    <div class="suggestions-header">
+      <h3>Suggested changes</h3>
+      <button id="btn-s-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <p class="suggestions-hint">Purple dashed items shown in graph. Select which to keep:</p>
+    <div id="suggestions-list"></div>
+    <div class="suggestions-actions">
+      <button id="btn-s-accept" class="success">Accept selected</button>
+      <button id="btn-s-reject" class="danger">Reject all</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Chain switcher modal ────────────────────────────────────────────── -->
+<div id="chain-switcher-overlay">
+  <div id="chain-switcher-panel">
+    <div class="chain-sw-header">
+      <h3>Select chain</h3>
+      <button id="btn-csw-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="chain-switcher-list"></div>
+  </div>
+</div>
+
+
+<!-- ── Note modal ─────────────────────────────────────────────────────── -->
+<div id="note-overlay">
+  <div id="note-panel">
+    <div class="note-header">
+      <h3>Add Note</h3>
+      <button id="btn-note-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div class="note-field">
+      <label>Load example <span class="note-hint">(fills form below)</span></label>
+      <select id="note-example">
+        <option value="">— type your own —</option>
+        <optgroup label="Original samples">
+          <option value="cold_swim">Cold swim → focus (observation, W=0.65)</option>
+          <option value="caffeine_loop">Caffeine-sleep feedback loop (hypothesis, W=0.52)</option>
+          <option value="deadline_stress">Deadline stress → sleep fragmentation (observation, W=0.42)</option>
+        </optgroup>
+        <optgroup label="RCDE single-type">
+          <option value="task_cold_protocol">TASK — formalise cold swim protocol (decision, W=0.79)</option>
+          <option value="goal_cognitive_peak">GOAL — 90-min cognitive peak anchor (hypothesis, W=0.73)</option>
+          <option value="gate_intervention_fork">GATE — cold swim vs. nootropic fork (decision, W=0.74)</option>
+          <option value="asset_cold_water_access">ASSET — cold water access ≤15°C (evidence, W=0.78)</option>
+        </optgroup>
+        <optgroup label="Mixed taxonomy">
+          <option value="cognitive_mechanisms">CONCEPT + QUESTION + BLACKBOX · FRAMES, BLOCKS (hypothesis, W=0.67)</option>
+          <option value="decision_and_requirements">DECISION · REQUIRES, PRECONDITION_OF, RESOLVES (decision, W=0.76)</option>
+          <option value="full_taxonomy_demo">All 10 node types · All 12 edge relations (evidence, W=0.73)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="note-field">
+      <label>Type</label>
+      <select id="note-type">
+        <option value="observation">observation</option>
+        <option value="hypothesis">hypothesis</option>
+        <option value="decision">decision</option>
+        <option value="question">question</option>
+        <option value="evidence">evidence</option>
+      </select>
+    </div>
+    <div class="note-field">
+      <label>Text</label>
+      <textarea id="note-text" rows="5" placeholder="Describe your observation, hypothesis, or finding..."></textarea>
+    </div>
+    <div class="note-field">
+      <label>Seed entities <span class="note-hint">(comma-separated node labels)</span></label>
+      <input type="text" id="note-seeds" placeholder="e.g. stress, sleep quality, focus">
+    </div>
+    <div class="note-field">
+      <label>Confidence: <span id="note-conf-val">0.5</span></label>
+      <input type="range" id="note-conf" min="0" max="1" step="0.05" value="0.5">
+    </div>
+    <div class="note-field">
+      <label>Urgency: <span id="note-urg-val">0.3</span></label>
+      <input type="range" id="note-urg" min="0" max="1" step="0.05" value="0.3">
+    </div>
+    <div class="note-wscore">
+      W-score: <span id="note-wscore-badge" class="wscore-badge wscore-low">0.42</span>
+      <span class="note-hint">(confidence × 0.6 + urgency × 0.4)</span>
+    </div>
+    <div class="note-actions">
+      <button id="btn-note-submit" class="success">Ingest note</button>
+      <button id="btn-note-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Manipulation: add/edit node ───────────────────────────────── -->
+<div id="manip-node-overlay" class="manip-overlay" style="display:none">
+  <div class="manip-box">
+    <h3 id="mn-title">Add Node</h3>
+    <p id="mn-hint" class="manip-hint"></p>
+    <div class="field">
+      <label>Label</label>
+      <input id="mn-label" maxlength="60" placeholder="Short label">
+    </div>
+    <div class="field">
+      <label>Type</label>
+      <select id="mn-type"></select>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="mn-desc" rows="2" placeholder="One sentence description"></textarea>
+    </div>
+    <div class="field">
+      <label>Archetype</label>
+      <select id="mn-archetype">
+        <option value="">— none —</option>
+        <option value="root_cause">root_cause</option>
+        <option value="mechanism">mechanism</option>
+        <option value="effect">effect</option>
+        <option value="moderator">moderator</option>
+        <option value="evidence">evidence</option>
+        <option value="question">question</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Confidence — <span id="mn-conf-val">0.70</span></label>
+      <input type="range" id="mn-conf" min="0" max="1" step="0.05" value="0.7">
+    </div>
+    <div class="manip-flag-row">
+      <input type="checkbox" id="mn-flagged">
+      <label for="mn-flagged">Flag for review</label>
+    </div>
+    <div class="manip-actions">
+      <button id="mn-apply" class="success">Apply  ↵</button>
+      <button id="mn-cancel">Cancel  Esc</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Manipulation: add/edit edge ───────────────────────────────── -->
+<div id="manip-edge-overlay" class="manip-overlay" style="display:none">
+  <div class="manip-box">
+    <h3 id="me-title">Add Edge</h3>
+    <div class="field">
+      <label>Endpoints</label>
+      <input id="me-endpoints" readonly style="opacity:0.5">
+    </div>
+    <div class="field">
+      <label>Relation</label>
+      <select id="me-relation"></select>
+    </div>
+    <div class="field">
+      <label>Weight — <span id="me-weight-val">0.50</span></label>
+      <input type="range" id="me-weight" min="0" max="1" step="0.05" value="0.5">
+    </div>
+    <div class="field">
+      <label>Evidence</label>
+      <textarea id="me-evidence" rows="2" placeholder="Source or rationale"></textarea>
+    </div>
+    <div class="field">
+      <label>Condition</label>
+      <input id="me-condition" placeholder="Under what condition? (optional)">
+    </div>
+    <div class="manip-actions">
+      <button id="me-apply" class="success">Apply  ↵</button>
+      <button id="me-cancel">Cancel  Esc</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/static/editor.js"></script>
+</body>
+</html>

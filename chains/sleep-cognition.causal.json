@@ -1,0 +1,2553 @@
+{
+  "meta": {
+    "id": "demo-sleep-cognition",
+    "name": "Sleep & Cognitive Performance",
+    "domain": "health",
+    "created_at": "2026-03-22T18:52:59.414074",
+    "updated_at": "2026-03-24T14:28:42.860204",
+    "version": 1,
+    "author": "",
+    "description": "Demo chain: causal model of sleep quality and cognitive outcomes."
+  },
+  "nodes": [
+    {
+      "id": "node_sleep",
+      "label": "Poor sleep quality",
+      "description": "Consistently less than 7h or fragmented sleep",
+      "type": "state",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.85,
+      "created_at": "2026-03-22T18:52:59.414104",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "node_cortisol",
+      "label": "Elevated cortisol",
+      "description": "Chronic sleep debt raises baseline cortisol",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.75,
+      "created_at": "2026-03-22T18:52:59.414112",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "node_focus",
+      "label": "Reduced focus",
+      "description": "Difficulty sustaining attention on demanding tasks",
+      "type": "state",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-03-22T18:52:59.414119",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "node_memory",
+      "label": "Working memory impairment",
+      "description": "Reduced capacity to hold and manipulate information",
+      "type": "state",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-03-22T18:52:59.414124",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "node_exercise",
+      "label": "Regular aerobic exercise",
+      "description": "30+ min moderate cardio reduces cortisol and improves sleep quality",
+      "type": "event",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T18:52:59.414128",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "node_decision",
+      "label": "Poor decision quality",
+      "description": "Increased error rate on complex tasks",
+      "type": "state",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.75,
+      "created_at": "2026-03-22T18:52:59.414133",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "1913b783",
+      "label": "cold swim",
+      "description": "Brief cold water immersion (~3 min) that acutely and transiently lowers cortisol and triggers norepinephrine release.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "5371459e",
+      "label": "norepinephrine spike",
+      "description": "Acute surge in norepinephrine following cold exposure, proposed to prime attention circuits and transiently improve focus.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "8d181426",
+      "label": "time-limited effect window",
+      "description": "The focus-enhancing effect of cold exposure is bounded to approximately 3 hours, indicating a transient rather than sustained causal pathway.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "f2767aee",
+      "label": "Stressor Exposure",
+      "description": "An organism or system encounters a demand or threat that exceeds or challenges its current capacity.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "89c10b5a",
+      "label": "Stress Appraisal",
+      "description": "Cognitive or systemic evaluation of whether a demand is threatening, harmful, or benign relative to available resources.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9bd9640e",
+      "label": "Physiological Stress Response",
+      "description": "Activation of neuroendocrine pathways (e.g., HPA axis, sympathetic nervous system) producing cortisol, adrenaline, and arousal.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "59fb55cf",
+      "label": "Psychological Stress State",
+      "description": "Subjective experience of tension, anxiety, or overwhelm arising from appraised demand-resource imbalance.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "7524556a",
+      "label": "Coping Resources",
+      "description": "Individual or collective capacities (social support, skills, resilience) that moderate the impact of stressors.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "515e4d6e",
+      "label": "Allostatic Load",
+      "description": "Cumulative physiological wear and tear resulting from chronic or repeated stress activation beyond adaptive capacity.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "0435eb90",
+      "label": "Performance Modulation",
+      "description": "Stress follows an inverted-U relationship with performance: moderate arousal enhances it, excess degrades it (Yerkes-Dodson principle).",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "a1951ddd",
+      "label": "Health Outcome Degradation",
+      "description": "Chronic stress contributes to immune suppression, cardiovascular disease, mental health disorders, and metabolic dysfunction.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "8ba25e20",
+      "label": "Adaptive Growth",
+      "description": "Acute manageable stress (eustress) can trigger learning, resilience building, and post-traumatic growth.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "bea92834",
+      "label": "Context Domain",
+      "description": "The specific named domain, entity, or setting in which stress occurs (e.g., workplace, clinical trial, geopolitical event) — instance value unknown without ΔDATA.",
+      "type": "blackbox",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "01b199dc",
+      "label": "cold swim / cold water immersion",
+      "description": "Acute cold exposure (e.g. 3-minute cold swim) that transiently suppresses cortisol and triggers a norepinephrine spike",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "25f840fa",
+      "label": "norepinephrine spike",
+      "description": "Acute catecholamine release triggered by cold exposure that primes attention circuits",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "cd64a3cd",
+      "label": "attentional sharpness / sustained focus",
+      "description": "Subjectively noticeable improvement in focused attention lasting ~3 hours post cold exposure, distinct from working memory capacity",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "a630d39d",
+      "label": "cold swim",
+      "description": "3-minute cold water immersion practice performed in the morning that triggers acute physiological stress responses",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "e534d63a",
+      "label": "acute cortisol reduction",
+      "description": "Transient lowering of cortisol levels caused by cold exposure, distinct from chronic cortisol elevation",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9d742cb9",
+      "label": "sustained focus window",
+      "description": "Period of noticeably sharper attentional focus lasting approximately 3 hours following cold exposure",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "ebb81911",
+      "label": "intervention strategy gate",
+      "description": "Formal decision fork between cold swim (Path A: cost-efficient) and L-tyrosine + ashwagandha stack (Path B: time-efficient), remaining open until the 4-week cold swim trial concludes.",
+      "type": "gate",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "abd8a584",
+      "label": "L-tyrosine + ashwagandha stack",
+      "description": "Supplement stack taken on waking as a time-cheap alternative to cold swim, intended to replicate norepinephrine spike and acute cortisol reduction at recurring monetary cost.",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9f8cf841",
+      "label": "4-week cold swim trial",
+      "description": "Time-bounded four-week trial of the cold swim protocol whose completion closes the intervention strategy gate and determines which strategy is selected.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "sc_goal_01",
+      "label": "90-min cognitive peak",
+      "description": "Desired terminal state: focus and working memory above baseline for 90 uninterrupted minutes every morning.",
+      "type": "goal",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "sc_conc_01",
+      "label": "Attentional resource theory",
+      "description": "The brain allocates a finite executive-bandwidth pool; norepinephrine is the primary modulator of pool size.",
+      "type": "concept",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.75,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "sc_ques_01",
+      "label": "Focus window exceeds 90 min?",
+      "description": "Unresolved: does the focus-window reliably extend past 90 min under chronic protocol, or does receptor downregulation cap the effect?",
+      "type": "question",
+      "archetype": "question",
+      "tags": [],
+      "confidence": 0.5,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "sc_bbox_01",
+      "label": "HPA axis calibration variance",
+      "description": "Opaque mechanism causing day-to-day noise in cortisol-reduction magnitude; internal process unknown.",
+      "type": "blackbox",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.4,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": true
+    },
+    {
+      "id": "sc_deci_01",
+      "label": "Biometric measurement protocol",
+      "description": "Decision to record resting HRV and a 3-min reaction-time benchmark every morning to generate evidence for resolving the open question.",
+      "type": "decision",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "sc_asset_hrv",
+      "label": "HRV chest strap",
+      "description": "Validated HRV sensor (Polar H10 or equivalent, ≥95% accuracy vs. ECG reference).",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "sc_asset_app",
+      "label": "Cognitive benchmark app",
+      "description": "Standardised daily cognitive test with score export; required for reaction-time series data.",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "00f49c3a",
+      "label": "cold water access ≤15°C",
+      "description": "Physical access to cold water at or below 15°C within 30 minutes of waking, serving as a hard prerequisite for executing the cold swim task.",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "d8c8974e",
+      "label": "ice bag supply (≥2kg per session)",
+      "description": "Secondary asset used in summer to cool tap water to ≤15°C when ambient tap temperature exceeds the cold swim protocol threshold.",
+      "type": "asset",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "1859ad7f",
+      "label": "cold water source discovery task",
+      "description": "Upstream task triggered when primary cold water access is absent, aimed at identifying or establishing a viable cold water source meeting the ≤15°C requirement.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "15e64e1b",
+      "label": "intervention strategy gate",
+      "description": "Formal decision fork between Path A (cold swim protocol) and Path B (L-tyrosine + ashwagandha stack), scoring each on cost and time-efficiency, remaining open until the 4-week cold swim trial concludes.",
+      "type": "gate",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "6a2a5ebe",
+      "label": "L-tyrosine + ashwagandha stack (Path B)",
+      "description": "Pharmacological intervention combining low-dose L-tyrosine with ashwagandha taken on waking; competing strategy to Path A targeting norepinephrine spike and cortisol reduction; recurring cost, time-cheap.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "bac9c0d3",
+      "label": "norepinephrine spike",
+      "description": "Acute elevation of norepinephrine serving as the shared proximal neurochemical output targeted by both intervention paths.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "47586de5",
+      "label": "acute cortisol reduction",
+      "description": "Short-term decrease in cortisol following the chosen intervention, modelled as downstream of the norepinephrine spike.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "582d1589",
+      "label": "sustained focus window",
+      "description": "Extended period of heightened cognitive focus produced downstream of the norepinephrine spike and cortisol reduction; the intended end-state outcome of the intervention strategies.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "ba0ac2d6",
+      "label": "fff",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-24T13:27:50.814Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "node_sleep",
+      "to": "node_cortisol",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.75,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414140",
+      "source": "user"
+    },
+    {
+      "id": "e2",
+      "from": "node_cortisol",
+      "to": "node_focus",
+      "relation": "REDUCES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414147",
+      "source": "user"
+    },
+    {
+      "id": "e3",
+      "from": "node_cortisol",
+      "to": "node_memory",
+      "relation": "REDUCES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414152",
+      "source": "user"
+    },
+    {
+      "id": "e4",
+      "from": "node_focus",
+      "to": "node_decision",
+      "relation": "CAUSES",
+      "weight": 0.75,
+      "confidence": 0.8,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414160",
+      "source": "user"
+    },
+    {
+      "id": "e5",
+      "from": "node_exercise",
+      "to": "node_cortisol",
+      "relation": "REDUCES",
+      "weight": 0.6,
+      "confidence": 0.65,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414165",
+      "source": "user"
+    },
+    {
+      "id": "e6",
+      "from": "node_exercise",
+      "to": "node_sleep",
+      "relation": "REDUCES",
+      "weight": 0.55,
+      "confidence": 0.6,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:52:59.414170",
+      "source": "user"
+    },
+    {
+      "id": "82cfff91",
+      "from": "1913b783",
+      "to": "node_cortisol",
+      "relation": "REDUCES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm"
+    },
+    {
+      "id": "5812e53c",
+      "from": "1913b783",
+      "to": "5371459e",
+      "relation": "TRIGGERS",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm"
+    },
+    {
+      "id": "a137ae67",
+      "from": "5371459e",
+      "to": "node_focus",
+      "relation": "REDUCES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm"
+    },
+    {
+      "id": "353d57a7",
+      "from": "8d181426",
+      "to": "5371459e",
+      "relation": "BLOCKS",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm"
+    },
+    {
+      "id": "798f73c4",
+      "from": "8d181426",
+      "to": "node_focus",
+      "relation": "BLOCKS",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T18:55:06.384Z",
+      "source": "llm"
+    },
+    {
+      "id": "a0f18d23",
+      "from": "f2767aee",
+      "to": "89c10b5a",
+      "relation": "TRIGGERS",
+      "weight": 0.92,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "7af81732",
+      "from": "89c10b5a",
+      "to": "9bd9640e",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "55ffeaf8",
+      "from": "89c10b5a",
+      "to": "59fb55cf",
+      "relation": "CAUSES",
+      "weight": 0.88,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "9992f782",
+      "from": "7524556a",
+      "to": "89c10b5a",
+      "relation": "REDUCES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "951bfda5",
+      "from": "9bd9640e",
+      "to": "515e4d6e",
+      "relation": "AMPLIFIES",
+      "weight": 0.87,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "d1052286",
+      "from": "9bd9640e",
+      "to": "0435eb90",
+      "relation": "CAUSES",
+      "weight": 0.84,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "2977bda4",
+      "from": "515e4d6e",
+      "to": "a1951ddd",
+      "relation": "CAUSES",
+      "weight": 0.89,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "8002f58f",
+      "from": "59fb55cf",
+      "to": "a1951ddd",
+      "relation": "AMPLIFIES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "c3908725",
+      "from": "7524556a",
+      "to": "8ba25e20",
+      "relation": "ENABLES",
+      "weight": 0.83,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "104c0296",
+      "from": "59fb55cf",
+      "to": "8ba25e20",
+      "relation": "ENABLES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "02ce9394",
+      "from": "bea92834",
+      "to": "f2767aee",
+      "relation": "REQUIRES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:21:50.072Z",
+      "source": "llm"
+    },
+    {
+      "id": "32f0dd22",
+      "from": "01b199dc",
+      "to": "node_cortisol",
+      "relation": "REDUCES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "a4518a7e",
+      "from": "01b199dc",
+      "to": "25f840fa",
+      "relation": "TRIGGERS",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "2baa9498",
+      "from": "25f840fa",
+      "to": "cd64a3cd",
+      "relation": "CAUSES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "726e0619",
+      "from": "25f840fa",
+      "to": "node_memory",
+      "relation": "AMPLIFIES",
+      "weight": 0.55,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "e67474c0",
+      "from": "node_cortisol",
+      "to": "cd64a3cd",
+      "relation": "REDUCES",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "de0b3345",
+      "from": "01b199dc",
+      "to": "node_sleep",
+      "relation": "REDUCES",
+      "weight": 0.45,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:50:39.229Z",
+      "source": "llm"
+    },
+    {
+      "id": "36006efc",
+      "from": "a630d39d",
+      "to": "25f840fa",
+      "relation": "TRIGGERS",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "d5e04c7d",
+      "from": "a630d39d",
+      "to": "e534d63a",
+      "relation": "CAUSES",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "e3a9bbd8",
+      "from": "25f840fa",
+      "to": "9d742cb9",
+      "relation": "ENABLES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "47f34b7c",
+      "from": "e534d63a",
+      "to": "9d742cb9",
+      "relation": "AMPLIFIES",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "6b874e11",
+      "from": "e534d63a",
+      "to": "node_memory",
+      "relation": "REDUCES",
+      "weight": 0.55,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "d0c2c259",
+      "from": "9d742cb9",
+      "to": "node_memory",
+      "relation": "REDUCES",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-23T19:57:46.957Z",
+      "source": "llm"
+    },
+    {
+      "id": "a4d003a2",
+      "from": "ebb81911",
+      "to": "a630d39d",
+      "relation": "DIVERGES_TO",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "d63dc7ce",
+      "from": "ebb81911",
+      "to": "abd8a584",
+      "relation": "DIVERGES_TO",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "329aa206",
+      "from": "9f8cf841",
+      "to": "ebb81911",
+      "relation": "RESOLVES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "e5357f11",
+      "from": "9f8cf841",
+      "to": "a630d39d",
+      "relation": "INSTANTIATES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "e44ce2a5",
+      "from": "ebb81911",
+      "to": "9f8cf841",
+      "relation": "TRIGGERS",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "63f33ec6",
+      "from": "abd8a584",
+      "to": "25f840fa",
+      "relation": "TRIGGERS",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "d5355664",
+      "from": "abd8a584",
+      "to": "e534d63a",
+      "relation": "CAUSES",
+      "weight": 0.62,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "c2c80a22",
+      "from": "ebb81911",
+      "to": "node_memory",
+      "relation": "FRAMES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:18:23.921Z",
+      "source": "llm"
+    },
+    {
+      "id": "sc_e01",
+      "from": "9d742cb9",
+      "to": "sc_goal_01",
+      "relation": "PRECONDITION_OF",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "The focus window must be measurably present before the 90-min goal can be claimed achieved.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e02",
+      "from": "sc_ques_01",
+      "to": "sc_goal_01",
+      "relation": "BLOCKS",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Until the 90-min ceiling question is resolved, the goal cannot be confirmed achievable via this pathway.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e03",
+      "from": "sc_conc_01",
+      "to": "25f840fa",
+      "relation": "FRAMES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Attentional resource theory explains why the spike increases executive pool size.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e04",
+      "from": "sc_conc_01",
+      "to": "9d742cb9",
+      "relation": "FRAMES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Theory predicts the focus window is the interval of elevated pool capacity.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e05",
+      "from": "sc_bbox_01",
+      "to": "e534d63a",
+      "relation": "CAUSES",
+      "weight": 0.45,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Unknown calibration variance causes day-to-day noise in cortisol-reduction magnitude.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e06",
+      "from": "sc_deci_01",
+      "to": "sc_asset_hrv",
+      "relation": "REQUIRES",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "HRV measurement cannot proceed without a validated chest-strap sensor.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e07",
+      "from": "sc_deci_01",
+      "to": "sc_asset_app",
+      "relation": "REQUIRES",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Reaction-time series requires a standardised benchmark app with daily export.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "sc_e08",
+      "from": "sc_deci_01",
+      "to": "sc_ques_01",
+      "relation": "RESOLVES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Daily biometric series will determine whether the 90-min window is a ceiling or a floor.",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T11:32:23.318764",
+      "source": "user"
+    },
+    {
+      "id": "d9ef1728",
+      "from": "00f49c3a",
+      "to": "9f8cf841",
+      "relation": "PRECONDITION_OF",
+      "weight": 0.78,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm"
+    },
+    {
+      "id": "bd1da408",
+      "from": "d8c8974e",
+      "to": "00f49c3a",
+      "relation": "ENABLES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm"
+    },
+    {
+      "id": "f85a0eee",
+      "from": "1859ad7f",
+      "to": "00f49c3a",
+      "relation": "RESOLVES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm"
+    },
+    {
+      "id": "0874986b",
+      "from": "9f8cf841",
+      "to": "1859ad7f",
+      "relation": "REQUIRES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:40:34.748Z",
+      "source": "llm"
+    },
+    {
+      "id": "973b4f53",
+      "from": "9f8cf841",
+      "to": "15e64e1b",
+      "relation": "RESOLVES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "050112db",
+      "from": "15e64e1b",
+      "to": "9f8cf841",
+      "relation": "FRAMES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "d9a547d8",
+      "from": "15e64e1b",
+      "to": "6a2a5ebe",
+      "relation": "DIVERGES_TO",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "0daf366e",
+      "from": "9f8cf841",
+      "to": "bac9c0d3",
+      "relation": "TRIGGERS",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "03eba420",
+      "from": "6a2a5ebe",
+      "to": "bac9c0d3",
+      "relation": "TRIGGERS",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "83af3cf4",
+      "from": "bac9c0d3",
+      "to": "47586de5",
+      "relation": "CAUSES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "0c8d60f9",
+      "from": "bac9c0d3",
+      "to": "582d1589",
+      "relation": "CAUSES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "bd50a369",
+      "from": "47586de5",
+      "to": "582d1589",
+      "relation": "AMPLIFIES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    },
+    {
+      "id": "e003f29e",
+      "from": "6a2a5ebe",
+      "to": "47586de5",
+      "relation": "CAUSES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-24T10:42:09.895Z",
+      "source": "llm"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "1913b783"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "5371459e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "8d181426"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "82cfff91"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "5812e53c"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a137ae67"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "353d57a7"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T18:55:06.384Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "798f73c4"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "f2767aee"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "89c10b5a"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9bd9640e"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "59fb55cf"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "7524556a"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "515e4d6e"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "0435eb90"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a1951ddd"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "8ba25e20"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "bea92834"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a0f18d23"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "7af81732"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "55ffeaf8"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "9992f782"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "951bfda5"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d1052286"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "2977bda4"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "8002f58f"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c3908725"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "104c0296"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:21:50.072Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "02ce9394"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "f2767aee",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "89c10b5a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "9bd9640e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "59fb55cf",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "7524556a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "515e4d6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0435eb90",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "a1951ddd",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "8ba25e20",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:45:30.794Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "bea92834",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:49:12.313Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_focus",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:49:12.313Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_decision",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:49:12.313Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "5371459e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:49:12.313Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "8d181426",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:49:36.541Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "1913b783",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "01b199dc"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "25f840fa"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "cd64a3cd"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "32f0dd22"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a4518a7e"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "2baa9498"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "726e0619"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e67474c0"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:50:39.229Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "de0b3345"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:55:47.423Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_sleep",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:55:47.423Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_cortisol",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:55:47.423Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_exercise",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:55:47.423Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "cd64a3cd",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:56:13.716Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "01b199dc",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a630d39d"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "e534d63a"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9d742cb9"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "36006efc"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d5e04c7d"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e3a9bbd8"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "47f34b7c"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "6b874e11"
+      }
+    },
+    {
+      "timestamp": "2026-03-23T19:57:46.957Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d0c2c259"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "ebb81911"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "abd8a584"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9f8cf841"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a4d003a2"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d63dc7ce"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "329aa206"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e5357f11"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e44ce2a5"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "63f33ec6"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d5355664"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:18:23.921Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c2c80a22"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T11:32:23.318764",
+      "action": "bulk_add",
+      "actor": "seed-update",
+      "payload": {
+        "nodes_added": 7,
+        "edges_added": 8
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:50.708Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_goal_01",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:50.708Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_ques_01",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:50.708Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_deci_01",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:50.708Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_asset_hrv",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:50.708Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_asset_app",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:58.446Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "25f840fa",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:58.446Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "abd8a584",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:37:58.446Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_conc_01",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:37.201Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "node_memory",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:37.201Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "e534d63a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:37.201Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "9d742cb9",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:37.201Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "sc_bbox_01",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:51.416Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "a630d39d",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:39:51.416Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "ebb81911",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "00f49c3a"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d8c8974e"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "1859ad7f"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d9ef1728"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "bd1da408"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "f85a0eee"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:40:34.748Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "0874986b"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "15e64e1b"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "6a2a5ebe"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "bac9c0d3"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "47586de5"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "582d1589"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "973b4f53"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "050112db"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d9a547d8"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "0daf366e"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "03eba420"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "83af3cf4"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "0c8d60f9"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "bd50a369"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T10:42:09.895Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e003f29e"
+      }
+    },
+    {
+      "timestamp": "2026-03-24T13:27:50.814Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "ba0ac2d6"
+      }
+    }
+  ]
+}

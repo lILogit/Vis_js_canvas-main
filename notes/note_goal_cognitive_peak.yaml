@@ -1,0 +1,16 @@
+---
+type: hypothesis
+confidence: 0.78
+urgency: 0.65
+seed_entities:
+  - sustained focus window
+  - Working memory impairment
+  - norepinephrine spike
+---
+The terminal outcome I am trying to engineer is a sustained cognitive peak: focus and working
+memory both above personal baseline for at least 90 uninterrupted minutes each morning, measured
+by zero task-switching in the first deep-work block. This should be modelled as a GOAL node —
+the single desired future STATE that anchors the entire chain. The sustained focus window is a
+direct precondition of this goal (PRECONDITION_OF). Working memory impairment is its negation and
+should remain in the chain as the risk case. The goal is not yet achieved; it is the reverse-
+engineered target that every other node in the chain is working toward.

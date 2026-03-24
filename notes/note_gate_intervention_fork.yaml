@@ -1,0 +1,18 @@
+---
+type: decision
+confidence: 0.70
+urgency: 0.80
+seed_entities:
+  - norepinephrine spike
+  - acute cortisol reduction
+  - sustained focus window
+---
+I am currently at a formal fork: two mutually exclusive intervention strategies compete to produce
+the norepinephrine spike and cortisol reduction the chain already models. Path A is the cold swim
+protocol (behavioural, zero cost, time-costly). Path B is a low-dose L-tyrosine + ashwagandha
+stack taken on waking (pharmacological, recurring cost, time-cheap). I cannot run both for
+measurement reasons — the confound would invalidate the N-of-1 data. This fork should be modelled
+as a GATE node ("cold swim vs. nootropic stack") with two DIVERGES_TO edges, one to each
+downstream TASK. The gate scores Path A higher on cost (free) and Path B higher on time-efficiency
+(2 minutes vs. 10 minutes). The active choice criteria are: cost, time slot availability, and
+long-term sustainability. The gate remains open until a 4-week trial of Path A concludes.

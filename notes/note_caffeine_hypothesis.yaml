@@ -1,0 +1,9 @@
+---
+type: hypothesis
+confidence: 0.6
+urgency: 0.4
+seed_entities:
+  - Poor sleep quality
+  - Reduced focus
+---
+I hypothesize that high caffeine intake late in the day (after 2pm) worsens sleep quality the following night, creating a feedback loop where poor focus leads to more caffeine consumption which further degrades sleep. This loop may be broken by enforcing a caffeine cutoff time.

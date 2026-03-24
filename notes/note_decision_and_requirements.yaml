@@ -1,0 +1,29 @@
+---
+type: decision
+confidence: 0.80
+urgency: 0.70
+seed_entities:
+  - sustained focus window
+  - Working memory impairment
+  - 4-week cold swim trial
+  - intervention strategy gate
+---
+I have decided to adopt a biometric measurement protocol for the duration of the trial. Every
+morning within 5 minutes of completing the cold swim (or the supplement stack on the control arm),
+I will record resting HRV via chest strap and run a 3-minute choice reaction-time benchmark on
+the cognitive test app. This DECISION node sits downstream of the intervention strategy gate —
+it does not change which path is taken, but it determines whether the gate can ever be resolved
+with evidence rather than guesswork.
+
+The decision REQUIRES two assets before it can execute: a validated HRV chest strap (Polar H10 or
+equivalent, ≥95% accuracy vs. ECG reference) and a standardised cognitive benchmark app with
+daily score export. Without both assets the decision fires in name only — the data would be
+uninterpretable and the 4-week cold swim trial cannot produce the evidence needed to resolve the
+intervention strategy gate.
+
+The sustained focus window is a direct PRECONDITION_OF the goal of a 90-minute cognitive peak:
+the window must be present and measurable before the goal can be claimed as achieved. Working
+memory impairment being absent is the complementary precondition — both must hold simultaneously.
+This decision also resolves the open question about focus window duration: by collecting daily
+reaction-time series, we will have the data to determine whether the 90-minute window is a
+ceiling or a floor.

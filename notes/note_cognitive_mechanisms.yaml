@@ -1,0 +1,29 @@
+---
+type: hypothesis
+confidence: 0.72
+urgency: 0.60
+seed_entities:
+  - norepinephrine spike
+  - sustained focus window
+  - acute cortisol reduction
+  - Working memory impairment
+---
+Attentional resource theory holds that the brain allocates a finite pool of executive bandwidth
+across competing tasks, and that norepinephrine acts as the primary modulator of pool size. This
+should be modelled as a CONCEPT node — an abstract principle that frames how the norepinephrine
+spike connects to the sustained focus window and why cortisol reduction amplifies that effect:
+lower cortisol reduces interference drain on the pool, freeing capacity for the spike to fill.
+The CONCEPT frames both the norepinephrine spike node and Working memory impairment — it explains
+why the same neurochemical state can both improve focus and reduce memory load simultaneously.
+
+There is an unresolved QUESTION blocking the current chain: does the focus window reliably extend
+beyond 90 minutes under chronic protocol, or does receptor downregulation cap the effect?
+This question directly blocks the goal of a 90-minute cognitive peak — if the answer is no, the
+goal is unreachable via this pathway and the gate must re-score toward the pharmacological branch.
+The question should remain open until 4-week trial data is available.
+
+Additionally, the mechanism by which cold exposure calibrates the HPA axis response differently
+on high-stress vs. low-stress days is a BLACKBOX: the internal process (likely glucocorticoid
+receptor sensitivity modulation) is unknown, and it causes day-to-day variance in the magnitude
+of acute cortisol reduction. This blackbox should be flagged for human review — it is the
+primary unexplained source of noise in the chain.

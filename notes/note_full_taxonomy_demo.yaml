@@ -1,0 +1,57 @@
+---
+type: evidence
+confidence: 0.85
+urgency: 0.55
+seed_entities:
+  - cold swim
+  - norepinephrine spike
+  - acute cortisol reduction
+  - sustained focus window
+  - Working memory impairment
+  - intervention strategy gate
+  - 4-week cold swim trial
+  - L-tyrosine + ashwagandha stack
+---
+This note is a full-chain synthesis intended to make every node type and edge relation explicit
+in a single coherent narrative. Use it as a reference when testing the ingestion pipeline.
+
+NODE TYPES IN THIS CHAIN:
+- STATE: "acute cortisol reduction" and "sustained focus window" are conditions that persist until
+  disrupted. "Working memory impairment" is the risk-state the chain aims to prevent.
+- EVENT: "cold swim" is a discrete occurrence that triggers downstream transitions.
+- TASK: "4-week cold swim trial" is a deliberate event triggered by the agent with intent to
+  produce specific downstream states. It fires only when its asset requirements are met.
+- ASSET: "L-tyrosine + ashwagandha stack" is a resource consumed by the pharmacological task
+  branch. It connects to its task via REQUIRES, not via a causal edge.
+- GATE: "intervention strategy gate" is a formally scored fork with mutually exclusive branches.
+  It carries explicit criteria (cost, time, sustainability) and diverges to each branch.
+- GOAL: the desired terminal state — 90-minute cognitive peak above baseline — is the single
+  anchor the whole chain works toward. Every other node is a precondition of or risk to it.
+- CONCEPT: attentional resource theory frames how the norepinephrine spike produces focus by
+  modulating executive bandwidth. It shapes interpretation of multiple nodes without being causal.
+- QUESTION: whether the focus window extends reliably past 90 minutes blocks the goal from being
+  confirmed achievable. It must be resolved before the gate closes permanently.
+- DECISION: adopting biometric measurement is a deliberate choice that requires specific assets
+  and resolves the open question by generating evidence.
+- BLACKBOX: HPA axis individual calibration variance is the opaque mechanism causing day-to-day
+  noise in the cortisol reduction magnitude. Internal process unknown; flagged for review.
+
+EDGE RELATIONS IN THIS CHAIN:
+- CAUSES: cold swim causes acute cortisol reduction (direct mechanism).
+- TRIGGERS: cold swim triggers norepinephrine spike (discrete onset event).
+- ENABLES: norepinephrine spike enables sustained focus window (prerequisite, not sufficient alone).
+- AMPLIFIES: norepinephrine spike amplifies working memory capacity; cortisol reduction amplifies
+  the focus window by removing interference.
+- REDUCES: acute cortisol reduction reduces working memory impairment risk.
+- FRAMES: attentional resource theory concept frames the norepinephrine spike and impairment nodes.
+- BLOCKS: the open question blocks the goal from being confirmed; the blackbox blocks the task
+  from being optimised.
+- REQUIRES: the 4-week trial task requires cold water access asset; the measurement decision
+  requires HRV monitor and benchmark app assets.
+- PRECONDITION_OF: sustained focus window is a precondition of the cognitive peak goal; absence
+  of working memory impairment is the complementary precondition.
+- INSTANTIATES: the 4-week cold swim trial task directly instantiates the cold swim event — it
+  is the agent-controlled trigger for the otherwise passive event node.
+- RESOLVES: the measurement decision resolves the open question about focus window duration.
+- DIVERGES_TO: the intervention strategy gate diverges to the cold swim trial (Path A) and to
+  the supplement stack task (Path B) as mutually exclusive branches.

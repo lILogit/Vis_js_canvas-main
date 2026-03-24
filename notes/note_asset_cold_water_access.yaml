@@ -1,0 +1,16 @@
+---
+type: evidence
+confidence: 0.90
+urgency: 0.60
+seed_entities:
+  - cold swim
+---
+The cold swim task cannot execute without physical access to cold water at or below 15°C within
+30 minutes of waking. This is a hard prerequisite — an ASSET node, not a causal state. Concretely
+it means: a working cold tap capable of reaching ≤15°C, or an outdoor body of water within 5
+minutes of home, or a chest freezer bath. At my current location the tap reaches 12°C in winter
+and 18°C in summer. In summer, the tap alone is insufficient and a secondary asset (ice bag
+supply, ≥2kg per session) is required. The ASSET connects to the cold swim TASK via a REQUIRES
+edge. If the asset is absent — e.g., travel to a hotel with only hot water — the task cannot
+fire and a Discovery Task should be generated upstream to find an alternative cold source.
+Asset confidence is high (0.9) in winter, drops to 0.45 in summer without the ice supply.

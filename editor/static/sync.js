@@ -1,0 +1,138 @@
+/**
+ * sync.js — chain save/load bridge
+ * Handles polling for external changes and POSTing saves to the local server.
+ */
+
+const POLL_INTERVAL = 3000; // ms
+let _dirty = false;
+let _lastSaveCount = 0;
+let _manualSaveCount = 0;
+const AUTO_BACKUP_EVERY = 10;
+
+export function markDirty() {
+  _dirty = true;
+  document.querySelector('#status-dot')?.classList.add('dirty');
+  document.querySelector('#status-saved')?.textContent &&
+    (document.getElementById('status-saved').textContent = 'unsaved');
+}
+
+export function markClean() {
+  _dirty = false;
+  document.querySelector('#status-dot')?.classList.remove('dirty');
+  const el = document.getElementById('status-saved');
+  if (el) el.textContent = 'saved';
+}
+
+export function isDirty() { return _dirty; }
+
+export async function loadChain() {
+  const resp = await fetch('/api/chain');
+  if (!resp.ok) throw new Error(`Load failed: ${resp.status}`);
+  return resp.json();
+}
+
+export async function listChains() {
+  const resp = await fetch('/api/chains');
+  if (!resp.ok) throw new Error(`List failed: ${resp.status}`);
+  return resp.json();
+}
+
+export async function switchChain(filename) {
+  const resp = await fetch('/api/chain/switch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function saveChain(chainData) {
+  const resp = await fetch('/api/chain', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(chainData),
+  });
+  const result = await resp.json();
+  if (!resp.ok || result.error) throw new Error(result.error || 'Save failed');
+
+  _manualSaveCount++;
+  if (_manualSaveCount % AUTO_BACKUP_EVERY === 0) {
+    console.log(`[sync] Auto-backup threshold reached (${_manualSaveCount} saves)`);
+  }
+  markClean();
+  return result;
+}
+
+export async function validateChain() {
+  const resp = await fetch('/api/validate');
+  if (!resp.ok) return { issues: [] };
+  return resp.json();
+}
+
+// LLM API calls
+export async function llmAsk(question, lang = 'en') {
+  return _llmPost('/llm/ask', { question, lang });
+}
+
+export async function llmExplain(nodeId = null, lang = 'en') {
+  return _llmPost('/llm/explain', { node_id: nodeId, lang });
+}
+
+export async function llmSuggest(n = 5) {
+  return _llmPost('/llm/suggest', { n });
+}
+
+export async function llmCritique() {
+  return _llmPost('/llm/critique', {});
+}
+
+export async function llmContradict(observation) {
+  return _llmPost('/llm/contradict', { observation });
+}
+
+export async function llmEnrichPreview(mode = 'gaps') {
+  return _llmPost('/llm/enrich-preview', { mode });
+}
+
+export async function llmImportText(text) {
+  return _llmPost('/llm/import-text', { text });
+}
+
+export async function llmIngestNote(noteData) {
+  return _llmPost('/llm/ingest-note', noteData);
+}
+
+export async function saveNewChain(payload) {
+  const resp = await fetch('/api/chain/save-new', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function resetDemo() {
+  const resp = await fetch('/api/demo/reset', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+async function _llmPost(endpoint, body) {
+  const resp = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}

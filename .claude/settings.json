@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/jirikouba/Documents/Vis_js_canvas/chains/*.json)",
+      "Bash(python3 demo.py --chain chains/sleep-cognition.causal.json --note notes/note_caffeine_hypothesis.yaml --dry-run)",
+      "Bash(printf \"1\\\\n1\\\\n\")",
+      "Bash(python3 demo.py)",
+      "Bash(python3 demo.py --chain chains/sleep-cognition.causal.json --note notes/note_cold_swim.yaml --dry-run)",
+      "Bash(python3 demo.py --chain chains/sleep-cognition.causal.json --note notes/note_plain.txt --dry-run)",
+      "Bash(python3 -c \"import editor.serve; print\\(''serve.py OK''\\)\")",
+      "Bash(curl -s --retry 5 --retry-delay 1 --retry-connrefused http://localhost:7331/api/chains)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X POST http://localhost:7331/api/chain/switch -H 'Content-Type: application/json' -d '{\"\"filename\"\":\"\"test-smoke.causal.json\"\"}')",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''switched to:'', d[''meta''][''name''], ''|'', len\\(d[''nodes'']\\), ''nodes''\\)\")",
+      "Bash(curl -s http://localhost:7331/api/chains)",
+      "Bash(python3 -c \"import sys,json; [print\\(c[''name''], ''| active:'', c[''active'']\\) for c in json.load\\(sys.stdin\\)[''chains'']]\")",
+      "Bash(python3 cli.py open chains/sleep-cognition.causal.json)",
+      "Bash(python3 -c \":*)",
+      "Bash(python3 cli.py reset-demo)"
+    ]
+  }
+}

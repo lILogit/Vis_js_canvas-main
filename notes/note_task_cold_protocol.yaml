@@ -1,0 +1,17 @@
+---
+type: decision
+confidence: 0.82
+urgency: 0.75
+seed_entities:
+  - cold swim
+  - norepinephrine spike
+  - acute cortisol reduction
+---
+I have decided to formalise the cold swim into a repeatable morning protocol: exactly 10 minutes
+in water at or below 15°C, performed within 30 minutes of waking, every weekday. This converts
+the incidental cold swim event into a deliberate TASK that an agent (me) triggers intentionally
+with the specific intent to produce the norepinephrine spike and acute cortisol reduction already
+in the chain. Unlike the passive event node, this task node should carry an explicit agent field
+and connect to both the cold swim event (INSTANTIATES) and the goal of sustained focus.
+The task only fires if its asset requirements are met — cold water access and a usable time slot
+before the first meeting.

@@ -1,0 +1,10 @@
+---
+type: observation
+confidence: 0.75
+urgency: 0.5
+seed_entities:
+  - cold swim
+  - focus
+  - cortisol
+---
+I've noticed that on days I do a 3-minute cold swim in the morning, my focus is noticeably sharper for the first 3 hours. This might be because cold exposure acutely lowers cortisol and triggers a norepinephrine spike that primes attention circuits.

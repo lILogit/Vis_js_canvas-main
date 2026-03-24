@@ -1,0 +1,3257 @@
+{
+  "meta": {
+    "id": "99f3d06f-074c-4c74-97c2-5f7da99e4a08",
+    "name": "test-smoke",
+    "domain": "custom",
+    "created_at": "2026-03-19T22:55:49.101457",
+    "updated_at": "2026-03-22T18:13:16.048877",
+    "version": 1,
+    "author": "",
+    "description": ""
+  },
+  "nodes": [
+    {
+      "id": "10f4f9d2",
+      "label": "Observe",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-19T22:55:49.208968",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "63c200ef",
+      "label": "Act",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-19T22:55:49.307701",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "de11f50f",
+      "label": "fff",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-19T21:57:47.754Z",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "f83dd130",
+      "label": "Cognitive fatigue",
+      "description": "Accumulated mental tiredness resulting from insufficient restorative sleep, reducing available cognitive resources.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "71da5d0a",
+      "label": "Redfuced prefrontal cortex activity",
+      "description": "Sleep deprivation suppresses activity in the prefrontal cortex, the brain region most responsible for executive function and sustained attention.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "dc35c391",
+      "label": "Increased adenosine levels",
+      "description": "Insufficient sleep prevents full clearance of adenosine, a sleep-pressure chemical that promotes drowsiness and impairs alertness.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "7c1986bd",
+      "label": "Disrupted sleep architecture",
+      "description": "Fragmentation or reduction of slow-wave and REM sleep stages that are critical for neural restoration and memory consolidation.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-20T14:09:04.932Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "aadf7bb5",
+      "label": "Raw Input",
+      "description": "The initial input provided to the system for processing.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "2bbf06ec",
+      "label": "Knowledge Classifier",
+      "description": "A classifier that determines whether input information is already present in the model's parametric knowledge.",
+      "type": "blackbox",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "a9fc6a6d",
+      "label": "Parametric Knowledge Test",
+      "description": "A probe that checks if the information exists within the model's trained parameters.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "6b9b09dd",
+      "label": "Perplexity Probe",
+      "description": "A measure of model uncertainty used to assess familiarity with the input.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "60f874c2",
+      "label": "Confidence Scoring",
+      "description": "Scoring mechanism that quantifies how confident the model is about the input information.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "5856bb35",
+      "label": "Known State",
+      "description": "The outcome when the classifier determines the information is within parametric knowledge.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "26f8d19f",
+      "label": "Unknown State",
+      "description": "The outcome when the classifier determines the information is outside parametric knowledge.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "7e8be9e0",
+      "label": "Prompt Activation",
+      "description": "Direct activation of a prompt when information is already known by the model.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "df65dcf0",
+      "label": "Delta Data Storage",
+      "description": "New or missing information is stored in an external graph or database for retrieval.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "32f1818a",
+      "label": "Incoming Information",
+      "description": "Raw text and metadata entering the system for processing.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "6cbebeba",
+      "label": "Capture Phase",
+      "description": "Initial ingestion of raw text and metadata into the pipeline.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "e95e96dc",
+      "label": "Analyze Phase",
+      "description": "Diffing against markdown files and Neo4j causal nodes, with duplicate detection and causal chain positioning.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "c8d11be8",
+      "label": "Knowledge Graph Context",
+      "description": "Existing Neo4j causal nodes and markdown corpus used as reference for contextualization.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "883f8fd1",
+      "label": "Orphan Notes / Duplicates",
+      "description": "Unconnected or redundant notes that degrade knowledge graph integrity.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "d43725d9",
+      "label": "Approve Phase",
+      "description": "User accepts, modifies, or rejects analyzed information via a temporary React UI.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "a24bf00c",
+      "label": "Contextualized Knowledge Entry",
+      "description": "Information successfully integrated into the knowledge graph without orphans or broken chains.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "67cc3ecb",
+      "label": "Speed vs Depth Tension",
+      "description": "Core trade-off between fast capture and thorough analysis that shapes MVP architecture.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "62778326",
+      "label": "Async Analysis + Batch Approve",
+      "description": "MVP design pattern of fast-in capture with asynchronous analysis and deferred batch approval.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "51a6d5b6",
+      "label": "Thinking",
+      "description": "The cognitive process of reasoning and mental deliberation",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "183501dd",
+      "label": "Situation Analysis",
+      "description": "The process of examining and understanding a given situation",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "d95efc1b",
+      "label": "Weighing Options",
+      "description": "Evaluating and comparing available courses of action",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "34d96475",
+      "label": "Anticipating Consequences",
+      "description": "Foreseeing potential outcomes of different choices",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "bf0cdac7",
+      "label": "Informed Decision",
+      "description": "A deliberate choice made based on analysis and reasoning",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "cf161a76",
+      "label": "Instinctive Reaction",
+      "description": "An automatic, unthought response to a stimulus",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "d81e5e70",
+      "label": "Problem Solved",
+      "description": "A state where a challenge or problem has been successfully addressed",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "47efd4c5",
+      "label": "Incoming Information",
+      "description": "Raw text and metadata entering the system for processing.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "15d8e7fa",
+      "label": "Capture Phase",
+      "description": "Initial ingestion of raw input before any analysis occurs.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "a06c14b9",
+      "label": "Analyze Phase",
+      "description": "Diffing against markdown files and Neo4j causal nodes, detecting duplicates and positioning causal chains.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "c914317c",
+      "label": "Knowledge Graph & Markdown Corpus",
+      "description": "Existing structured knowledge base used as context for evaluating new information.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "4d4cf1ad",
+      "label": "Orphan Notes & Duplicates",
+      "description": "Disconnected or redundant notes that degrade knowledge graph integrity.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "5942818e",
+      "label": "Approve Phase",
+      "description": "User-facing React UI step where captured and analyzed information is accepted, modified, or rejected.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "d6f11196",
+      "label": "Contextualized Knowledge Entry",
+      "description": "A new note or node properly integrated into the causal graph without broken links or duplication.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "ed919a5f",
+      "label": "Speed vs Depth Tension",
+      "description": "The core trade-off between fast capture and thorough analysis that shapes MVP architecture.",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "1f776ff0",
+      "label": "Async Batch Processing",
+      "description": "MVP architectural choice to capture fast, analyze asynchronously, and approve in batches.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "7e650b6f",
+      "label": "Prompt",
+      "description": "Initial input that triggers processing by an LLM",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "de67c811",
+      "label": "LLM Processing",
+      "description": "Edge local or reasoning LLM (e.g., Anthropic) that processes the prompt",
+      "type": "blackbox",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9330ac15",
+      "label": "Better Utilization",
+      "description": "Improved efficiency and usage of resources",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "deea2956",
+      "label": "Cost",
+      "description": "Financial cost associated with LLM usage",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "0498050a",
+      "label": "Observe",
+      "description": "Initial act of gathering raw information from the environment",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "f33d045b",
+      "label": "Knowledge",
+      "description": "Accumulated understanding derived from reasoning over summarized content",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9be3e255",
+      "label": "Evaluate",
+      "description": "Assessing observed information for relevance and quality",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "93657b9b",
+      "label": "Predict",
+      "description": "Forecasting outcomes based on evaluated information",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "b4c2e986",
+      "label": "Decide",
+      "description": "Choosing a course of action based on predictions",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "03bf2a46",
+      "label": "Act",
+      "description": "Executing the decided action in the environment",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "3dc2f621",
+      "label": "Feedback",
+      "description": "Result of action fed back into the observation loop",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "d029592a",
+      "label": "Assets",
+      "description": "Resources such as skills or money available to an agent",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "8d3c6a49",
+      "label": "Combined Output",
+      "description": "Synergistic result of combining skills and money",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "9ef19eca",
+      "label": "Gold",
+      "description": "Precious metal serving as a store of value and financial asset",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "55e51eff",
+      "label": "Mining Supply",
+      "description": "The quantity of gold produced through mining operations",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "ceaded91",
+      "label": "Portfolio Diversification",
+      "description": "Investment strategy of spreading assets to reduce risk, enabled by gold",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "04c35ed7",
+      "label": "Central Bank Reserves",
+      "description": "Gold holdings maintained by central banks as monetary reserves",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "f93ea079",
+      "label": "Real Interest Rates",
+      "description": "Interest rates adjusted for inflation that influence gold's attractiveness",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "88c178d0",
+      "from": "10f4f9d2",
+      "to": "63c200ef",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-19T22:55:54.744440",
+      "source": "user"
+    },
+    {
+      "id": "bf59ebfd",
+      "from": "10f4f9d2",
+      "to": "f83dd130",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "c6ba1fff",
+      "from": "f83dd130",
+      "to": "63c200ef",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "d89419dc",
+      "from": "10f4f9d2",
+      "to": "71da5d0a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "7b2f3074",
+      "from": "71da5d0a",
+      "to": "63c200ef",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "2a938d6d",
+      "from": "10f4f9d2",
+      "to": "dc35c391",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "ea0cdf47",
+      "from": "dc35c391",
+      "to": "63c200ef",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T08:17:16.350Z",
+      "source": "llm"
+    },
+    {
+      "id": "36f17ccb",
+      "from": "10f4f9d2",
+      "to": "7c1986bd",
+      "relation": "BLEBLE",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T14:09:04.932Z",
+      "source": "llm"
+    },
+    {
+      "id": "f95b926a",
+      "from": "7c1986bd",
+      "to": "f83dd130",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-20T14:09:04.932Z",
+      "source": "llm"
+    },
+    {
+      "id": "79146c4f",
+      "from": "aadf7bb5",
+      "to": "2bbf06ec",
+      "relation": "TRIGGERS",
+      "weight": 1,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "7ca38855",
+      "from": "2bbf06ec",
+      "to": "a9fc6a6d",
+      "relation": "ENABLES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "faf3860e",
+      "from": "2bbf06ec",
+      "to": "6b9b09dd",
+      "relation": "ENABLES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "58583854",
+      "from": "2bbf06ec",
+      "to": "60f874c2",
+      "relation": "ENABLES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "92d66abb",
+      "from": "a9fc6a6d",
+      "to": "5856bb35",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "21cb9af0",
+      "from": "a9fc6a6d",
+      "to": "26f8d19f",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "9f1b985f",
+      "from": "6b9b09dd",
+      "to": "60f874c2",
+      "relation": "ENABLES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "d468afd5",
+      "from": "60f874c2",
+      "to": "5856bb35",
+      "relation": "AMPLIFIES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "ddfd654f",
+      "from": "60f874c2",
+      "to": "26f8d19f",
+      "relation": "AMPLIFIES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "62a1b0b6",
+      "from": "5856bb35",
+      "to": "7e8be9e0",
+      "relation": "TRIGGERS",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "cb3ed884",
+      "from": "26f8d19f",
+      "to": "df65dcf0",
+      "relation": "TRIGGERS",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T11:49:47.533Z",
+      "source": "llm"
+    },
+    {
+      "id": "e4e85fa9",
+      "from": "32f1818a",
+      "to": "6cbebeba",
+      "relation": "TRIGGERS",
+      "weight": 1,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "fea11cf7",
+      "from": "6cbebeba",
+      "to": "e95e96dc",
+      "relation": "ENABLES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "d31bc48a",
+      "from": "c8d11be8",
+      "to": "e95e96dc",
+      "relation": "ENABLES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "0798aa29",
+      "from": "e95e96dc",
+      "to": "883f8fd1",
+      "relation": "REDUCES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "e3794e62",
+      "from": "e95e96dc",
+      "to": "d43725d9",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "d0c0ac04",
+      "from": "d43725d9",
+      "to": "a24bf00c",
+      "relation": "ENABLES",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "fa929a1a",
+      "from": "a24bf00c",
+      "to": "c8d11be8",
+      "relation": "AMPLIFIES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "7f877762",
+      "from": "67cc3ecb",
+      "to": "62778326",
+      "relation": "CAUSES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "33bddea0",
+      "from": "62778326",
+      "to": "6cbebeba",
+      "relation": "ENABLES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "80eed7a5",
+      "from": "62778326",
+      "to": "e95e96dc",
+      "relation": "ENABLES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:32:16.638Z",
+      "source": "llm"
+    },
+    {
+      "id": "d52a4f88",
+      "from": "51a6d5b6",
+      "to": "183501dd",
+      "relation": "ENABLES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "9968d237",
+      "from": "183501dd",
+      "to": "d95efc1b",
+      "relation": "TRIGGERS",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "c90d97f9",
+      "from": "d95efc1b",
+      "to": "34d96475",
+      "relation": "ENABLES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "60a13e62",
+      "from": "34d96475",
+      "to": "bf0cdac7",
+      "relation": "CAUSES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "8c44941b",
+      "from": "51a6d5b6",
+      "to": "cf161a76",
+      "relation": "REDUCES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "8437d5d1",
+      "from": "bf0cdac7",
+      "to": "d81e5e70",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "ce83b4a1",
+      "from": "cf161a76",
+      "to": "d81e5e70",
+      "relation": "REDUCES",
+      "weight": 0.6,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:40:10.199Z",
+      "source": "llm"
+    },
+    {
+      "id": "3b9d83f3",
+      "from": "47efd4c5",
+      "to": "15d8e7fa",
+      "relation": "TRIGGERS",
+      "weight": 1,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "5324167d",
+      "from": "15d8e7fa",
+      "to": "a06c14b9",
+      "relation": "ENABLES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "a7f82b1e",
+      "from": "c914317c",
+      "to": "a06c14b9",
+      "relation": "ENABLES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "f66e79bc",
+      "from": "a06c14b9",
+      "to": "4d4cf1ad",
+      "relation": "REDUCES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "09ae2671",
+      "from": "a06c14b9",
+      "to": "5942818e",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "6f5aa928",
+      "from": "5942818e",
+      "to": "d6f11196",
+      "relation": "CAUSES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "af32b492",
+      "from": "d6f11196",
+      "to": "c914317c",
+      "relation": "AMPLIFIES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "900be5a0",
+      "from": "ed919a5f",
+      "to": "1f776ff0",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "5fbc2301",
+      "from": "1f776ff0",
+      "to": "a06c14b9",
+      "relation": "ENABLES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "66cb36d1",
+      "from": "4d4cf1ad",
+      "to": "d6f11196",
+      "relation": "BLOCKS",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T12:59:44.858Z",
+      "source": "llm"
+    },
+    {
+      "id": "76cbfccb",
+      "from": "7e650b6f",
+      "to": "de67c811",
+      "relation": "TRIGGERS",
+      "weight": 1,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "10a07a4d",
+      "from": "de67c811",
+      "to": "9330ac15",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "9a339600",
+      "from": "9330ac15",
+      "to": "deea2956",
+      "relation": "REDUCES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "b0f0bb50",
+      "from": "0498050a",
+      "to": "9be3e255",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "e597179e",
+      "from": "9be3e255",
+      "to": "93657b9b",
+      "relation": "ENABLES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "b602baf6",
+      "from": "93657b9b",
+      "to": "b4c2e986",
+      "relation": "ENABLES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "4a60fae4",
+      "from": "b4c2e986",
+      "to": "03bf2a46",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "932c61f8",
+      "from": "03bf2a46",
+      "to": "3dc2f621",
+      "relation": "CAUSES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "3eb8f5cc",
+      "from": "3dc2f621",
+      "to": "0498050a",
+      "relation": "TRIGGERS",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "a02e1c19",
+      "from": "0498050a",
+      "to": "f33d045b",
+      "relation": "ENABLES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "751f8a59",
+      "from": "f33d045b",
+      "to": "b4c2e986",
+      "relation": "AMPLIFIES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "8eac7c75",
+      "from": "d029592a",
+      "to": "8d3c6a49",
+      "relation": "CAUSES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "c929505f",
+      "from": "f33d045b",
+      "to": "d029592a",
+      "relation": "AMPLIFIES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:10:32.973Z",
+      "source": "llm"
+    },
+    {
+      "id": "3e2beb88",
+      "from": "55e51eff",
+      "to": "9ef19eca",
+      "relation": "ENABLES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm"
+    },
+    {
+      "id": "c50a62ff",
+      "from": "9ef19eca",
+      "to": "ceaded91",
+      "relation": "ENABLES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm"
+    },
+    {
+      "id": "78afb824",
+      "from": "04c35ed7",
+      "to": "9ef19eca",
+      "relation": "AMPLIFIES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm"
+    },
+    {
+      "id": "92d2fc3e",
+      "from": "f93ea079",
+      "to": "9ef19eca",
+      "relation": "REDUCES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-22T13:37:01.862Z",
+      "source": "llm"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-19T22:55:49.208973",
+      "action": "node_add",
+      "actor": "cli",
+      "payload": {
+        "node_id": "10f4f9d2",
+        "label": "Poor sleep"
+      }
+    },
+    {
+      "timestamp": "2026-03-19T22:55:49.307705",
+      "action": "node_add",
+      "actor": "cli",
+      "payload": {
+        "node_id": "63c200ef",
+        "label": "Low focus"
+      }
+    },
+    {
+      "timestamp": "2026-03-19T22:55:54.744444",
+      "action": "edge_add",
+      "actor": "cli",
+      "payload": {
+        "edge_id": "88c178d0"
+      }
+    },
+    {
+      "timestamp": "2026-03-19T21:57:47.756Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "de11f50f"
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:06:59.658Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "de11f50f",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:17:16.350Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "f83dd130"
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:17:16.350Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "71da5d0a"
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:17:16.350Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "dc35c391"
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:43:24.103Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "88c178d0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-20T08:44:03.978Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "88c178d0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-20T14:08:08.305Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "88c178d0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-20T14:09:04.932Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "7c1986bd"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T08:44:32.780Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "88c178d0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T08:45:02.809Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "71da5d0a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:32:45.040Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "dc35c391",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:32:48.170Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "7c1986bd",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:32:51.457Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "f83dd130",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "aadf7bb5"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "2bbf06ec"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a9fc6a6d"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "6b9b09dd"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "60f874c2"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "5856bb35"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "26f8d19f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "7e8be9e0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "df65dcf0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "79146c4f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "7ca38855"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "faf3860e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "58583854"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "92d66abb"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "21cb9af0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "9f1b985f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d468afd5"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "ddfd654f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "62a1b0b6"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T11:49:47.533Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "cb3ed884"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "aadf7bb5",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "2bbf06ec",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "a9fc6a6d",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "6b9b09dd",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "60f874c2",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "5856bb35",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "26f8d19f",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "7e8be9e0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:26:10.684Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "df65dcf0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "32f1818a"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "6cbebeba"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "e95e96dc"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "c8d11be8"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "883f8fd1"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d43725d9"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a24bf00c"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "67cc3ecb"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "62778326"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e4e85fa9"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "fea11cf7"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d31bc48a"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "0798aa29"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e3794e62"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d0c0ac04"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "fa929a1a"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "7f877762"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "33bddea0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:32:16.638Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "80eed7a5"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "32f1818a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "6cbebeba",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "e95e96dc",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "c8d11be8",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "883f8fd1",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "d43725d9",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "a24bf00c",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "67cc3ecb",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:38:42.999Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "62778326",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "51a6d5b6"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "183501dd"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d95efc1b"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "34d96475"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "bf0cdac7"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "cf161a76"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d81e5e70"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "d52a4f88"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "9968d237"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c90d97f9"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "60a13e62"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "8c44941b"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "8437d5d1"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:40:10.199Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "ce83b4a1"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:41:01.862Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "bf0cdac7",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:41:01.862Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "cf161a76",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:41:01.862Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "d81e5e70",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:41:26.259Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "10f4f9d2",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:41:26.259Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "63c200ef",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "47efd4c5"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "15d8e7fa"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a06c14b9"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "c914317c"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "4d4cf1ad"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "5942818e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d6f11196"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "ed919a5f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "1f776ff0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "3b9d83f3"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "5324167d"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a7f82b1e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "f66e79bc"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "09ae2671"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "6f5aa928"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "af32b492"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "900be5a0"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "5fbc2301"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T12:59:44.858Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "66cb36d1"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "47efd4c5",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "15d8e7fa",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "a06c14b9",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "c914317c",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "4d4cf1ad",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "5942818e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "d6f11196",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "ed919a5f",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:05:45.433Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "1f776ff0",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "7e650b6f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "de67c811"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9330ac15"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "deea2956"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "0498050a"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "f33d045b"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9be3e255"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "93657b9b"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "b4c2e986"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "03bf2a46"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "3dc2f621"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "d029592a"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "8d3c6a49"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "76cbfccb"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "10a07a4d"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "9a339600"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "b0f0bb50"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "e597179e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "b602baf6"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "4a60fae4"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "932c61f8"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "3eb8f5cc"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "a02e1c19"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "751f8a59"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "8eac7c75"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:10:32.973Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c929505f"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "7e650b6f",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "de67c811",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "9330ac15",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "deea2956",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0498050a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "f33d045b",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "9be3e255",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "93657b9b",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "b4c2e986",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "03bf2a46",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "3dc2f621",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "d029592a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:11:59.173Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "8d3c6a49",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "9ef19eca"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "55e51eff"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "ceaded91"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "04c35ed7"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "f93ea079"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "3e2beb88"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c50a62ff"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "78afb824"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T13:37:01.862Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "92d2fc3e"
+      }
+    },
+    {
+      "timestamp": "2026-03-22T17:13:08.753Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "51a6d5b6",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T17:13:08.753Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "183501dd",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T17:13:08.753Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "d95efc1b",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-22T17:13:08.753Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "34d96475",
+        "deprecated": true
+      }
+    }
+  ]
+}
