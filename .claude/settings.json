@@ -16,7 +16,8 @@
       "Bash(python3 -c \"import sys,json; [print\\(c[''name''], ''| active:'', c[''active'']\\) for c in json.load\\(sys.stdin\\)[''chains'']]\")",
       "Bash(python3 cli.py open chains/sleep-cognition.causal.json)",
       "Bash(python3 -c \":*)",
-      "Bash(python3 cli.py reset-demo)"
+      "Bash(python3 cli.py reset-demo)",
+      "Bash(git add:*)"
     ]
   }
 }

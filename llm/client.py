@@ -7,7 +7,7 @@ import anthropic
 from llm.prompts import SYSTEM_BASE
 
 _MODEL = "claude-sonnet-4-6"
-_MAX_TOKENS = 1000
+_MAX_TOKENS = 4000
 
 
 def _strip_markdown(text: str) -> str:
