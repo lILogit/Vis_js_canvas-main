@@ -1,0 +1,384 @@
+{
+  "meta": {
+    "id": "8fafafee",
+    "name": "Cognitive process",
+    "domain": "cognition",
+    "created_at": "2026-03-25T10:33:01.570449",
+    "updated_at": "2026-03-25T10:59:09.084597",
+    "version": 1,
+    "author": "",
+    "description": ""
+  },
+  "nodes": [
+    {
+      "id": "11119e6a",
+      "label": "Asset Inventory",
+      "description": "skills, income, outcome, passive, active, local resources, etc.",
+      "type": "concept",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:33:49.361Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "6287ac8f",
+      "label": "Activity Planner",
+      "description": "GPS location trace person",
+      "type": "blackbox",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:34:54.970Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "15cdeeed",
+      "label": "causal process",
+      "description": "",
+      "type": "concept",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:36:18.624Z",
+      "source": "user",
+      "deprecated": true,
+      "flagged": false
+    },
+    {
+      "id": "f9409b9a",
+      "label": "Location Data Aggregation",
+      "description": "The accumulated GPS trace data is processed and structured into meaningful location history, representing where a person has been, how long, and in what sequence.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "a2a7dd65",
+      "label": "Movement Pattern Recognition",
+      "description": "Analyzes aggregated location data to identify behavioral patterns such as routines, anomalies, or deviations from expected activity plans.",
+      "type": "blackbox",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "26631879",
+      "label": "Risk or Compliance Assessment",
+      "description": "Evaluates whether the tracked person's movements comply with predefined rules, constraints, or risk thresholds that Asset Control is designed to enforce.",
+      "type": "decision",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "66809c9f",
+      "label": "Person-Asset Association Mapping",
+      "description": "The task of linking tracked persons to specific assets they are responsible for, authorized to access, or whose custody is being monitored.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": true
+    },
+    {
+      "id": "6b090993",
+      "label": "Activity Schedule vs. Actual Deviation",
+      "description": "A detectable event where the person's real-world GPS trace diverges from their planned activity schedule, triggering a potential asset control response.",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "0ee0ed6c",
+      "from": "11119e6a",
+      "to": "6287ac8f",
+      "relation": "ENABLES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:35:35.085Z",
+      "source": "user"
+    },
+    {
+      "id": "73f7ece0",
+      "from": "6287ac8f",
+      "to": "f9409b9a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "466b9bb8",
+      "from": "f9409b9a",
+      "to": "11119e6a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "c7b4baac",
+      "from": "6287ac8f",
+      "to": "a2a7dd65",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "f503185f",
+      "from": "a2a7dd65",
+      "to": "11119e6a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "e401b5a1",
+      "from": "6287ac8f",
+      "to": "26631879",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "d9bf9937",
+      "from": "26631879",
+      "to": "11119e6a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "d76d0092",
+      "from": "6287ac8f",
+      "to": "66809c9f",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "546c6987",
+      "from": "66809c9f",
+      "to": "11119e6a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "a647ec1f",
+      "from": "6287ac8f",
+      "to": "6b090993",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    },
+    {
+      "id": "f30d1b6f",
+      "from": "6b090993",
+      "to": "11119e6a",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T09:41:12.034Z",
+      "source": "llm"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-25T09:33:49.361Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "11119e6a"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:34:54.970Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "6287ac8f"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:35:35.085Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0ee0ed6c"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:36:18.624Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "15cdeeed"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:41:12.034Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "f9409b9a"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:41:12.034Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "a2a7dd65"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:41:12.034Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "26631879"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:41:12.034Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "66809c9f"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:41:12.034Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "6b090993"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T09:59:06.086Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "15cdeeed",
+        "deprecated": true
+      }
+    }
+  ]
+}

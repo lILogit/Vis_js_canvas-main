@@ -17,7 +17,28 @@
       "Bash(python3 cli.py open chains/sleep-cognition.causal.json)",
       "Bash(python3 -c \":*)",
       "Bash(python3 cli.py reset-demo)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(ls /home/nemo/Documents/Vis_js_canvas-main/chains/*.causal.json)",
+      "Bash(lsof -ti:7331)",
+      "Bash(xargs kill:*)",
+      "Bash(curl -s http://localhost:7331/api/llm-status)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST \"https://api.z.ai/v1/messages\" -H \"x-api-key: 64082325ee144182ad1d0b116b97803a.pTTUZspZdbkBgeyG\" -H \"content-type: application/json\" -H \"anthropic-version: 2023-06-01\" -d '{\"\"model\"\":\"\"claude-sonnet-4-5\"\",\"\"max_tokens\"\":4,\"\"system\"\":\"\"ping\"\",\"\"messages\"\":[{\"\"role\"\":\"\"user\"\",\"\"content\"\":\"\"hi\"\"}]}')",
+      "Bash(curl -sv -X POST \"https://api.z.ai/api/v1/messages\" -H \"x-api-key: 64082325ee144182ad1d0b116b97803a.pTTUZspZdbkBgeyG\" -H \"content-type: application/json\" -H \"anthropic-version: 2023-06-01\" -d '{\"\"\"\"model\"\"\"\":\"\"\"\"claude-sonnet-4-5\"\"\"\",\"\"\"\"max_tokens\"\"\"\":4,\"\"\"\"system\"\"\"\":\"\"\"\"ping\"\"\"\",\"\"\"\"messages\"\"\"\":[{\"\"\"\"role\"\"\"\":\"\"\"\"user\"\"\"\",\"\"\"\"content\"\"\"\":\"\"\"\"hi\"\"\"\"}]}')",
+      "Bash(curl -s -X POST \"https://api.z.ai/api/v1/messages\" -H \"x-api-key: 64082325ee144182ad1d0b116b97803a.pTTUZspZdbkBgeyG\" -H \"content-type: application/json\" -H \"anthropic-version: 2023-06-01\" -d '{\"\"model\"\":\"\"claude-3-5-sonnet-20240620\"\",\"\"max_tokens\"\":4,\"\"system\"\":\"\"ping\"\",\"\"messages\"\":[{\"\"role\"\":\"\"user\"\",\"\"content\"\":\"\"hi\"\"}]}')",
+      "Bash(curl -s \"https://api.z.ai/api/v1/models\" -H \"x-api-key: 64082325ee144182ad1d0b116b97803a.pTTUZspZdbkBgeyG\" -H \"anthropic-version: 2023-06-01\")",
+      "Bash(curl -s -X POST \"https://api.z.ai/api/v1/messages\" -H \"x-api-key: 64082325ee144182ad1d0b116b97803a.pTTUZspZdbkBgeyG\" -H \"content-type: application/json\" -H \"anthropic-version: 2023-06-01\" -d '{\"\"model\"\":\"\"claude-sonnet-4-6\"\",\"\"max_tokens\"\":4,\"\"system\"\":\"\"ping\"\",\"\"messages\"\":[{\"\"role\"\":\"\"user\"\",\"\"content\"\":\"\"hi\"\"}]}')",
+      "Bash(for m:*)",
+      "Bash(do echo:*)",
+      "Bash(python3 -c \"import anthropic; c = anthropic.Anthropic\\(base_url=''https://api.z.ai/api/v1'', api_key=''test''\\); print\\(c.base_url\\)\")",
+      "Bash(python3 -c \"import openai; print\\(openai.__version__\\)\")",
+      "Bash(pip install:*)",
+      "Bash(curl -s -X POST http://localhost:7331/api/llm-provider -H \"content-type: application/json\" -d '{\"\"provider\"\":\"\"openai\"\"}')",
+      "Bash(curl -s http://localhost:7331/api/chain)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d[''''meta''''][''''name'''']\\)\")",
+      "Bash(curl -s -X POST http://localhost:7331/api/chain/new -H \"Content-Type: application/json\" -d '{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"domain\"\"\"\":\"\"\"\"test\"\"\"\"}')",
+      "Bash(python3 -c \"import sys,json; print\\(json.load\\(sys.stdin\\)\\)\")",
+      "Bash(curl -s -X POST http://localhost:7331/api/chain/delete -H \"Content-Type: application/json\" -d '{\"\"\"\"filename\"\"\"\":\"\"\"\"test.causal.json\"\"\"\"}')",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''deleted''''\\) or d.get\\(''''error''''\\)\\)\")"
     ]
   }
 }
