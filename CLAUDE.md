@@ -163,9 +163,11 @@ Free text body.
 
 ## Browser UI features
 
-Toolbar buttons: `⎇ Chain` (chain switcher modal) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `Save ⌘S`
+Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `Save ⌘S`
 
-**Chain switcher** — lists all non-seed chains from `GET /api/chains` as cards; clicking one calls `POST /api/chain/switch` and re-renders the graph without page reload.
+**Chain switcher** — lists all non-seed chains from `GET /api/chains` as cards; clicking one calls `POST /api/chain/switch` and re-renders the graph without page reload. Hover a card to reveal a 🗑 delete button (backs up then removes the file; seed files are protected).
+
+**New chain** — `＋ New` button opens a modal with Name + Domain fields; calls `POST /api/chain/new`, saves an empty chain and switches to it immediately.
 
 **Reset demo** — `↺ Reset demo` button calls `POST /api/demo/reset`; backs up current chain then restores from `*-seed.causal.json`. Seed files are excluded from the chain switcher and cannot be switched to directly.
 
@@ -173,9 +175,13 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `↺ Reset demo` | `+ Node
 
 **Knowledge Decomposer** (`⊕ Decompose` → opens `/decompose` in new tab) — standalone page that runs the `TEXT_TO_CHAIN` pipeline on pasted text. Nodes are coloured by epistemic class instead of confidence: `KK` blue (abstract parametric mechanism), `KU` yellow (known category, specific instance value), `UU` red (post-cutoff/proprietary, flagged for human review), `UK` purple (cross-domain bridge pattern). Result can be saved as a new `.causal.json` chain via `Save as chain`.
 
-**Polygon lasso** — overlay canvas, click to add points, dblclick to finish; ray-casting hit test against all node positions; `softDeleteNodesBatch()` soft-deletes all enclosed nodes.
+**Summary modal** — `📋 Summary` button calls `POST /llm/summarize`; returns a structured briefing (headline, goal, critical path, tasks, decisions, risks, open questions) rendered in colour-coded sections. Operates on selected nodes if any are selected, otherwise the full chain.
 
-**Keyboard shortcuts:** `⌘S`/`Ctrl+S` save | `Delete`/`Backspace` soft-delete selected | `Escape` cancel lasso / close any overlay | `Enter` finish lasso polygon (≥3 points)
+**Polygon lasso** — overlay canvas; click to place vertices, **double-click** or **Enter** to close polygon and select all enclosed nodes (persists selection); `Escape` cancels. Selection can then be used with Find gaps / Suggest / Summary (scoped to selected nodes) or deleted with `Delete`/`Backspace`. Multi-node selection also works with **Ctrl+click** (or **Cmd+click**).
+
+**Selection-scoped LLM features** — `Find gaps`, `Suggest`, and `📋 Summary` check `network.getSelectedNodes()` before calling the server. If ≥1 real nodes are selected, only that subgraph (selected nodes + edges between them) is sent to the LLM; the loading message shows the count. Deselect all to revert to full-chain scope.
+
+**Keyboard shortcuts:** `⌘S`/`Ctrl+S` save | `Delete`/`Backspace` soft-delete selected | `Escape` cancel lasso / close any overlay | `Enter` finish lasso polygon (≥3 points) | `Ctrl+click` / `Cmd+click` multi-select nodes
 
 ## Key invariants
 
@@ -197,7 +203,7 @@ Model: `claude-sonnet-4-6` | Max tokens: 1000 per call
 All prompts are named constants in `llm/prompts.py`. System prompt always includes: `"Return only valid JSON. No preamble. No markdown."`
 
 CLI enrichment modes (`python3 cli.py enrich <file> --mode`): `full | gaps | weights | scope`
-Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both use preview flow.
+Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both use preview flow. `📋 Summary` uses a separate read-only modal (no preview nodes). All three are selection-scoped when nodes are selected (`POST /llm/enrich-preview` and `POST /llm/summarize` accept optional `node_ids`; server calls `_subgraph()` to filter chain data).
 
 ## .causal.json format
 

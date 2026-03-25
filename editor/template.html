@@ -12,6 +12,7 @@
 <!-- ── Toolbar ──────────────────────────────────────────────────────────── -->
 <div id="toolbar">
   <button id="btn-switch-chain" title="Switch chain">⎇ Chain</button>
+  <button id="btn-new-chain" title="Create a new empty chain">＋ New</button>
   <span id="chain-name" class="chain-name">Loading...</span>
   <button id="btn-reset-demo" class="danger-dim" title="Restore demo chain to its initial seed state">↺ Reset demo</button>
   <div class="sep"></div>
@@ -24,6 +25,7 @@
   <button id="btn-enrich">Find gaps</button>
   <button id="btn-suggest">Suggest</button>
   <button id="btn-critique">Critique</button>
+  <button id="btn-summarize">📋 Summary</button>
   <a href="/decompose" id="btn-decompose" class="btn-toolbar" target="_blank">⊕ Decompose</a>
   <button id="btn-note">📝 Note</button>
   <div class="sep"></div>
@@ -45,6 +47,16 @@
   <!-- Info panel -->
   <div id="info-panel">
     <h3>Inspector</h3>
+    <div id="llm-status-bar">
+      <span id="llm-status-dot" class="llm-dot"></span>
+      <select id="llm-provider-select" title="Active LLM provider">
+        <option value="anthropic">Anthropic</option>
+        <option value="openai">OpenAI</option>
+        <option value="zai">Z.AI</option>
+      </select>
+      <span id="llm-status-label">checking…</span>
+      <button id="btn-llm-recheck" title="Re-check LLM availability">↺</button>
+    </div>
     <div id="info-content">
       <p style="color:#666;font-size:12px;padding:8px 0">Click a node or edge to inspect.</p>
     </div>
@@ -261,6 +273,42 @@
       <button id="me-apply" class="success">Apply  ↵</button>
       <button id="me-cancel">Cancel  Esc</button>
     </div>
+  </div>
+</div>
+
+<!-- ── New chain modal ───────────────────────────────────────────── -->
+<div id="new-chain-overlay">
+  <div id="new-chain-panel">
+    <div class="new-chain-header">
+      <h3>New Chain</h3>
+      <button id="btn-new-chain-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div class="note-field">
+      <label>Name</label>
+      <input type="text" id="nc-name" maxlength="80" placeholder="My Chain">
+    </div>
+    <div class="note-field">
+      <label>Domain <span class="note-hint">(optional)</span></label>
+      <input type="text" id="nc-domain" maxlength="40" placeholder="e.g. science, health, business">
+    </div>
+    <div class="note-actions" style="margin-top:4px">
+      <button id="btn-nc-create" class="success">Create</button>
+      <button id="btn-nc-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Summary modal ──────────────────────────────────────────────── -->
+<div id="summary-overlay">
+  <div id="summary-panel">
+    <div class="summary-header">
+      <div>
+        <div class="summary-title">Chain Summary</div>
+        <div id="summary-headline" class="summary-headline"></div>
+      </div>
+      <button id="btn-summary-close" class="summary-close-btn">✕</button>
+    </div>
+    <div id="summary-body" class="summary-body"></div>
   </div>
 </div>
 

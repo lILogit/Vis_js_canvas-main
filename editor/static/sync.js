@@ -92,8 +92,8 @@ export async function llmContradict(observation) {
   return _llmPost('/llm/contradict', { observation });
 }
 
-export async function llmEnrichPreview(mode = 'gaps') {
-  return _llmPost('/llm/enrich-preview', { mode });
+export async function llmEnrichPreview(mode = 'gaps', nodeIds = null) {
+  return _llmPost('/llm/enrich-preview', { mode, ...(nodeIds ? { node_ids: nodeIds } : {}) });
 }
 
 export async function llmImportText(text) {
@@ -102,6 +102,32 @@ export async function llmImportText(text) {
 
 export async function llmIngestNote(noteData) {
   return _llmPost('/llm/ingest-note', noteData);
+}
+
+export async function createChain(name, domain) {
+  const resp = await fetch('/api/chain/new', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, domain }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function deleteChain(filename) {
+  const resp = await fetch('/api/chain/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function llmSummarize(nodeIds = null) {
+  return _llmPost('/llm/summarize', nodeIds ? { node_ids: nodeIds } : {});
 }
 
 export async function saveNewChain(payload) {

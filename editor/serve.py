@@ -30,6 +30,15 @@ _chain_lock = threading.Lock()
 _last_modified: float = 0.0
 
 
+def _subgraph(chain_data: dict, node_ids: list) -> dict:
+    """Return a copy of chain_data filtered to the given node ids and edges between them."""
+    id_set = set(node_ids)
+    nodes = [n for n in chain_data.get("nodes", []) if n.get("id") in id_set]
+    edges = [e for e in chain_data.get("edges", [])
+             if e.get("from") in id_set and e.get("to") in id_set]
+    return {"meta": chain_data.get("meta", {}), "nodes": nodes, "edges": edges}
+
+
 def _mime(path: str) -> str:
     ext = os.path.splitext(path)[1].lower()
     return {
@@ -154,6 +163,10 @@ class Handler(BaseHTTPRequestHandler):
             self._api_get_chain()
         elif path == "/api/chains":
             self._api_list_chains()
+        elif path == "/api/llm-status":
+            self._api_llm_status()
+        elif path == "/api/llm-provider":
+            self._api_get_llm_provider()
         elif path.startswith("/static/"):
             rel = path[len("/static/"):]
             self._serve_file(os.path.join(_STATIC_DIR, rel))
@@ -171,8 +184,14 @@ class Handler(BaseHTTPRequestHandler):
             self._api_demo_reset()
         elif path == "/api/chain/save-new":
             self._api_save_new_chain()
+        elif path == "/api/chain/new":
+            self._api_new_chain()
+        elif path == "/api/chain/delete":
+            self._api_delete_chain()
         elif path == "/api/validate":
             self._api_validate()
+        elif path == "/api/llm-provider":
+            self._api_set_llm_provider()
         elif path == "/llm/ask":
             self._llm_ask()
         elif path == "/llm/explain":
@@ -189,6 +208,8 @@ class Handler(BaseHTTPRequestHandler):
             self._llm_import_text()
         elif path == "/llm/ingest-note":
             self._llm_ingest_note()
+        elif path == "/llm/summarize":
+            self._llm_summarize()
         else:
             self._send_error("Not found", 404)
 
@@ -407,6 +428,83 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             self._send_error(str(exc))
 
+    def _api_new_chain(self):
+        """Create and switch to a new empty chain."""
+        global _chain, _chain_path, _last_modified
+        from datetime import datetime
+        body = self._body()
+        name = body.get("name", "").strip() or "Untitled"
+        domain = body.get("domain", "custom").strip() or "custom"
+        try:
+            chains_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chains")
+            slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-') or 'chain'
+            filename = f"{slug}.causal.json"
+            path = os.path.join(chains_dir, filename)
+            counter = 1
+            while os.path.exists(path):
+                filename = f"{slug}-{counter}.causal.json"
+                path = os.path.join(chains_dir, filename)
+                counter += 1
+            import chain.schema as schema
+            now = datetime.now().isoformat()
+            meta = schema.ChainMeta(
+                id=uuid.uuid4().hex[:8], name=name, domain=domain,
+                created_at=now, updated_at=now, version=1, author="",
+                description="",
+            )
+            new_chain = schema.CausalChain(meta=meta, nodes=[], edges=[], history=[])
+            chain_io.save(new_chain, path)
+            with _chain_lock:
+                _chain = new_chain
+                _chain_path = path
+                _last_modified = os.path.getmtime(path)
+            self._send_json({"filename": filename, "chain": chain_io.to_dict(new_chain)})
+        except Exception as exc:
+            self._send_error(str(exc))
+
+    def _api_delete_chain(self):
+        """Move a chain file to backups and, if active, switch to another chain."""
+        global _chain, _chain_path, _last_modified
+        import shutil
+        body = self._body()
+        filename = body.get("filename", "").strip()
+        if not filename:
+            self._send_error("No filename provided")
+            return
+        if filename.endswith("-seed.causal.json"):
+            self._send_error("Seed files cannot be deleted", 400)
+            return
+        chains_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chains")
+        path = os.path.join(chains_dir, filename)
+        if not os.path.isfile(path):
+            self._send_error(f"Chain not found: {filename}", 404)
+            return
+        with _chain_lock:
+            try:
+                chain_io.backup(path)  # move to backups before deleting
+                os.remove(path)
+                was_active = _chain_path and os.path.abspath(_chain_path) == os.path.abspath(path)
+                next_chain_data = None
+                if was_active:
+                    # Switch to first remaining non-seed chain, or null
+                    remaining = sorted(
+                        f for f in os.listdir(chains_dir)
+                        if f.endswith(".causal.json") and not f.endswith("-seed.causal.json")
+                    )
+                    if remaining:
+                        next_path = os.path.join(chains_dir, remaining[0])
+                        _chain = chain_io.load(next_path)
+                        _chain_path = next_path
+                        _last_modified = os.path.getmtime(next_path)
+                        next_chain_data = chain_io.to_dict(_chain)
+                    else:
+                        _chain = None
+                        _chain_path = None
+                        _last_modified = 0
+                self._send_json({"deleted": filename, "next_chain": next_chain_data})
+            except Exception as exc:
+                self._send_error(str(exc))
+
     # ── LLM endpoints ─────────────────────────────────────────────────────────
 
     def _llm_ask(self):
@@ -501,8 +599,11 @@ class Handler(BaseHTTPRequestHandler):
     def _llm_enrich_preview(self):
         body = self._body()
         mode = body.get("mode", "gaps")
+        node_ids = body.get("node_ids") or []
         with _chain_lock:
             chain_data = chain_io.to_dict(_chain) if _chain else {}
+        if node_ids:
+            chain_data = _subgraph(chain_data, node_ids)
         try:
             from llm import client as llm_client
             from llm.prompts import ENRICH_GAPS, SUGGEST_NODES, CRITIQUE_CHAIN
@@ -668,6 +769,96 @@ class Handler(BaseHTTPRequestHandler):
             })
         except Exception as exc:
             self._send_error(str(exc))
+
+
+    def _llm_summarize(self):
+        body = self._body()
+        node_ids = body.get("node_ids") or []
+        with _chain_lock:
+            chain_data = chain_io.to_dict(_chain) if _chain else {}
+        if node_ids:
+            chain_data = _subgraph(chain_data, node_ids)
+        try:
+            from llm import client as llm_client
+            from llm.prompts import SUMMARIZE_CHAIN
+            prompt = SUMMARIZE_CHAIN.format(chain_json=json.dumps(chain_data, indent=2))
+            result = llm_client.call(prompt)
+            self._send_json(result)
+        except Exception as exc:
+            self._send_error(str(exc))
+
+    def _api_get_llm_provider(self):
+        self._send_json({
+            "provider": os.environ.get("LLM_PROVIDER", "anthropic").lower(),
+            "providers": ["anthropic", "openai", "zai"],
+        })
+
+    def _api_set_llm_provider(self):
+        body = self._body()
+        provider = body.get("provider", "").lower()
+        if provider not in ("anthropic", "zai", "openai"):
+            self._send_error(f"Unknown provider: {provider}")
+            return
+        os.environ["LLM_PROVIDER"] = provider
+        self._send_json({"provider": provider})
+
+    def _api_llm_status(self):
+        """Return active provider info and do a minimal ping to verify connectivity."""
+        provider = os.environ.get("LLM_PROVIDER", "anthropic").lower()
+        if provider == "zai":
+            key_var = "ZAI_API_KEY"
+            label = "Z.AI"
+        elif provider == "openai":
+            key_var = "OPENAI_API_KEY"
+            label = "OpenAI"
+        else:
+            key_var = "ANTHROPIC_API_KEY"
+            label = "Anthropic"
+
+        api_key = os.environ.get(key_var)
+        if not api_key:
+            self._send_json({"provider": label, "ok": False, "error": f"{key_var} not set"})
+            return
+
+        try:
+            if provider in ("zai", "openai"):
+                from openai import OpenAI as _OAI
+                if provider == "zai":
+                    from llm.client import _ZAI_BASE_URL, _ZAI_MODEL
+                    base_url, model = _ZAI_BASE_URL, _ZAI_MODEL
+                else:
+                    from llm.client import _OPENAI_BASE_URL, _OPENAI_MODEL
+                    base_url, model = _OPENAI_BASE_URL, _OPENAI_MODEL
+                c = _OAI(base_url=base_url, api_key=api_key)
+                token_kwarg = "max_completion_tokens" if provider == "openai" else "max_tokens"
+                resp = c.chat.completions.create(
+                    model=model,
+                    **{token_kwarg: 4},
+                    messages=[
+                        {"role": "system", "content": "ping"},
+                        {"role": "user", "content": "hi"},
+                    ],
+                )
+                self._send_json({"provider": label, "ok": True,
+                                 "reply": resp.choices[0].message.content.strip()})
+            else:
+                import anthropic as _anthropic
+                from llm.client import _MODEL
+                c = _anthropic.Anthropic(api_key=api_key)
+                msg = c.messages.create(
+                    model=_MODEL,
+                    max_tokens=4,
+                    system="ping",
+                    messages=[{"role": "user", "content": "hi"}],
+                )
+                self._send_json({"provider": label, "ok": True, "reply": msg.content[0].text.strip()})
+        except Exception as exc:
+            # RateLimitError with balance message → API reachable, key valid, no credits
+            msg = str(exc)
+            if "balance" in msg.lower() or "recharge" in msg.lower():
+                self._send_json({"provider": label, "ok": True, "reply": "API reachable (no credits)"})
+            else:
+                self._send_json({"provider": label, "ok": False, "error": msg})
 
 
 def start(chain_path: str, port: int = 7331, open_browser: bool = True):

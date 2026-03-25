@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote } from './sync.js';
+import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, createChain, deleteChain } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -203,6 +203,29 @@ let _lassoMousePos = null;
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────
 
+async function checkLlmStatus() {
+  const dot   = document.getElementById('llm-status-dot');
+  const label = document.getElementById('llm-status-label');
+  dot.className   = 'llm-dot spin';
+  label.textContent = 'LLM: checking…';
+  try {
+    const resp = await fetch('/api/llm-status');
+    const data = await resp.json();
+    if (data.ok) {
+      dot.className   = 'llm-dot ok';
+      label.textContent = `LLM: ${data.provider} — OK`;
+    } else {
+      dot.className   = 'llm-dot error';
+      label.textContent = `LLM: ${data.provider} — Failure`;
+      label.title = data.error || '';
+    }
+  } catch (e) {
+    dot.className   = 'llm-dot error';
+    label.textContent = 'LLM: unreachable';
+    label.title = String(e);
+  }
+}
+
 async function init() {
   chainData = await loadChain();
   renderGraph(chainData);
@@ -216,6 +239,23 @@ async function init() {
   setupKeyboard();
   setupSuggestionsPanel();
   setupLasso();
+
+  // Load current provider from server and sync the select
+  fetch('/api/llm-provider').then(r => r.json()).then(data => {
+    document.getElementById('llm-provider-select').value = data.provider;
+  });
+
+  document.getElementById('llm-provider-select').addEventListener('change', async e => {
+    await fetch('/api/llm-provider', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({provider: e.target.value}),
+    });
+    checkLlmStatus();
+  });
+
+  document.getElementById('btn-llm-recheck').addEventListener('click', checkLlmStatus);
+  checkLlmStatus();
 }
 
 function renderGraph(data) {
@@ -935,9 +975,11 @@ async function runEnrich(mode = 'gaps') {
   clearPreviewItems();
   document.getElementById('suggestions-overlay').classList.remove('visible');
 
-  showLlmLoading(`Analyzing chain (mode: ${mode})...`);
+  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
+  const scope = selIds.length ? `${selIds.length} selected node${selIds.length > 1 ? 's' : ''}` : 'chain';
+  showLlmLoading(`Analyzing ${scope} (mode: ${mode})...`);
   try {
-    const r = await llmEnrichPreview(mode);
+    const r = await llmEnrichPreview(mode, selIds.length ? selIds : null);
     _pendingSuggestions = r.suggestions || [];
 
     if (!_pendingSuggestions.length) {
@@ -1179,13 +1221,14 @@ function finishLasso() {
     return pos && pointInPolygon(pos.x, pos.y, canvasPoly);
   });
 
-  deactivateLasso();
+  deactivateLasso();  // must run before selectNodes — setOptions here would clear selection
 
   if (!matched.length) {
     setStatus('No nodes in selection');
     return;
   }
-  softDeleteNodesBatch(matched);
+  network.selectNodes(matched);
+  setStatus(`${matched.length} node${matched.length > 1 ? 's' : ''} selected — Delete to remove, or use Find Gaps / Suggest / Summary`);
 }
 
 async function softDeleteNodesBatch(ids) {
@@ -1275,6 +1318,9 @@ function setupToolbar() {
   document.getElementById('btn-enrich').addEventListener('click', () => runEnrich('gaps'));
   document.getElementById('btn-suggest').addEventListener('click', () => runEnrich('suggest'));
   document.getElementById('btn-critique').addEventListener('click', () => runEnrich('critique'));
+  document.getElementById('btn-summarize').addEventListener('click', runSummarize);
+  document.getElementById('btn-summary-close').addEventListener('click', () =>
+    document.getElementById('summary-overlay').classList.remove('visible'));
   document.getElementById('btn-lasso').addEventListener('click', () => {
     if (_lassoActive) deactivateLasso();
     else activateLasso();
@@ -1407,14 +1453,40 @@ function setupToolbar() {
       const { chains } = await listChains();
       list.innerHTML = chains.map(c => `
         <div class="chain-item${c.active ? ' active' : ''}" data-filename="${esc(c.filename)}">
-          <div>
+          <div class="chain-item-info">
             <div class="chain-item-name">${esc(c.name)}</div>
             <div class="chain-item-meta">${esc(c.domain)} · ${c.nodes}n / ${c.edges}e</div>
           </div>
-          <span class="chain-item-badge">${c.active ? '● active' : c.filename}</span>
+          <div class="chain-item-actions">
+            <span class="chain-item-badge">${c.active ? '● active' : c.filename}</span>
+            <button class="chain-item-del" data-filename="${esc(c.filename)}" title="Delete chain">🗑</button>
+          </div>
         </div>
       `).join('');
       list.querySelectorAll('.chain-item').forEach(el => {
+        // Delete button — stop propagation so it doesn't trigger switch
+        el.querySelector('.chain-item-del').addEventListener('click', async e => {
+          e.stopPropagation();
+          const filename = el.dataset.filename;
+          const name = el.querySelector('.chain-item-name').textContent;
+          if (!confirm(`Delete "${name}"? A backup will be saved.`)) return;
+          try {
+            const r = await deleteChain(filename);
+            if (r.next_chain) {
+              chainData = r.next_chain;
+              renderGraph(chainData);
+              document.getElementById('chain-name').textContent = r.next_chain.meta?.name || '';
+            }
+            // Refresh the list
+            el.remove();
+            setStatus('Deleted: ' + filename);
+            if (!list.querySelectorAll('.chain-item').length) {
+              list.innerHTML = '<div style="color:#666;font-size:12px;padding:8px">No chains.</div>';
+            }
+          } catch (err) {
+            setStatus('Delete failed: ' + err.message, 'error');
+          }
+        });
         el.addEventListener('click', async () => {
           const filename = el.dataset.filename;
           if (el.classList.contains('active')) { cswOverlay.classList.remove('visible'); return; }
@@ -1436,6 +1508,32 @@ function setupToolbar() {
     }
   });
   document.getElementById('btn-csw-close').addEventListener('click', () => cswOverlay.classList.remove('visible'));
+
+  // New chain modal
+  const ncOverlay = document.getElementById('new-chain-overlay');
+  function openNewChain() { ncOverlay.classList.add('visible'); document.getElementById('nc-name').focus(); }
+  function closeNewChain() { ncOverlay.classList.remove('visible'); }
+  document.getElementById('btn-new-chain').addEventListener('click', openNewChain);
+  document.getElementById('btn-new-chain-close').addEventListener('click', closeNewChain);
+  document.getElementById('btn-nc-cancel').addEventListener('click', closeNewChain);
+  document.getElementById('btn-nc-create').addEventListener('click', async () => {
+    const name = document.getElementById('nc-name').value.trim();
+    if (!name) { document.getElementById('nc-name').focus(); return; }
+    const domain = document.getElementById('nc-domain').value.trim() || 'custom';
+    closeNewChain();
+    setStatus('Creating chain…');
+    try {
+      const r = await createChain(name, domain);
+      chainData = r.chain;
+      renderGraph(chainData);
+      document.getElementById('chain-name').textContent = r.chain.meta?.name || name;
+      document.getElementById('nc-name').value = '';
+      document.getElementById('nc-domain').value = '';
+      setStatus('Created: ' + (r.chain.meta?.name || name));
+    } catch (e) {
+      setStatus('Create failed: ' + e.message, 'error');
+    }
+  });
 
   // Reset demo
   document.getElementById('btn-reset-demo').addEventListener('click', async () => {
@@ -1481,6 +1579,8 @@ function setupKeyboard() {
       document.getElementById('suggestions-overlay').classList.remove('visible');
       document.getElementById('note-overlay').classList.remove('visible');
       document.getElementById('chain-switcher-overlay').classList.remove('visible');
+      document.getElementById('new-chain-overlay').classList.remove('visible');
+      document.getElementById('summary-overlay').classList.remove('visible');
     }
     // Enter: finish lasso polygon
     if (e.key === 'Enter' && _lassoActive) {
@@ -1521,6 +1621,98 @@ function showContradictDialog(edgeId) {
     ).join('\n\n');
     showLlmResult(conflicts || JSON.stringify(r));
   }).catch(e => showLlmResult('Error: ' + e.message));
+}
+
+async function runSummarize() {
+  const overlay = document.getElementById('summary-overlay');
+  const body = document.getElementById('summary-body');
+  const headline = document.getElementById('summary-headline');
+  headline.textContent = '';
+
+  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
+  const scope = selIds.length ? `${selIds.length} selected node${selIds.length > 1 ? 's' : ''}` : null;
+  body.innerHTML = `<div class="summary-loading">${scope ? `Summarizing ${scope}…` : 'Generating summary…'}</div>`;
+  overlay.classList.add('visible');
+
+  try {
+    const r = await llmSummarize(selIds.length ? selIds : null);
+    headline.textContent = r.headline || '';
+    body.innerHTML = _renderSummary(r);
+  } catch (e) {
+    body.innerHTML = `<div class="summary-error">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+function _renderSummary(r) {
+  const parts = [];
+
+  // Goal
+  if (r.goal) {
+    parts.push(`
+      <div class="sum-section sum-goal">
+        <div class="sum-section-title">🎯 Goal</div>
+        <div class="sum-item">
+          <span class="sum-label">${esc(r.goal.label || '')}</span>
+          <span class="sum-plain">${esc(r.goal.plain || '')}</span>
+        </div>
+      </div>`);
+  }
+
+  // Critical path
+  if (r.critical_path?.length) {
+    const steps = r.critical_path.map(s => `
+      <div class="sum-step">
+        <span class="sum-step-num">${s.step}</span>
+        <div class="sum-step-body">
+          <span class="sum-label">${esc(s.label || '')}</span>
+          <span class="sum-role sum-role-${(s.role || '').replace('_', '-')}">${esc(s.role || '')}</span>
+          <span class="sum-plain">${esc(s.plain || '')}</span>
+        </div>
+      </div>`).join('');
+    parts.push(`
+      <div class="sum-section sum-path">
+        <div class="sum-section-title">🛤 Critical Path</div>
+        ${steps}
+      </div>`);
+  }
+
+  // Tasks
+  if (r.tasks?.length) {
+    const items = r.tasks.map(t => {
+      const req = t.requires?.length ? `<span class="sum-requires">requires: ${t.requires.map(x => esc(x)).join(', ')}</span>` : '';
+      return `<div class="sum-item"><span class="sum-label">${esc(t.label || '')}</span>${req}<span class="sum-plain">${esc(t.plain || '')}</span></div>`;
+    }).join('');
+    parts.push(`<div class="sum-section sum-tasks"><div class="sum-section-title">⚡ Tasks</div>${items}</div>`);
+  }
+
+  // Decisions
+  if (r.decisions?.length) {
+    const items = r.decisions.map(d => {
+      const branches = d.branches?.length
+        ? `<div class="sum-branches">${d.branches.map(b => `<span class="sum-branch">${esc(b.label || '')} → ${esc(b.outcome || '')}</span>`).join('')}</div>`
+        : '';
+      return `<div class="sum-item"><span class="sum-label">${esc(d.label || '')}</span><span class="sum-plain">${esc(d.plain || '')}</span>${branches}</div>`;
+    }).join('');
+    parts.push(`<div class="sum-section sum-decisions"><div class="sum-section-title">🔀 Decisions</div>${items}</div>`);
+  }
+
+  // Risks
+  if (r.risks?.length) {
+    const items = r.risks.map(risk => `
+      <div class="sum-item sum-risk-item">
+        <span class="sum-label">${esc(risk.label || '')}</span>
+        <span class="sum-plain">${esc(risk.plain || '')}</span>
+      </div>`).join('');
+    parts.push(`<div class="sum-section sum-risks"><div class="sum-section-title">⚠ Risks</div>${items}</div>`);
+  }
+
+  // Open questions
+  if (r.open_questions?.length) {
+    const items = r.open_questions.map(q => `<div class="sum-question">${esc(q)}</div>`).join('');
+    parts.push(`<div class="sum-section sum-questions"><div class="sum-section-title">❓ Open Questions</div>${items}</div>`);
+  }
+
+  return parts.join('') || '<div class="summary-loading">Nothing to summarize yet.</div>';
 }
 
 function showLlmLoading(msg) {

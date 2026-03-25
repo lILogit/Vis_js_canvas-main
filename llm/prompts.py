@@ -280,6 +280,62 @@ Rules:
 - compression_ratio = kk_count / total_nodes (fraction that is parametric knowledge)
 - roundtrip_fidelity: 0.95 if compose(causal_prompt, ΔDATA) ≈ original text, else lower"""
 
+SUMMARIZE_CHAIN = """Given this causal chain:
+{chain_json}
+
+Produce a structured briefing designed for a reader who has NOT seen the graph.
+Minimize cognitive load: lead with the goal, then the critical path, then supporting details.
+
+Return JSON:
+{{
+  "headline": "One sentence: what causal story this chain tells",
+  "goal": {{
+    "label": "the GOAL node label (or the most terminal effect if no GOAL exists)",
+    "plain": "plain-language description of what success looks like"
+  }},
+  "critical_path": [
+    {{
+      "step": 1,
+      "label": "node label",
+      "role": "root_cause | mechanism | effect | moderator",
+      "plain": "one sentence explaining this step in plain language"
+    }}
+  ],
+  "tasks": [
+    {{
+      "label": "TASK node label",
+      "requires": ["ASSET labels this task needs"],
+      "plain": "what this action does and when it fires"
+    }}
+  ],
+  "decisions": [
+    {{
+      "label": "DECISION or GATE node label",
+      "plain": "what is being decided and why it matters",
+      "branches": [
+        {{"label": "branch label", "outcome": "likely effect"}}
+      ]
+    }}
+  ],
+  "risks": [
+    {{
+      "label": "node or edge label that represents a risk",
+      "plain": "what could go wrong and its downstream impact"
+    }}
+  ],
+  "open_questions": [
+    "plain-language statement of each unresolved QUESTION node or identified gap"
+  ]
+}}
+
+Rules:
+- critical_path: 3-7 steps covering the main causal spine from root to goal; skip peripheral nodes
+- tasks: only include TASK-type nodes; omit if none exist
+- decisions: include DECISION and GATE nodes; omit if none exist
+- risks: BLOCKS edges and low-confidence nodes (< 0.4) are primary risk signals; omit section if no clear risks
+- open_questions: include QUESTION nodes and flagged nodes; omit section if empty
+- plain language: no graph jargon, no node ids, write as if explaining to a smart non-expert"""
+
 MERGE_OVERLAP = """Given two causal chains:
 Chain A: {chain_a_json}
 Chain B: {chain_b_json}
