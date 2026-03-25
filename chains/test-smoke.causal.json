@@ -4,10 +4,10 @@
     "name": "test-smoke",
     "domain": "custom",
     "created_at": "2026-03-19T22:55:49.101457",
-    "updated_at": "2026-03-22T18:13:16.048877",
+    "updated_at": "2026-03-25T12:05:39.854254",
     "version": 1,
     "author": "",
-    "description": ""
+    "description": "+ přesouvání hodnot mezi trhy CNB\n"
   },
   "nodes": [
     {

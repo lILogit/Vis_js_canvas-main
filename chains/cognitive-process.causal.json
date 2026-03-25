@@ -4,10 +4,10 @@
     "name": "Cognitive process",
     "domain": "cognition",
     "created_at": "2026-03-25T10:33:01.570449",
-    "updated_at": "2026-03-25T11:42:30.067030",
+    "updated_at": "2026-03-25T12:02:39.900353",
     "version": 1,
     "author": "",
-    "description": "+ nastavení vrstev > clusters\n+ "
+    "description": "+ nastavení vrstev > clusters as link to another chain?\n+ cesta a kde se nacházím\n"
   },
   "nodes": [
     {
@@ -21,7 +21,7 @@
       "created_at": "2026-03-25T09:33:49.361Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": true
     },
     {
       "id": "6287ac8f",

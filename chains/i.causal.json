@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "id": "5ba2a61c",
+    "name": "I",
+    "domain": "custom",
+    "created_at": "2026-03-25T13:43:19.341239",
+    "updated_at": "2026-03-25T14:08:13.431840",
+    "version": 1,
+    "author": "",
+    "description": "+ jaké jsou moje faktory pro štěstí > očekávání realita?\n+ změna práce worrst case realistic ideal > reasoning, asset impact\n\n\n"
+  },
+  "nodes": [
+    {
+      "id": "bfe815c0",
+      "label": "cognitive process",
+      "description": "",
+      "type": "concept",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:43:42.828Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "59e2c983",
+      "label": "Happiness",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:44:01.395Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "20832aa8",
+      "label": "Expectation vs Reality Gap",
+      "description": "The discrepancy between what one expects from life, work, or relationships and what actually occurs. A large gap reduces happiness; alignment increases it.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:47:07.637Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "0626b017",
+      "label": "Job Change Decision",
+      "description": "Decision to change employment, ranging from worst-case (unemployment, bad culture fit) to realistic to ideal scenarios.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:47:07.637Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "a5a9ac80",
+      "label": "Work Satisfaction",
+      "description": "Degree of fulfillment derived from work environment, role, compensation, and autonomy. Acts as a primary asset impacting overall happiness.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:47:07.637Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "facad553",
+      "label": "Personal Happiness Factors",
+      "description": "The individual's specific weighted factors contributing to happiness (e.g., autonomy, relationships, financial security, health, meaning). Currently unresolved.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T12:47:07.637Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "0e4144e8",
+      "from": "bfe815c0",
+      "to": "59e2c983",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:44:13.076Z",
+      "source": "user"
+    },
+    {
+      "id": "979f7676",
+      "from": "59e2c983",
+      "to": "bfe815c0",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:47:07.637Z",
+      "source": "llm"
+    },
+    {
+      "id": "16010b6e",
+      "from": "59e2c983",
+      "to": "0626b017",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:47:27.140Z",
+      "source": "user"
+    },
+    {
+      "id": "0cf5cb2a",
+      "from": "59e2c983",
+      "to": "a5a9ac80",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:47:39.779Z",
+      "source": "user"
+    },
+    {
+      "id": "a8ca1cec",
+      "from": "59e2c983",
+      "to": "facad553",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:47:55.420Z",
+      "source": "user"
+    },
+    {
+      "id": "0ea0a0fb",
+      "from": "20832aa8",
+      "to": "59e2c983",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:48:16.020Z",
+      "source": "user"
+    },
+    {
+      "id": "f6cdd91e",
+      "from": "a5a9ac80",
+      "to": "0626b017",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:48:59.964Z",
+      "source": "user"
+    },
+    {
+      "id": "bcba7799",
+      "from": "facad553",
+      "to": "20832aa8",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T12:53:44.493Z",
+      "source": "user"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-25T12:43:42.828Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "bfe815c0"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:44:01.395Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "59e2c983"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:44:13.076Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0e4144e8"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:46:58.669Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0e4144e8",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:07.637Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "20832aa8"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:07.637Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "0626b017"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:07.637Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "a5a9ac80"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:07.637Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "facad553"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:07.637Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "979f7676"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:27.140Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "16010b6e"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:39.779Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0cf5cb2a"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:47:55.420Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "a8ca1cec"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:48:16.020Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0ea0a0fb"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:48:51.005Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "16010b6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:48:59.964Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "f6cdd91e"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:49:27.588Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0ea0a0fb"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:49:37.428Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0ea0a0fb"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:53:44.493Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "bcba7799"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T12:54:17.526Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0ea0a0fb",
+        "deprecated": true
+      }
+    }
+  ]
+}

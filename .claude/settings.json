@@ -38,7 +38,8 @@
       "Bash(curl -s -X POST http://localhost:7331/api/chain/new -H \"Content-Type: application/json\" -d '{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"domain\"\"\"\":\"\"\"\"test\"\"\"\"}')",
       "Bash(python3 -c \"import sys,json; print\\(json.load\\(sys.stdin\\)\\)\")",
       "Bash(curl -s -X POST http://localhost:7331/api/chain/delete -H \"Content-Type: application/json\" -d '{\"\"\"\"filename\"\"\"\":\"\"\"\"test.causal.json\"\"\"\"}')",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''deleted''''\\) or d.get\\(''''error''''\\)\\)\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''deleted''''\\) or d.get\\(''''error''''\\)\\)\")",
+      "Bash(git rm:*)"
     ]
   }
 }
