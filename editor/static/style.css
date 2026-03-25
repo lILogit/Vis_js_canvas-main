@@ -185,6 +185,54 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
   padding: 12px;
 }
 
+/* ── Chain notes panel (shown when nothing is selected) ──────── */
+.chain-panel { display: flex; flex-direction: column; gap: 8px; }
+
+.cp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.cp-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  width: 46px;
+}
+.cp-value {
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cp-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+.cp-notes .cp-label { width: auto; }
+#cp-notes-ta {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 9px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+#cp-notes-ta:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .field { margin-bottom: 12px; }
 .field label {
   display: block;

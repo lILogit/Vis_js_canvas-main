@@ -261,6 +261,7 @@ async function init() {
 function renderGraph(data) {
   const visNodes = (data.nodes || []).filter(n => !n.deprecated).map(nodeToVis);
   const visEdges = (data.edges || []).map(edgeToVis);
+  showChainPanel();
 
   if (network) {
     // Show overlay to hide the clear/add flash and layout computation,
@@ -335,13 +336,13 @@ function renderGraph(data) {
   network.on('deselectNode', () => {
     selectedId = null;
     selectedType = null;
-    clearInfoPanel();
+    showChainPanel();
   });
 
   network.on('deselectEdge', () => {
     selectedId = null;
     selectedType = null;
-    clearInfoPanel();
+    showChainPanel();
   });
 
   // Double-click → open edit modal for node or edge
@@ -363,6 +364,30 @@ function renderGraph(data) {
 }
 
 // ── Info panel ────────────────────────────────────────────────────────────
+
+function showChainPanel() {
+  if (!chainData) return;
+  const m = chainData.meta || {};
+  document.getElementById('info-content').innerHTML = `
+    <div class="chain-panel">
+      <div class="cp-row">
+        <span class="cp-label">Chain</span>
+        <span class="cp-value">${esc(m.name || 'Untitled')}</span>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Domain</span>
+        <span class="cp-value">${esc(m.domain || '')}</span>
+      </div>
+      <div class="cp-notes">
+        <label class="cp-label" for="cp-notes-ta">Notes</label>
+        <textarea id="cp-notes-ta" rows="6" placeholder="Add notes about this chain…">${esc(m.description || '')}</textarea>
+      </div>
+    </div>`;
+  document.getElementById('cp-notes-ta').addEventListener('input', e => {
+    chainData.meta.description = e.target.value;
+    markDirty();
+  });
+}
 
 function clearInfoPanel() {
   document.getElementById('info-content').innerHTML =
@@ -1556,7 +1581,7 @@ function setupToolbar() {
 }
 
 function setupInfoPanel() {
-  clearInfoPanel();
+  showChainPanel();
 }
 
 function setupKeyboard() {
