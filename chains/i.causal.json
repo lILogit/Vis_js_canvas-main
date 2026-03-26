@@ -4,10 +4,10 @@
     "name": "I",
     "domain": "custom",
     "created_at": "2026-03-25T13:43:19.341239",
-    "updated_at": "2026-03-25T14:08:13.431840",
+    "updated_at": "2026-03-26T12:55:21.217285",
     "version": 1,
     "author": "",
-    "description": "+ jaké jsou moje faktory pro štěstí > očekávání realita?\n+ změna práce worrst case realistic ideal > reasoning, asset impact\n\n\n"
+    "description": "+ extrakt goal\n+ buils business plan \n+ build small images vision or marketing image\n+ Hostinger\n+ summary report + status update\n+ collective share\n+ jaké jsou moje faktory pro štěstí > očekávání realita?\n+ změna práce worrst case realistic ideal > reasoning, asset impact\n+ asset inventory ušlé příležitosti, worstcase, optima, ideal, loop new assest z assets!\n+ proaktivně hledat nové vazby, node, edge z news a observace\nDecision Support System\n\n"
   },
   "nodes": [
     {
@@ -27,7 +27,7 @@
       "id": "59e2c983",
       "label": "Happiness",
       "description": "",
-      "type": "state",
+      "type": "goal",
       "archetype": null,
       "tags": [],
       "confidence": 0.7,
@@ -51,9 +51,9 @@
     },
     {
       "id": "0626b017",
-      "label": "Job Change Decision",
+      "label": "Job Change Decision or Startup",
       "description": "Decision to change employment, ranging from worst-case (unemployment, bad culture fit) to realistic to ideal scenarios.",
-      "type": "state",
+      "type": "decision",
       "archetype": null,
       "tags": [],
       "confidence": 0.7,
@@ -87,6 +87,162 @@
       "source": "llm",
       "deprecated": false,
       "flagged": true
+    },
+    {
+      "id": "2afb36ed",
+      "label": "Cognitive Load",
+      "description": "",
+      "type": "blackbox",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-25T13:56:53.108Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "a3cf475c",
+      "label": "Asset",
+      "description": "skills, cashflow, income, outcome, local recources, new asset loop",
+      "type": "asset",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T08:15:11.320Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "16c878ff",
+      "label": "Asset Inventory",
+      "description": "Decision Support System\nhttps://gemini.google.com/app/38ffe289dc973938",
+      "type": "task",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T08:17:46.135Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": true
+    },
+    {
+      "id": "1e107b47",
+      "label": "Passive Income",
+      "description": "",
+      "type": "asset",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T08:18:45.731Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "b776851e",
+      "label": "Activity Planner",
+      "description": "",
+      "type": "task",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T09:49:58.804Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": true
+    },
+    {
+      "id": "0788cc62",
+      "label": "Lost opportunity",
+      "description": "worst, optimal, ideal path\nmonitoring ",
+      "type": "event",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T09:51:53.993Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "9c70c5e4",
+      "label": "Monitor",
+      "description": "how to monitor exceptation vs reality gap?",
+      "type": "question",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:06:48.649Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "25edece6",
+      "label": "Turnover Intention",
+      "description": "A conscious desire to change jobs or start a venture triggered by (dis)satisfaction, which precedes concrete decision-making.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "65137493",
+      "label": "Perceived Progress Toward Goals",
+      "description": "Ongoing sense of moving forward on planned activities, which directly elevates positive affect and well-being.",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "1246036f",
+      "label": "Opportunity Identification and Prioritization",
+      "description": "Translate the asset inventory into a mapped, ranked list of opportunities with owners and due dates to prevent or recover losses.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "3f741389",
+      "label": "Feasibility and Fit Analysis",
+      "description": "Evaluate assets against market and role options to create a viable shortlist and decision criteria for a job change or startup.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "c56ee0d9",
+      "label": "Automated Revenue Stream Setup",
+      "description": "Design and implement the mechanisms (e.g., product, funnel, automation) that generate income with minimal ongoing effort.",
+      "type": "task",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false
     }
   ],
   "edges": [
@@ -148,7 +304,7 @@
       "direction": "forward",
       "condition": null,
       "evidence": "",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "version": 1,
       "created_at": "2026-03-25T12:47:39.779Z",
@@ -212,11 +368,379 @@
       "direction": "forward",
       "condition": null,
       "evidence": "",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "version": 1,
       "created_at": "2026-03-25T12:53:44.493Z",
       "source": "user"
+    },
+    {
+      "id": "ff2a8913",
+      "from": "2afb36ed",
+      "to": "bfe815c0",
+      "relation": "BLOCKS",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-25T13:57:12.339Z",
+      "source": "user"
+    },
+    {
+      "id": "3a53eb5f",
+      "from": "a3cf475c",
+      "to": "a5a9ac80",
+      "relation": "ENABLES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T08:15:27.952Z",
+      "source": "user"
+    },
+    {
+      "id": "90c9ed76",
+      "from": "16c878ff",
+      "to": "a3cf475c",
+      "relation": "ENABLES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T08:18:04.559Z",
+      "source": "user"
+    },
+    {
+      "id": "37ee9d29",
+      "from": "1e107b47",
+      "to": "a5a9ac80",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T08:19:17.407Z",
+      "source": "user"
+    },
+    {
+      "id": "93a6630c",
+      "from": "a3cf475c",
+      "to": "1e107b47",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": true,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T08:26:12.900Z",
+      "source": "user"
+    },
+    {
+      "id": "1b43427f",
+      "from": "0626b017",
+      "to": "1e107b47",
+      "relation": "RESOLVES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T09:19:39.669Z",
+      "source": "user"
+    },
+    {
+      "id": "0ddb703a",
+      "from": "b776851e",
+      "to": "59e2c983",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T09:50:17.668Z",
+      "source": "user"
+    },
+    {
+      "id": "7a9e92fc",
+      "from": "16c878ff",
+      "to": "0788cc62",
+      "relation": "RESOLVES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T09:52:12.369Z",
+      "source": "user"
+    },
+    {
+      "id": "24018af2",
+      "from": "16c878ff",
+      "to": "0626b017",
+      "relation": "ENABLES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T09:53:11.702Z",
+      "source": "user"
+    },
+    {
+      "id": "df2295c2",
+      "from": "a5a9ac80",
+      "to": "59e2c983",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T09:55:38.775Z",
+      "source": "user"
+    },
+    {
+      "id": "6a0d417f",
+      "from": "a3cf475c",
+      "to": "a3cf475c",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": "higher utility, income",
+      "evidence": "new asset",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T10:14:22.916Z",
+      "source": "user"
+    },
+    {
+      "id": "4f5d6065",
+      "from": "a3cf475c",
+      "to": "16c878ff",
+      "relation": "REQUIRES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T10:15:49.805Z",
+      "source": "user"
+    },
+    {
+      "id": "3d89e2b1",
+      "from": "20832aa8",
+      "to": "9c70c5e4",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:07:10.582Z",
+      "source": "user"
+    },
+    {
+      "id": "fe17f22c",
+      "from": "a5a9ac80",
+      "to": "25edece6",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "98f40685",
+      "from": "25edece6",
+      "to": "0626b017",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "7e8ca5a2",
+      "from": "b776851e",
+      "to": "65137493",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "58c1c781",
+      "from": "65137493",
+      "to": "59e2c983",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "178ec2bb",
+      "from": "16c878ff",
+      "to": "1246036f",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "a2614b46",
+      "from": "1246036f",
+      "to": "0788cc62",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "c7e078a9",
+      "from": "16c878ff",
+      "to": "3f741389",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "01fff4ec",
+      "from": "3f741389",
+      "to": "0626b017",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "7275a7a1",
+      "from": "0626b017",
+      "to": "c56ee0d9",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
+    },
+    {
+      "id": "24f458ef",
+      "from": "c56ee0d9",
+      "to": "1e107b47",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-26T11:53:06.022Z",
+      "source": "llm"
     }
   ],
   "history": [
@@ -373,6 +897,309 @@
       "payload": {
         "id": "0ea0a0fb",
         "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-25T13:56:53.108Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "2afb36ed"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T13:57:12.339Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "ff2a8913"
+      }
+    },
+    {
+      "timestamp": "2026-03-25T13:57:48.218Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "16010b6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:15:11.320Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "a3cf475c"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:15:27.952Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "3a53eb5f"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:17:46.135Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "16c878ff"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:18:04.559Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "90c9ed76"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:18:45.731Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "1e107b47"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:19:17.407Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "37ee9d29"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:25:58.740Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "37ee9d29",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T08:26:12.900Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "93a6630c"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:19:39.669Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "1b43427f"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:23:09.730Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "node_id": "0626b017"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:49:58.804Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "b776851e"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:50:17.668Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "0ddb703a"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:51:53.993Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "0788cc62"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:52:12.369Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "7a9e92fc"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:52:34.121Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "3a53eb5f",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:52:39.897Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "93a6630c",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:53:11.702Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "24018af2"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:53:55.765Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "16010b6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:54:53.582Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "bcba7799",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:55:31.752Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0cf5cb2a",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T09:55:38.775Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "df2295c2"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T10:07:37.717Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "16010b6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T10:14:22.916Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "6a0d417f"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T10:15:27.038Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "90c9ed76",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T10:15:49.805Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "4f5d6065"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T10:17:04.675Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "16010b6e",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:06:48.649Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "9c70c5e4"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:07:10.582Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "3d89e2b1"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:53:06.022Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "25edece6"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:53:06.022Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "65137493"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:53:06.022Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "1246036f"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:53:06.022Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "3f741389"
+      }
+    },
+    {
+      "timestamp": "2026-03-26T11:53:06.022Z",
+      "action": "enrich",
+      "actor": "llm",
+      "payload": {
+        "type": "gap",
+        "node_id": "c56ee0d9"
       }
     }
   ]

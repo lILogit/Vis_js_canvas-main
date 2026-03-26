@@ -37,6 +37,20 @@ const RELATION_COLOR = {
   DIVERGES_TO:     '#fb923c',  // orange — one branch of a gate fork
 };
 
+// ── Cluster roles (edit-action oriented, 5–7 chunks cognitive load) ──────
+// Priority: issues → levers → drivers → outcomes → pathway
+
+const CLUSTER_ROLES = {
+  drivers:  { label: 'Drivers',  color: '#c92a2a', shape: 'box' },
+  pathway:  { label: 'Pathway',  color: '#1971c2', shape: 'ellipse' },
+  outcomes: { label: 'Outcomes', color: '#2f9e44', shape: 'triangle' },
+  levers:   { label: 'Levers',   color: '#e67700', shape: 'hexagon' },
+  issues:   { label: 'Issues',   color: '#8b5cf6', shape: 'star' },
+};
+
+const CLUSTER_OUT_SCALE = 0.45;
+const CLUSTER_IN_SCALE  = 0.65;
+
 function confidenceColor(c) {
   // Dark-enough fills so white label text passes WCAG AA contrast
   if (c >= 0.80) return '#2f9e44';  // forest green
@@ -196,6 +210,10 @@ let _previewNodeIds = [];
 let _previewEdgeIds = [];
 let _pendingSuggestions = [];
 
+// Cluster state
+let _clusteringEnabled = false;
+let _activeClusters = []; // [{id, role}]
+
 // Lasso selection state
 let _lassoActive = false;
 let _lassoPoints = []; // [{x, y}] in overlay-canvas DOM coords
@@ -259,6 +277,11 @@ async function init() {
 }
 
 function renderGraph(data) {
+  // Reset clustering before layout so clusters don't interfere with hierarchical recalc
+  _clusteringEnabled = false;
+  _activeClusters = [];
+  document.getElementById('btn-cluster')?.classList.remove('active');
+
   const visNodes = (data.nodes || []).filter(n => !n.deprecated).map(nodeToVis);
   const visEdges = (data.edges || []).map(edgeToVis);
   showChainPanel();
@@ -313,8 +336,12 @@ function renderGraph(data) {
   network.once('stabilized', _hideLoading);
   _hideLoadingFallback = setTimeout(_hideLoading, 3000);
 
+  network.on('zoom', handleZoomClustering);
+
   network.on('selectNode', ({ nodes: sel }) => {
     if (!sel.length) return;
+    // Open cluster on click
+    if (network.isCluster(sel[0])) { network.openCluster(sel[0]); _activeClusters = _activeClusters.filter(c => c.id !== sel[0]); return; }
     // Ignore clicks on preview nodes
     if (String(sel[0]).startsWith('_preview_')) return;
     selectedId = sel[0];
@@ -890,6 +917,10 @@ function addPreviewToGraph(suggestions) {
 
 function rerenderLayout() {
   if (!network) return;
+  // Clear clusters before hierarchical layout recalculation
+  declusAll();
+  _clusteringEnabled = false;
+  document.getElementById('btn-cluster')?.classList.remove('active');
   // Same overlay-fade pattern as page refresh and chain switch:
   // overlay hides computation → instant fit → CSS transition reveals graph.
   const loadingEl = document.getElementById('graph-loading');
@@ -1289,6 +1320,88 @@ async function softDeleteNodesBatch(ids) {
   }
 }
 
+// ── Clustering ────────────────────────────────────────────────────────────
+
+function _computeDegrees() {
+  const inDeg = {}, outDeg = {};
+  (chainData?.nodes || []).filter(n => !n.deprecated).forEach(n => {
+    inDeg[n.id] = 0;
+    outDeg[n.id] = 0;
+  });
+  (chainData?.edges || []).filter(e => !e.deprecated).forEach(e => {
+    if (e.from in outDeg) outDeg[e.from]++;
+    if (e.to   in inDeg)  inDeg[e.to]++;
+  });
+  return { inDeg, outDeg };
+}
+
+function _nodeRole(raw, inDeg, outDeg) {
+  // Priority 1: issues — flagged, uncertain, or unresolved
+  if (raw.flagged || raw.type === 'question' || raw.archetype === 'question' ||
+      (raw.confidence != null && raw.confidence < 0.4)) return 'issues';
+  // Priority 2: levers — RCDE action types
+  if (['task', 'decision', 'gate', 'asset'].includes(raw.type)) return 'levers';
+  // Priority 3: drivers — no incoming edges or explicit archetype
+  if (raw.archetype === 'root_cause' || (inDeg[raw.id] === 0)) return 'drivers';
+  // Priority 4: outcomes — no outgoing edges, explicit archetype, or goal type
+  if (raw.archetype === 'effect' || raw.type === 'goal' || (outDeg[raw.id] === 0)) return 'outcomes';
+  // Priority 5: everything else is on the causal pathway
+  return 'pathway';
+}
+
+function clusterByRole() {
+  if (!network || !chainData) return;
+  declusAll();
+  const { inDeg, outDeg } = _computeDegrees();
+  // Iterate in display order — issues last so they're visually distinct
+  const roleOrder = ['drivers', 'pathway', 'outcomes', 'levers', 'issues'];
+  roleOrder.forEach(role => {
+    const props = CLUSTER_ROLES[role];
+    const clusterId = `_cluster_${role}`;
+    network.cluster({
+      joinCondition: childNode => {
+        if (String(childNode.id).startsWith('_preview_')) return false;
+        const raw = (chainData?.nodes || []).find(n => n.id === childNode.id);
+        return raw && !raw.deprecated && _nodeRole(raw, inDeg, outDeg) === role;
+      },
+      processProperties: (clusterOpts, childNodes) => {
+        const n = childNodes.length;
+        clusterOpts.id    = clusterId;
+        clusterOpts.label = `${props.label}\n(${n})`;
+        clusterOpts.title = `${props.label}: ${n} node${n > 1 ? 's' : ''}`;
+        _activeClusters.push({ id: clusterId, role });
+        return clusterOpts;
+      },
+      clusterNodeProperties: {
+        id: clusterId,
+        borderWidth: 3,
+        shape: props.shape,
+        color: { background: props.color, border: '#fff', highlight: { background: props.color, border: '#fff' } },
+        font: { size: 14, color: '#fff', bold: true, multi: false },
+        widthConstraint: { minimum: 90, maximum: 180 },
+        allowSingleNodeCluster: false,
+      },
+    });
+  });
+}
+
+function declusAll() {
+  if (!network) return;
+  [..._activeClusters].forEach(({ id }) => {
+    try { if (network.isCluster(id)) network.openCluster(id); } catch (_) {}
+  });
+  _activeClusters = [];
+}
+
+function handleZoomClustering(params) {
+  if (!_clusteringEnabled) return;
+  if (params.direction === '-' && params.scale < CLUSTER_OUT_SCALE && !_activeClusters.length) {
+    clusterByRole();
+  } else if (params.direction === '+' && params.scale > CLUSTER_IN_SCALE && _activeClusters.length) {
+    declusAll();
+  }
+}
+
 function setupLasso() {
   const lassoCanvas = document.getElementById('lasso-canvas');
 
@@ -1340,6 +1453,19 @@ function setupToolbar() {
   document.getElementById('btn-fit').addEventListener('click', () =>
     network?.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } }));
   document.getElementById('btn-hierarchical').addEventListener('click', rerenderLayout);
+  document.getElementById('btn-cluster').addEventListener('click', () => {
+    if (_clusteringEnabled) {
+      _clusteringEnabled = false;
+      declusAll();
+      document.getElementById('btn-cluster').classList.remove('active');
+      setStatus('Clustering off');
+    } else {
+      _clusteringEnabled = true;
+      document.getElementById('btn-cluster').classList.add('active');
+      clusterByRole();
+      setStatus('Clustered by role — zoom out to auto-cluster, click a group to expand');
+    }
+  });
   document.getElementById('btn-enrich').addEventListener('click', () => runEnrich('gaps'));
   document.getElementById('btn-suggest').addEventListener('click', () => runEnrich('suggest'));
   document.getElementById('btn-critique').addEventListener('click', () => runEnrich('critique'));
