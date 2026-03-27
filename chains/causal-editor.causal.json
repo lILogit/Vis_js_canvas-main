@@ -4,7 +4,7 @@
     "name": "Causal Editor",
     "domain": "custom",
     "created_at": "2026-03-27T13:49:22.916321",
-    "updated_at": "2026-03-27T13:55:48.294666",
+    "updated_at": "2026-03-27T15:04:59.293018",
     "version": 1,
     "author": "",
     "description": ""
@@ -14,7 +14,7 @@
       "id": "2ecb7d77",
       "label": "Rules",
       "description": "",
-      "type": "concept",
+      "type": "blackbox",
       "archetype": "mechanism",
       "tags": [],
       "confidence": 0.7,
@@ -39,12 +39,38 @@
     {
       "id": "2eb422b4",
       "label": "framework",
-      "description": "",
+      "description": "observation to causal chain",
       "type": "blackbox",
       "archetype": "mechanism",
       "tags": [],
       "confidence": 0.7,
       "created_at": "2026-03-27T12:52:08.891Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "b38aaf6c",
+      "label": "human interaction",
+      "description": "",
+      "type": "event",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T13:15:00.280Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "6e8fa6ac",
+      "label": "Causal Forecast",
+      "description": "",
+      "type": "goal",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T13:17:26.226Z",
       "source": "user",
       "deprecated": false,
       "flagged": false
@@ -81,6 +107,38 @@
       "flagged": false,
       "version": 1,
       "created_at": "2026-03-27T12:52:54.163Z",
+      "source": "user"
+    },
+    {
+      "id": "48111738",
+      "from": "b38aaf6c",
+      "to": "2eb422b4",
+      "relation": "INSTANTIATES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T13:15:20.408Z",
+      "source": "user"
+    },
+    {
+      "id": "7a7c1758",
+      "from": "2eb422b4",
+      "to": "6e8fa6ac",
+      "relation": "CAUSES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T13:17:51.322Z",
       "source": "user"
     }
   ],
@@ -123,6 +181,68 @@
       "actor": "user",
       "payload": {
         "edge_id": "c84bb3b0"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T13:15:00.280Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "b38aaf6c"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T13:15:20.408Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "48111738"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T13:17:26.226Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "6e8fa6ac"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T13:17:51.322Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "7a7c1758"
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "id": "hr4b2lxh",
+      "created_at": "2026-03-27T14:04:59.287Z",
+      "headline": "This chain is empty—no goal, causes, or effects have been defined yet.",
+      "scope": [
+        "399b8531"
+      ],
+      "data": {
+        "headline": "This chain is empty—no goal, causes, or effects have been defined yet.",
+        "goal": {
+          "label": "Unspecified (no GOAL node)",
+          "plain": "No end outcome is defined; success starts with agreeing on a single, clear goal for the chain."
+        },
+        "critical_path": [],
+        "tasks": [],
+        "decisions": [],
+        "risks": [],
+        "open_questions": [
+          "What is the single primary outcome we want to achieve?",
+          "What starting condition or root cause sets this story in motion?",
+          "What are the 3–5 key mechanisms that plausibly connect the root cause to the desired outcome?",
+          "Which concrete tasks or interventions should we include, and what assets or resources do they require?",
+          "What decisions or gates determine alternative paths or trade-offs we must choose between?",
+          "What blockers or constraints could derail progress and should be modeled explicitly?",
+          "What uncertainties should be captured as questions to test or resolve?"
+        ]
       }
     }
   ]
