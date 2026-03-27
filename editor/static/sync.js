@@ -130,6 +130,28 @@ export async function llmSummarize(nodeIds = null) {
   return _llmPost('/llm/summarize', nodeIds ? { node_ids: nodeIds } : {});
 }
 
+export async function saveSummary(entry) {
+  const resp = await fetch('/api/summary/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ entry }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function deleteSummary(id) {
+  const resp = await fetch('/api/summary/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
 export async function saveNewChain(payload) {
   const resp = await fetch('/api/chain/save-new', {
     method: 'POST',

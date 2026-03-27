@@ -28,6 +28,7 @@
   <button id="btn-critique">Critique</button>
   <button id="btn-summarize">📋 Summary</button>
   <a href="/decompose" id="btn-decompose" class="btn-toolbar" target="_blank">⊕ Decompose</a>
+  <a href="/grammar" id="btn-grammar" class="btn-toolbar" target="_blank">📖 Grammar</a>
   <button id="btn-note">📝 Note</button>
   <div class="sep"></div>
   <button id="btn-lasso">⬡ Polygon</button>
@@ -307,7 +308,11 @@
         <div class="summary-title">Chain Summary</div>
         <div id="summary-headline" class="summary-headline"></div>
       </div>
-      <button id="btn-summary-close" class="summary-close-btn">✕</button>
+      <div class="summary-header-actions">
+        <button id="btn-summary-save" class="summary-action-btn" title="Save this summary to the chain" style="display:none">💾 Save</button>
+        <button id="btn-summary-history" class="summary-action-btn" title="Browse saved summaries">📂 History</button>
+        <button id="btn-summary-close" class="summary-close-btn">✕</button>
+      </div>
     </div>
     <div id="summary-body" class="summary-body"></div>
   </div>

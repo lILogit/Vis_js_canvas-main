@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, createChain, deleteChain } from './sync.js';
+import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, createChain, deleteChain } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -1538,8 +1538,13 @@ function setupToolbar() {
   document.getElementById('btn-suggest').addEventListener('click', () => runEnrich('suggest'));
   document.getElementById('btn-critique').addEventListener('click', () => runEnrich('critique'));
   document.getElementById('btn-summarize').addEventListener('click', runSummarize);
-  document.getElementById('btn-summary-close').addEventListener('click', () =>
-    document.getElementById('summary-overlay').classList.remove('visible'));
+  document.getElementById('btn-summary-close').addEventListener('click', () => {
+    document.getElementById('summary-overlay').classList.remove('visible');
+    _summaryHistoryMode = false;
+    document.getElementById('btn-summary-history').classList.remove('active');
+  });
+  document.getElementById('btn-summary-save').addEventListener('click', saveSummaryEntry);
+  document.getElementById('btn-summary-history').addEventListener('click', toggleSummaryHistory);
   document.getElementById('btn-lasso').addEventListener('click', () => {
     if (_lassoActive) deactivateLasso();
     else activateLasso();
@@ -1842,24 +1847,141 @@ function showContradictDialog(edgeId) {
   }).catch(e => showLlmResult('Error: ' + e.message));
 }
 
+let _lastSummaryResult = null;
+let _lastSummaryScope = null;  // null = full chain, or array of node ids
+let _summaryHistoryMode = false;
+
 async function runSummarize() {
+  _summaryHistoryMode = false;
+  document.getElementById('btn-summary-history').classList.remove('active');
   const overlay = document.getElementById('summary-overlay');
   const body = document.getElementById('summary-body');
   const headline = document.getElementById('summary-headline');
   headline.textContent = '';
 
   const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
-  const scope = selIds.length ? `${selIds.length} selected node${selIds.length > 1 ? 's' : ''}` : null;
-  body.innerHTML = `<div class="summary-loading">${scope ? `Summarizing ${scope}…` : 'Generating summary…'}</div>`;
+  const scope = selIds.length ? selIds : null;
+  const scopeLabel = scope ? `${scope.length} selected node${scope.length > 1 ? 's' : ''}` : null;
+  const saveBtn = document.getElementById('btn-summary-save');
+  saveBtn.style.display = 'none';
+  _lastSummaryResult = null;
+  _lastSummaryScope = scope;
+
+  body.innerHTML = `<div class="summary-loading">${scopeLabel ? `Summarizing ${scopeLabel}…` : 'Generating summary…'}</div>`;
   overlay.classList.add('visible');
 
   try {
-    const r = await llmSummarize(selIds.length ? selIds : null);
+    const r = await llmSummarize(scope);
+    _lastSummaryResult = r;
     headline.textContent = r.headline || '';
     body.innerHTML = _renderSummary(r);
+    saveBtn.style.display = '';
   } catch (e) {
     body.innerHTML = `<div class="summary-error">Error: ${esc(e.message)}</div>`;
   }
+}
+
+async function saveSummaryEntry() {
+  if (!_lastSummaryResult) return;
+  const btn = document.getElementById('btn-summary-save');
+  btn.textContent = '…';
+  btn.disabled = true;
+  try {
+    const entry = {
+      id: Math.random().toString(36).slice(2, 10),
+      created_at: new Date().toISOString(),
+      headline: _lastSummaryResult.headline || '',
+      scope: _lastSummaryScope,
+      data: _lastSummaryResult,
+    };
+    await saveSummary(entry);
+    if (!chainData.summaries) chainData.summaries = [];
+    chainData.summaries.push(entry);
+    btn.textContent = '✓ Saved';
+    setTimeout(() => { btn.textContent = '💾 Save'; btn.disabled = false; }, 1500);
+  } catch (e) {
+    btn.textContent = '💾 Save';
+    btn.disabled = false;
+    alert('Save failed: ' + e.message);
+  }
+}
+
+function toggleSummaryHistory() {
+  _summaryHistoryMode = !_summaryHistoryMode;
+  const histBtn = document.getElementById('btn-summary-history');
+  const saveBtn = document.getElementById('btn-summary-save');
+  const body = document.getElementById('summary-body');
+  const headline = document.getElementById('summary-headline');
+
+  if (_summaryHistoryMode) {
+    histBtn.classList.add('active');
+    saveBtn.style.display = 'none';
+    headline.textContent = '';
+    _renderSummaryHistory(body);
+  } else {
+    histBtn.classList.remove('active');
+    if (_lastSummaryResult) {
+      headline.textContent = _lastSummaryResult.headline || '';
+      body.innerHTML = _renderSummary(_lastSummaryResult);
+      saveBtn.style.display = '';
+    } else {
+      headline.textContent = '';
+      body.innerHTML = '<div class="summary-loading">Click 📋 Summary to generate a new summary.</div>';
+    }
+  }
+}
+
+function _renderSummaryHistory(body) {
+  const summaries = (chainData?.summaries || []).slice().reverse();
+  if (!summaries.length) {
+    body.innerHTML = '<div class="sum-history-empty">No saved summaries yet. Generate and save a summary first.</div>';
+    return;
+  }
+  const items = summaries.map(s => {
+    const date = new Date(s.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    const scopeHtml = s.scope ? `<div class="sum-history-scope">${s.scope.length} node scope</div>` : '';
+    return `
+      <div class="sum-history-item" data-sid="${esc(s.id)}">
+        <div class="sum-history-item-body">
+          <div class="sum-history-date">${esc(date)}</div>
+          <div class="sum-history-headline">${esc(s.headline || '(no headline)')}</div>
+          ${scopeHtml}
+        </div>
+        <button class="sum-history-del" data-sid="${esc(s.id)}" title="Delete this summary">🗑</button>
+      </div>`;
+  }).join('');
+  body.innerHTML = `<div class="sum-history-list">${items}</div>`;
+
+  body.querySelectorAll('.sum-history-item').forEach(el => {
+    el.addEventListener('click', (ev) => {
+      if (ev.target.closest('.sum-history-del')) return;
+      const sid = el.dataset.sid;
+      const entry = (chainData?.summaries || []).find(s => s.id === sid);
+      if (!entry) return;
+      _summaryHistoryMode = false;
+      document.getElementById('btn-summary-history').classList.remove('active');
+      _lastSummaryResult = entry.data;
+      _lastSummaryScope = entry.scope;
+      document.getElementById('summary-headline').textContent = entry.headline || '';
+      body.innerHTML = _renderSummary(entry.data);
+      document.getElementById('btn-summary-save').style.display = 'none';
+    });
+  });
+  body.querySelectorAll('.sum-history-del').forEach(btn => {
+    btn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      const sid = btn.dataset.sid;
+      btn.textContent = '…';
+      try {
+        await deleteSummary(sid);
+        chainData.summaries = (chainData.summaries || []).filter(s => s.id !== sid);
+        _renderSummaryHistory(body);
+      } catch (e) {
+        btn.textContent = '🗑';
+        alert('Delete failed: ' + e.message);
+      }
+    });
+  });
 }
 
 function _renderSummary(r) {

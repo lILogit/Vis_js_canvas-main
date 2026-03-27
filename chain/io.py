@@ -57,7 +57,7 @@ def load(path: str) -> CausalChain:
             source=e.get("source", "user"),
         ))
 
-    return CausalChain(meta=meta, nodes=nodes, edges=edges, history=data.get("history", []))
+    return CausalChain(meta=meta, nodes=nodes, edges=edges, history=data.get("history", []), summaries=data.get("summaries", []))
 
 
 def to_dict(chain: CausalChain) -> dict:
@@ -110,6 +110,7 @@ def to_dict(chain: CausalChain) -> dict:
         "nodes": nodes,
         "edges": edges,
         "history": chain.history,
+        "summaries": chain.summaries,
     }
 
 

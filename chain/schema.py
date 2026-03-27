@@ -59,3 +59,4 @@ class CausalChain:
     nodes: list = field(default_factory=list)
     edges: list = field(default_factory=list)
     history: list = field(default_factory=list)
+    summaries: list = field(default_factory=list)

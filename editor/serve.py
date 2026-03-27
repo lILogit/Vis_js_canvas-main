@@ -212,6 +212,10 @@ class Handler(BaseHTTPRequestHandler):
             self._llm_ingest_note()
         elif path == "/llm/summarize":
             self._llm_summarize()
+        elif path == "/api/summary/save":
+            self._api_summary_save()
+        elif path == "/api/summary/delete":
+            self._api_summary_delete()
         else:
             self._send_error("Not found", 404)
 
@@ -788,6 +792,51 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(result)
         except Exception as exc:
             self._send_error(str(exc))
+
+    def _api_summary_save(self):
+        """Append a summary snapshot to the chain's summaries list and persist."""
+        body = self._body()
+        entry = body.get("entry")
+        if not entry or not isinstance(entry, dict):
+            self._send_error("Missing entry")
+            return
+        with _chain_lock:
+            if not _chain:
+                self._send_error("No chain loaded")
+                return
+            _chain.summaries.append(entry)
+            try:
+                chain_io.save(_chain, _chain_path)
+            except Exception as exc:
+                # Roll back in-memory on save failure
+                _chain.summaries.pop()
+                self._send_error(str(exc))
+                return
+        self._send_json({"ok": True, "id": entry.get("id")})
+
+    def _api_summary_delete(self):
+        """Remove a summary by id from the chain's summaries list and persist."""
+        body = self._body()
+        sid = body.get("id")
+        if not sid:
+            self._send_error("Missing id")
+            return
+        with _chain_lock:
+            if not _chain:
+                self._send_error("No chain loaded")
+                return
+            before = list(_chain.summaries)
+            _chain.summaries = [s for s in _chain.summaries if s.get("id") != sid]
+            if len(_chain.summaries) == len(before):
+                self._send_error("Summary not found", 404)
+                return
+            try:
+                chain_io.save(_chain, _chain_path)
+            except Exception as exc:
+                _chain.summaries = before
+                self._send_error(str(exc))
+                return
+        self._send_json({"ok": True})
 
     def _api_get_llm_provider(self):
         self._send_json({
