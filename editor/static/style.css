@@ -867,6 +867,7 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
   color: var(--accent);
   margin-top: 2px;
 }
+.sum-history-export,
 .sum-history-del {
   background: none;
   border: none;
@@ -877,6 +878,7 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
   flex-shrink: 0;
   line-height: 1;
 }
+.sum-history-export:hover { color: var(--text); }
 .sum-history-del:hover { color: var(--danger); }
 
 .summary-body {

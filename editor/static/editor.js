@@ -1947,14 +1947,24 @@ function _renderSummaryHistory(body) {
           <div class="sum-history-headline">${esc(s.headline || '(no headline)')}</div>
           ${scopeHtml}
         </div>
+        <button class="sum-history-export" data-sid="${esc(s.id)}" title="Download as markdown file">📄</button>
         <button class="sum-history-del" data-sid="${esc(s.id)}" title="Delete this summary">🗑</button>
       </div>`;
   }).join('');
   body.innerHTML = `<div class="sum-history-list">${items}</div>`;
 
+  body.querySelectorAll('.sum-history-export').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const sid = btn.dataset.sid;
+      const entry = (chainData?.summaries || []).find(s => s.id === sid);
+      if (entry) _downloadSummaryFile(entry);
+    });
+  });
+
   body.querySelectorAll('.sum-history-item').forEach(el => {
     el.addEventListener('click', (ev) => {
-      if (ev.target.closest('.sum-history-del')) return;
+      if (ev.target.closest('.sum-history-del') || ev.target.closest('.sum-history-export')) return;
       const sid = el.dataset.sid;
       const entry = (chainData?.summaries || []).find(s => s.id === sid);
       if (!entry) return;
@@ -1982,6 +1992,92 @@ function _renderSummaryHistory(body) {
       }
     });
   });
+}
+
+function _downloadSummaryFile(entry) {
+  const md = _summaryToMarkdown(entry);
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const chainName = (chainData?.meta?.name || 'chain').replace(/\s+/g, '-').toLowerCase();
+  const date = new Date(entry.created_at).toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+  a.href = url;
+  a.download = `summary_${chainName}_${date}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function _summaryToMarkdown(entry) {
+  const r = entry.data || {};
+  const date = new Date(entry.created_at).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' });
+  const chainName = chainData?.meta?.name || 'Chain';
+  const lines = [];
+
+  lines.push(`# Chain Summary — ${chainName}`);
+  lines.push(`*Generated: ${date}*`);
+  if (entry.scope) lines.push(`*Scope: ${entry.scope.length} selected nodes*`);
+  lines.push('');
+
+  if (r.headline) {
+    lines.push(`> ${r.headline}`);
+    lines.push('');
+  }
+
+  if (r.goal) {
+    lines.push('## 🎯 Goal');
+    if (r.goal.label) lines.push(`**${r.goal.label}**`);
+    if (r.goal.plain) lines.push(r.goal.plain);
+    lines.push('');
+  }
+
+  if (r.critical_path?.length) {
+    lines.push('## 🛤 Critical Path');
+    r.critical_path.forEach(s => {
+      const role = s.role ? ` *(${s.role})*` : '';
+      lines.push(`${s.step}. **${s.label || ''}**${role}`);
+      if (s.plain) lines.push(`   ${s.plain}`);
+    });
+    lines.push('');
+  }
+
+  if (r.tasks?.length) {
+    lines.push('## ⚡ Tasks');
+    r.tasks.forEach(t => {
+      lines.push(`- **${t.label || ''}**`);
+      if (t.requires?.length) lines.push(`  *requires: ${t.requires.join(', ')}*`);
+      if (t.plain) lines.push(`  ${t.plain}`);
+    });
+    lines.push('');
+  }
+
+  if (r.decisions?.length) {
+    lines.push('## 🔀 Decisions');
+    r.decisions.forEach(d => {
+      lines.push(`- **${d.label || ''}**`);
+      if (d.plain) lines.push(`  ${d.plain}`);
+      if (d.branches?.length) {
+        d.branches.forEach(b => lines.push(`  - ${b.label || ''} → ${b.outcome || ''}`));
+      }
+    });
+    lines.push('');
+  }
+
+  if (r.risks?.length) {
+    lines.push('## ⚠ Risks');
+    r.risks.forEach(risk => {
+      lines.push(`- **${risk.label || ''}**`);
+      if (risk.plain) lines.push(`  ${risk.plain}`);
+    });
+    lines.push('');
+  }
+
+  if (r.open_questions?.length) {
+    lines.push('## ❓ Open Questions');
+    r.open_questions.forEach(q => lines.push(`- ${q}`));
+    lines.push('');
+  }
+
+  return lines.join('\n');
 }
 
 function _renderSummary(r) {
