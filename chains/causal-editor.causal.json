@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "id": "812828fe",
+    "name": "Causal Editor",
+    "domain": "custom",
+    "created_at": "2026-03-27T13:49:22.916321",
+    "updated_at": "2026-03-27T13:55:48.294666",
+    "version": 1,
+    "author": "",
+    "description": ""
+  },
+  "nodes": [
+    {
+      "id": "2ecb7d77",
+      "label": "Rules",
+      "description": "",
+      "type": "concept",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T12:49:35.018Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "f75b515b",
+      "label": "Observation",
+      "description": "",
+      "type": "event",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T12:51:34.755Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "2eb422b4",
+      "label": "framework",
+      "description": "",
+      "type": "blackbox",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T12:52:08.891Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "cee1c10f",
+      "from": "f75b515b",
+      "to": "2eb422b4",
+      "relation": "TRIGGERS",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T12:52:31.571Z",
+      "source": "user"
+    },
+    {
+      "id": "c84bb3b0",
+      "from": "2ecb7d77",
+      "to": "2eb422b4",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T12:52:54.163Z",
+      "source": "user"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-03-27T12:49:35.018Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "2ecb7d77"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:51:34.755Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "f75b515b"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:52:08.891Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "2eb422b4"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:52:31.571Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "cee1c10f"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:52:54.163Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "c84bb3b0"
+      }
+    }
+  ]
+}

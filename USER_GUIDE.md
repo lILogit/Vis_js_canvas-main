@@ -163,7 +163,7 @@ Select a node or edge and press `Delete` or `Backspace`. This is a **soft delete
 ### Layout
 - **Fit** — zoom to fit the entire graph
 - **Layout ↕** — re-run the hierarchical top-down layout
-- **⊞ Cluster** — group nodes into 5 semantic clusters: Drivers, Pathway, Outcomes, Levers, Issues. Click a cluster node to expand it.
+- **⊞ Cluster** — group nodes by RCDE layer: **Root Cause** (upstream drivers), **Pathway** (mid-chain propagation), **Decision** (interventions: task/gate/decision/asset), **Effect** (goals and terminal nodes), **Questions** (open uncertainties). Click a cluster to expand it. Zoom out past 0.45× to auto-cluster; zoom back in past 0.65× to auto-expand.
 - Nodes can be freely dragged after layout
 
 ### Saving

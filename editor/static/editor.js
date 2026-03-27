@@ -41,15 +41,24 @@ const RELATION_COLOR = {
 // Priority: issues → levers → drivers → outcomes → pathway
 
 const CLUSTER_ROLES = {
-  drivers:  { label: 'Drivers',  color: '#c92a2a', shape: 'box' },
-  pathway:  { label: 'Pathway',  color: '#1971c2', shape: 'ellipse' },
-  outcomes: { label: 'Outcomes', color: '#2f9e44', shape: 'triangle' },
-  levers:   { label: 'Levers',   color: '#e67700', shape: 'hexagon' },
-  issues:   { label: 'Issues',   color: '#8b5cf6', shape: 'star' },
+  root_cause: { label: 'Root Cause', color: '#c92a2a', shape: 'box'      },
+  pathway:    { label: 'Pathway',    color: '#1971c2', shape: 'ellipse'   },
+  decision:   { label: 'Decision',   color: '#e67700', shape: 'hexagon'   },
+  effect:     { label: 'Effect',     color: '#2f9e44', shape: 'triangle'  },
+  questions:  { label: 'Questions',  color: '#8b5cf6', shape: 'star'      },
 };
 
-const CLUSTER_OUT_SCALE = 0.45;
-const CLUSTER_IN_SCALE  = 0.65;
+// RCDE layer y-positions in network coordinates (top → bottom = R → C → D → E → Q)
+// 400-unit gaps leave room for vertical node columns without overlapping adjacent bands
+const RCDE_Y = {
+  root_cause: -800,
+  pathway:    -400,
+  decision:    0,
+  effect:      400,
+  questions:   800,
+};
+const RCDE_BAND_HALF = 110; // half-height of collapsed band; expanded bands are computed dynamically
+
 
 function confidenceColor(c) {
   // Dark-enough fills so white label text passes WCAG AA contrast
@@ -212,7 +221,8 @@ let _pendingSuggestions = [];
 
 // Cluster state
 let _clusteringEnabled = false;
-let _activeClusters = []; // [{id, role}]
+let _layerState = {};           // { role: { nodeIds: string[] } }
+let _preclusterPositions = {};  // { nodeId: {x,y} } — saved before layer snap
 
 // Lasso selection state
 let _lassoActive = false;
@@ -279,7 +289,8 @@ async function init() {
 function renderGraph(data) {
   // Reset clustering before layout so clusters don't interfere with hierarchical recalc
   _clusteringEnabled = false;
-  _activeClusters = [];
+  _layerState = {};
+  _preclusterPositions = {};
   document.getElementById('btn-cluster')?.classList.remove('active');
 
   const visNodes = (data.nodes || []).filter(n => !n.deprecated).map(nodeToVis);
@@ -336,12 +347,10 @@ function renderGraph(data) {
   network.once('stabilized', _hideLoading);
   _hideLoadingFallback = setTimeout(_hideLoading, 3000);
 
-  network.on('zoom', handleZoomClustering);
+  network.on('afterDrawing', _drawRCDEZones);
 
   network.on('selectNode', ({ nodes: sel }) => {
     if (!sel.length) return;
-    // Open cluster on click
-    if (network.isCluster(sel[0])) { network.openCluster(sel[0]); _activeClusters = _activeClusters.filter(c => c.id !== sel[0]); return; }
     // Ignore clicks on preview nodes
     if (String(sel[0]).startsWith('_preview_')) return;
     selectedId = sel[0];
@@ -442,6 +451,13 @@ function showNodePanel(n) {
       </select>
     </div>
     <div class="field">
+      <label>Archetype</label>
+      <select id="pi-archetype">
+        ${['', 'root_cause', 'mechanism', 'effect', 'moderator', 'evidence', 'question']
+          .map(a => `<option value="${a}" ${(n.archetype||'')===a?'selected':''}>${a || '— none —'}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
       <label>Description</label>
       <textarea id="pi-desc">${esc(n.description || '')}</textarea>
     </div>
@@ -530,10 +546,11 @@ function showEdgePanel(e) {
 function applyNodeEdits(nodeId) {
   const node = chainData.nodes.find(n => n.id === nodeId);
   if (!node) return;
-  node.label = document.getElementById('pi-label').value.trim();
-  node.type = document.getElementById('pi-type').value;
+  node.label       = document.getElementById('pi-label').value.trim();
+  node.type        = document.getElementById('pi-type').value;
+  node.archetype   = document.getElementById('pi-archetype').value || null;
   node.description = document.getElementById('pi-desc').value;
-  node.confidence = parseFloat(document.getElementById('pi-conf').value);
+  node.confidence  = parseFloat(document.getElementById('pi-conf').value);
   nodes.update(nodeToVis(node));
   markDirty();
   updateStatusBar();
@@ -917,9 +934,10 @@ function addPreviewToGraph(suggestions) {
 
 function rerenderLayout() {
   if (!network) return;
-  // Clear clusters before hierarchical layout recalculation
-  declusAll();
+  // Exit layer view before hierarchical layout recalculation
   _clusteringEnabled = false;
+  _layerState = {};
+  _preclusterPositions = {};
   document.getElementById('btn-cluster')?.classList.remove('active');
   // Same overlay-fade pattern as page refresh and chain switch:
   // overlay hides computation → instant fit → CSS transition reveals graph.
@@ -1336,70 +1354,120 @@ function _computeDegrees() {
 }
 
 function _nodeRole(raw, inDeg, outDeg) {
-  // Priority 1: issues — flagged, uncertain, or unresolved
-  if (raw.flagged || raw.type === 'question' || raw.archetype === 'question' ||
-      (raw.confidence != null && raw.confidence < 0.4)) return 'issues';
-  // Priority 2: levers — RCDE action types
-  if (['task', 'decision', 'gate', 'asset'].includes(raw.type)) return 'levers';
-  // Priority 3: drivers — no incoming edges or explicit archetype
-  if (raw.archetype === 'root_cause' || (inDeg[raw.id] === 0)) return 'drivers';
-  // Priority 4: outcomes — no outgoing edges, explicit archetype, or goal type
-  if (raw.archetype === 'effect' || raw.type === 'goal' || (outDeg[raw.id] === 0)) return 'outcomes';
-  // Priority 5: everything else is on the causal pathway
+  // P1: questions — always own cluster regardless of topology
+  if (raw.type === 'question' || raw.archetype === 'question') return 'questions';
+  // P2: decision point — intervention/action types always land here
+  if (['decision', 'gate', 'task', 'asset'].includes(raw.type)) return 'decision';
+  // P3: effect — goal type, explicit archetype, or topological leaf (no outgoing edges)
+  if (raw.type === 'goal' || raw.archetype === 'effect' || outDeg[raw.id] === 0) return 'effect';
+  // P4: root cause — explicit archetype or topological root (no incoming edges)
+  if (raw.archetype === 'root_cause' || inDeg[raw.id] === 0) return 'root_cause';
+  // P5: causal pathway — everything else (state/event/blackbox/concept mid-chain)
   return 'pathway';
 }
 
-function clusterByRole() {
-  if (!network || !chainData) return;
-  declusAll();
+// Assign each non-deprecated, non-preview node to its RCDE role
+function _buildLayerState() {
   const { inDeg, outDeg } = _computeDegrees();
-  // Iterate in display order — issues last so they're visually distinct
-  const roleOrder = ['drivers', 'pathway', 'outcomes', 'levers', 'issues'];
-  roleOrder.forEach(role => {
-    const props = CLUSTER_ROLES[role];
-    const clusterId = `_cluster_${role}`;
-    network.cluster({
-      joinCondition: childNode => {
-        if (String(childNode.id).startsWith('_preview_')) return false;
-        const raw = (chainData?.nodes || []).find(n => n.id === childNode.id);
-        return raw && !raw.deprecated && _nodeRole(raw, inDeg, outDeg) === role;
-      },
-      processProperties: (clusterOpts, childNodes) => {
-        const n = childNodes.length;
-        clusterOpts.id    = clusterId;
-        clusterOpts.label = `${props.label}\n(${n})`;
-        clusterOpts.title = `${props.label}: ${n} node${n > 1 ? 's' : ''}`;
-        _activeClusters.push({ id: clusterId, role });
-        return clusterOpts;
-      },
-      clusterNodeProperties: {
-        id: clusterId,
-        borderWidth: 3,
-        shape: props.shape,
-        color: { background: props.color, border: '#fff', highlight: { background: props.color, border: '#fff' } },
-        font: { size: 14, color: '#fff', bold: true, multi: false },
-        widthConstraint: { minimum: 90, maximum: 180 },
-        allowSingleNodeCluster: false,
-      },
+  _layerState = {};
+  for (const role of Object.keys(CLUSTER_ROLES)) {
+    const nodeIds = (chainData?.nodes || [])
+      .filter(n => !n.deprecated && !String(n.id).startsWith('_preview_'))
+      .filter(n => _nodeRole(n, inDeg, outDeg) === role)
+      .map(n => n.id);
+    _layerState[role] = { nodeIds };
+  }
+}
+
+// Save current node positions, then move every node into its RCDE band as a vertical column
+function _snapToLayers() {
+  if (!network || !chainData) return;
+  _preclusterPositions = {};
+  (chainData?.nodes || []).filter(n => !n.deprecated).forEach(n => {
+    try { _preclusterPositions[n.id] = network.getPosition(n.id); } catch (_) {}
+  });
+  _buildLayerState();
+  Object.keys(CLUSTER_ROLES).forEach(role => {
+    const { nodeIds } = _layerState[role];
+    const cy      = RCDE_Y[role];
+    const spacing = 70;
+    const startY  = cy - spacing * (nodeIds.length - 1) / 2;
+    nodeIds.forEach((id, i) => {
+      try { network.moveNode(id, 0, startY + i * spacing); } catch (_) {}
     });
   });
+  network.fit({ animation: { duration: 400, easingFunction: 'easeInOutQuad' } });
 }
 
-function declusAll() {
+// Restore node positions saved before the last snap
+function _restorePositions() {
   if (!network) return;
-  [..._activeClusters].forEach(({ id }) => {
-    try { if (network.isCluster(id)) network.openCluster(id); } catch (_) {}
+  Object.entries(_preclusterPositions).forEach(([id, pos]) => {
+    try { network.moveNode(id, pos.x, pos.y); } catch (_) {}
   });
-  _activeClusters = [];
+  _preclusterPositions = {};
+  _layerState = {};
+  network.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
 }
 
-function handleZoomClustering(params) {
-  if (!_clusteringEnabled) return;
-  if (params.direction === '-' && params.scale < CLUSTER_OUT_SCALE && !_activeClusters.length) {
-    clusterByRole();
-  } else if (params.direction === '+' && params.scale > CLUSTER_IN_SCALE && _activeClusters.length) {
-    declusAll();
-  }
+// Draw semi-transparent RCDE zone bands on the vis-network afterDrawing canvas.
+// The ctx is already transformed to network coordinates, so we draw in network space.
+function _drawRCDEZones(ctx) {
+  if (!_clusteringEnabled || !network) return;
+  const scale    = network.getScale();
+  const view     = network.getViewPosition();
+  const canvasEl = document.querySelector('#graph canvas');
+  if (!canvasEl) return;
+
+  const halfW = canvasEl.width  / (2 * scale);
+  const left  = view.x - halfW;
+  const bw    = halfW * 2;
+  const lh    = 13 / scale; // fixed 13px label height regardless of zoom
+
+  const zones = [
+    { role: 'root_cause', label: 'R — Root Cause',     color: [201,  42,  42] },
+    { role: 'pathway',    label: 'C — Causal Pathway', color: [ 25, 113, 194] },
+    { role: 'decision',   label: 'D — Decision Point', color: [230, 119,   0] },
+    { role: 'effect',     label: 'E — Effect',          color: [ 47, 158,  68] },
+    { role: 'questions',  label: 'Open Questions',      color: [139,  92, 246] },
+  ];
+
+  zones.forEach(({ role, label, color: [r, g, b] }) => {
+    const cy    = RCDE_Y[role];
+    const state = _layerState[role];
+    const PAD   = 40;
+    let top, bandH;
+
+    if (state?.nodeIds?.length > 0) {
+      // Compute actual y extent of layer nodes + padding
+      const ys = state.nodeIds.map(id => { try { return network.getPosition(id).y; } catch(_) { return cy; } });
+      top   = Math.min(...ys) - PAD;
+      bandH = Math.max(...ys) - Math.min(...ys) + PAD * 2;
+    } else {
+      top   = cy - RCDE_BAND_HALF;
+      bandH = RCDE_BAND_HALF * 2;
+    }
+
+    // Fill band
+    ctx.save();
+    ctx.fillStyle = `rgba(${r},${g},${b},0.09)`;
+    ctx.fillRect(left, top, bw, bandH);
+
+    // Top border line
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.30)`;
+    ctx.lineWidth   = 1 / scale;
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(left + bw, top);
+    ctx.stroke();
+
+    // Layer label — pinned to top-right of band, fixed screen size
+    ctx.font      = `bold ${lh}px Courier New`;
+    ctx.fillStyle = `rgba(${r},${g},${b},0.65)`;
+    ctx.textAlign = 'right';
+    ctx.fillText(label, left + bw - 6 / scale, top + lh + 4 / scale);
+    ctx.restore();
+  });
 }
 
 function setupLasso() {
@@ -1456,14 +1524,14 @@ function setupToolbar() {
   document.getElementById('btn-cluster').addEventListener('click', () => {
     if (_clusteringEnabled) {
       _clusteringEnabled = false;
-      declusAll();
+      _restorePositions();
       document.getElementById('btn-cluster').classList.remove('active');
-      setStatus('Clustering off');
+      setStatus('Layer view off');
     } else {
       _clusteringEnabled = true;
       document.getElementById('btn-cluster').classList.add('active');
-      clusterByRole();
-      setStatus('Clustered by role — zoom out to auto-cluster, click a group to expand');
+      _snapToLayers();
+      setStatus('Nodes organized by RCDE layer — click ⊞ Cluster again to restore');
     }
   });
   document.getElementById('btn-enrich').addEventListener('click', () => runEnrich('gaps'));

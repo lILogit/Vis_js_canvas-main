@@ -4,7 +4,7 @@
     "name": "I",
     "domain": "custom",
     "created_at": "2026-03-25T13:43:19.341239",
-    "updated_at": "2026-03-26T15:09:02.682622",
+    "updated_at": "2026-03-27T13:49:04.167316",
     "version": 1,
     "author": "",
     "description": "+ dashboard basic RCDE\n+ buils business plan with picture gemeni\n+ build small images vision or marketing image\n+ Hostinger\n+ summary report + status update\n+ collective share\n+ jaké jsou moje faktory pro štěstí > očekávání realita?\n+ změna práce worrst case realistic ideal > reasoning, asset impact\n+ asset inventory ušlé příležitosti, worstcase, optima, ideal, loop new assest z assets!\n+ proaktivně hledat nové vazby, node, edge z news a observace\nDecision Support System\n\n"
@@ -104,7 +104,7 @@
     {
       "id": "a3cf475c",
       "label": "Asset",
-      "description": "skills, cashflow, income, outcome, local recources, new asset loop",
+      "description": "I, skills, cashflow, income, outcome, local recources, new asset loop",
       "type": "asset",
       "archetype": "root_cause",
       "tags": [],
@@ -347,6 +347,32 @@
       "source": "llm",
       "deprecated": false,
       "flagged": true
+    },
+    {
+      "id": "399b8531",
+      "label": "health",
+      "description": "",
+      "type": "state",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T07:49:34.843Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
+    },
+    {
+      "id": "a24652bb",
+      "label": "Utility",
+      "description": "maximize asset utility",
+      "type": "goal",
+      "archetype": null,
+      "tags": [],
+      "confidence": 0.7,
+      "created_at": "2026-03-27T12:17:51.852Z",
+      "source": "user",
+      "deprecated": false,
+      "flagged": false
     }
   ],
   "edges": [
@@ -1149,6 +1175,54 @@
       "version": 1,
       "created_at": "2026-03-26T13:27:38.406Z",
       "source": "llm"
+    },
+    {
+      "id": "e17c69f0",
+      "from": "399b8531",
+      "to": "59e2c983",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T07:49:44.055Z",
+      "source": "user"
+    },
+    {
+      "id": "6599598a",
+      "from": "b776851e",
+      "to": "399b8531",
+      "relation": "AMPLIFIES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T07:51:22.496Z",
+      "source": "user"
+    },
+    {
+      "id": "854a4bdb",
+      "from": "a3cf475c",
+      "to": "a24652bb",
+      "relation": "ENABLES",
+      "weight": 0.5,
+      "confidence": 0.5,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-03-27T12:18:20.237Z",
+      "source": "user"
     }
   ],
   "history": [
@@ -1905,6 +1979,46 @@
       "actor": "llm",
       "payload": {
         "edge_id": "820408c3"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T07:49:34.843Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "399b8531"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T07:49:44.055Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "e17c69f0"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T07:51:22.496Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "6599598a"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:17:51.852Z",
+      "action": "node_add",
+      "actor": "user",
+      "payload": {
+        "node_id": "a24652bb"
+      }
+    },
+    {
+      "timestamp": "2026-03-27T12:18:20.237Z",
+      "action": "edge_add",
+      "actor": "user",
+      "payload": {
+        "edge_id": "854a4bdb"
       }
     }
   ]

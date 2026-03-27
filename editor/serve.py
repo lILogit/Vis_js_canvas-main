@@ -159,6 +159,8 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_file(_TEMPLATE)
         elif path == "/decompose":
             self._serve_file(os.path.join(os.path.dirname(__file__), "decompose.html"))
+        elif path == "/grammar":
+            self._serve_file(os.path.join(os.path.dirname(__file__), "grammar.html"))
         elif path == "/api/chain":
             self._api_get_chain()
         elif path == "/api/chains":
