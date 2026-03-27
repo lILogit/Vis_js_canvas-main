@@ -1857,12 +1857,54 @@ async function runSummarize() {
   const overlay = document.getElementById('summary-overlay');
   const body = document.getElementById('summary-body');
   const headline = document.getElementById('summary-headline');
+  const saveBtn = document.getElementById('btn-summary-save');
   headline.textContent = '';
+  saveBtn.style.display = 'none';
+
+  const hasSaved = (chainData?.summaries || []).length > 0;
+  if (hasSaved) {
+    _showSummaryChoice(overlay, body);
+    return;
+  }
+  await _generateSummary(overlay, body, headline, saveBtn);
+}
+
+function _showSummaryChoice(overlay, body) {
+  body.innerHTML = `
+    <div class="sum-choice">
+      <button id="sum-choice-new" class="sum-choice-btn">
+        <span class="sum-choice-icon">⚡</span>
+        <span class="sum-choice-label">Generate new summary</span>
+        <span class="sum-choice-hint">Run AI analysis on current chain state</span>
+      </button>
+      <button id="sum-choice-history" class="sum-choice-btn">
+        <span class="sum-choice-icon">📂</span>
+        <span class="sum-choice-label">Open from history</span>
+        <span class="sum-choice-hint">${(chainData?.summaries || []).length} saved snapshot${(chainData?.summaries || []).length !== 1 ? 's' : ''}</span>
+      </button>
+    </div>`;
+  overlay.classList.add('visible');
+
+  const headline = document.getElementById('summary-headline');
+  const saveBtn = document.getElementById('btn-summary-save');
+
+  document.getElementById('sum-choice-new').addEventListener('click', () =>
+    _generateSummary(overlay, body, headline, saveBtn));
+  document.getElementById('sum-choice-history').addEventListener('click', () => {
+    _summaryHistoryMode = true;
+    document.getElementById('btn-summary-history').classList.add('active');
+    headline.textContent = '';
+    _renderSummaryHistory(body);
+  });
+}
+
+async function _generateSummary(overlay, body, headline, saveBtn) {
+  _summaryHistoryMode = false;
+  document.getElementById('btn-summary-history').classList.remove('active');
 
   const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
   const scope = selIds.length ? selIds : null;
   const scopeLabel = scope ? `${scope.length} selected node${scope.length > 1 ? 's' : ''}` : null;
-  const saveBtn = document.getElementById('btn-summary-save');
   saveBtn.style.display = 'none';
   _lastSummaryResult = null;
   _lastSummaryScope = scope;
@@ -1924,6 +1966,9 @@ function toggleSummaryHistory() {
       headline.textContent = _lastSummaryResult.headline || '';
       body.innerHTML = _renderSummary(_lastSummaryResult);
       saveBtn.style.display = '';
+    } else if ((chainData?.summaries || []).length) {
+      const overlay = document.getElementById('summary-overlay');
+      _showSummaryChoice(overlay, body);
     } else {
       headline.textContent = '';
       body.innerHTML = '<div class="summary-loading">Click 📋 Summary to generate a new summary.</div>';
