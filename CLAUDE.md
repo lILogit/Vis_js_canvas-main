@@ -87,9 +87,10 @@ editor/
   serve.py              ← HTTPServer on port 7331; REST API + WebSocket upgrade
   template.html         ← vis.js editor UI (toolbar + graph + inspector + overlays)
   decompose.html        ← standalone Knowledge Decomposer page (/decompose route)
+  grammar.html          ← standalone Chain Grammar System page (/grammar route)
   static/
-    editor.js           ← vis-network init, visual encoding, enrich/import/ingest preview
-    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints
+    editor.js           ← vis-network init, visual encoding, enrich/import/ingest preview, RCDE cluster, summary save/history
+    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, etc.)
     style.css           ← dark theme
     decompose.js        ← Knowledge Decomposer vis-network; epistemic class coloring
     decompose.css       ← Decomposer layout + klass badge styles
@@ -123,6 +124,8 @@ tests/                  ← pytest; 42 tests across schema, validate, io, note
 - `POST /api/chain/switch` — hot-swap active chain without server restart; body: `{filename}`; rejects seed files
 - `POST /api/demo/reset` — copies `*-seed.causal.json` over matching chain files, reloads if active; returns `{reset: [filenames], chain}`
 - `POST /api/validate` — run structural validation
+- `POST /api/summary/save` — append a summary snapshot to `chain.summaries` and persist; body: `{entry}`
+- `POST /api/summary/delete` — remove a summary by id; body: `{id}`
 - `POST /llm/ask` — free-form question
 - `POST /llm/explain` — explain node or full chain
 - `POST /llm/suggest` — suggest N new nodes/edges
@@ -131,6 +134,7 @@ tests/                  ← pytest; 42 tests across schema, validate, io, note
 - `POST /llm/enrich-preview` — gap/suggest candidates (no write); mode: `gaps|suggest`
 - `POST /llm/import-text` — convert free text to nodes/edges (preview only)
 - `POST /llm/ingest-note` — full note ingestion pipeline; body: NoteInput fields; returns `{suggestions, classification, w_score}`
+- `POST /llm/summarize` — structured briefing; optional `node_ids` for selection scope
 
 **Enrich/import/ingest preview flow (browser):**
 Any LLM action that produces graph items → preview nodes/edges added with `_preview_*` ids (purple dashed, `⟨new⟩` label) → suggestions overlay with checkboxes and optional W-score badge → `Accept selected` → `applyPreviewSuggestions()` → `rerenderLayout()` → auto-save
@@ -163,7 +167,7 @@ Free text body.
 
 ## Browser UI features
 
-Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `Save ⌘S`
+Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `⊞ Cluster` | `Save ⌘S`
 
 **Chain switcher** — lists all non-seed chains from `GET /api/chains` as cards; clicking one calls `POST /api/chain/switch` and re-renders the graph without page reload. Hover a card to reveal a 🗑 delete button (backs up then removes the file; seed files are protected).
 
@@ -175,7 +179,11 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty ch
 
 **Knowledge Decomposer** (`⊕ Decompose` → opens `/decompose` in new tab) — standalone page that runs the `TEXT_TO_CHAIN` pipeline on pasted text. Nodes are coloured by epistemic class instead of confidence: `KK` blue (abstract parametric mechanism), `KU` yellow (known category, specific instance value), `UU` red (post-cutoff/proprietary, flagged for human review), `UK` purple (cross-domain bridge pattern). Result can be saved as a new `.causal.json` chain via `Save as chain`.
 
-**Summary modal** — `📋 Summary` button calls `POST /llm/summarize`; returns a structured briefing (headline, goal, critical path, tasks, decisions, risks, open questions) rendered in colour-coded sections. Operates on selected nodes if any are selected, otherwise the full chain.
+**Summary modal** — `📋 Summary` opens a choice screen when saved summaries exist: `⚡ Generate new` (calls `POST /llm/summarize`) or `📂 Open from history`. When no history exists, generates immediately. Result is a structured briefing (headline, goal, critical path, tasks, decisions, risks, open questions) in colour-coded sections. `💾 Save` persists the snapshot to `chain.summaries` via `POST /api/summary/save`. `📂 History` lists all snapshots; each entry can be viewed, exported as `.md`, or deleted. Operates on selected nodes if any are selected, otherwise the full chain.
+
+**RCDE Cluster view** — `⊞ Cluster` toggles a layer-snap layout. Nodes are assigned to RCDE roles (`root_cause` → top, `pathway`, `decision`, `effect`, `questions` → bottom) by `_nodeRole()` using type, archetype, and in/out degree. `_snapToLayers()` saves current positions to `_preclusterPositions` then moves all nodes to vertical columns at fixed Y bands; `_restorePositions()` reverts. `afterDrawing` draws labelled colour bands each frame. No `network.cluster()` API is used — pure `moveNode()`.
+
+**Grammar System** — `📖 Grammar` (opens `/grammar` in new tab) — 4-tab reference: concept map SVG, node/edge compatibility matrix, grammar rules G1–G8 accordion, RCDE binding panel.
 
 **Polygon lasso** — overlay canvas; click to place vertices, **double-click** or **Enter** to close polygon and select all enclosed nodes (persists selection); `Escape` cancels. Selection can then be used with Find gaps / Suggest / Summary (scoped to selected nodes) or deleted with `Delete`/`Backspace`. Multi-node selection also works with **Ctrl+click** (or **Cmd+click**).
 
@@ -213,7 +221,8 @@ Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both 
   "nodes": [{ "id", "label", "description", "type", "archetype", "tags", "confidence", "created_at", "source", "deprecated", "flagged" }],
   "edges": [{ "id", "from", "to", "relation", "weight", "confidence", "direction", "condition",
               "evidence", "deprecated", "flagged", "version", "created_at", "source" }],
-  "history": [{ "timestamp", "action", "actor", "payload" }]
+  "history": [{ "timestamp", "action", "actor", "payload" }],
+  "summaries": [{ "id", "created_at", "headline", "scope", "data" }]
 }
 ```
 
