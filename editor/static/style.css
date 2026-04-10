@@ -824,6 +824,26 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
 }
 .summary-close-btn:hover { color: var(--text); }
 
+/* Summary history tabs */
+.sum-history-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+.sum-history-tab {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.sum-history-tab:hover { color: var(--text); }
+.sum-history-tab.active { color: var(--accent); border-color: var(--accent); background: rgba(139,92,246,0.08); }
+
 /* Summary history list */
 .sum-history-list {
   display: flex;
@@ -920,6 +940,21 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
 }
 .sum-history-export:hover { color: var(--text); }
 .sum-history-del:hover { color: var(--danger); }
+
+/* Markdown file viewer */
+.sum-md-viewer {
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 0;
+}
 
 .summary-body {
   overflow-y: auto;

@@ -152,6 +152,30 @@ export async function deleteSummary(id) {
   return data;
 }
 
+export async function listSummaryFiles() {
+  const resp = await fetch('/api/summary/files');
+  if (!resp.ok) throw new Error(`List files failed: ${resp.status}`);
+  return (await resp.json()).files || [];
+}
+
+export async function readSummaryFile(name) {
+  const resp = await fetch(`/api/summary/file?name=${encodeURIComponent(name)}`);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data.content;
+}
+
+export async function exportSummaryFile(name, content) {
+  const resp = await fetch('/api/summary/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, content }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
 export async function saveNewChain(payload) {
   const resp = await fetch('/api/chain/save-new', {
     method: 'POST',

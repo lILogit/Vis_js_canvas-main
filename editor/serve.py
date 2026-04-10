@@ -22,6 +22,7 @@ from chain.validate import validate
 
 _STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 _TEMPLATE = os.path.join(os.path.dirname(__file__), "template.html")
+_SUMMARIES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "summaries")
 
 # Shared state
 _chain: CausalChain = None
@@ -169,6 +170,10 @@ class Handler(BaseHTTPRequestHandler):
             self._api_llm_status()
         elif path == "/api/llm-provider":
             self._api_get_llm_provider()
+        elif path == "/api/summary/files":
+            self._api_summary_list_files()
+        elif path == "/api/summary/file":
+            self._api_summary_read_file()
         elif path.startswith("/static/"):
             rel = path[len("/static/"):]
             self._serve_file(os.path.join(_STATIC_DIR, rel))
@@ -216,6 +221,8 @@ class Handler(BaseHTTPRequestHandler):
             self._api_summary_save()
         elif path == "/api/summary/delete":
             self._api_summary_delete()
+        elif path == "/api/summary/export":
+            self._api_summary_export()
         else:
             self._send_error("Not found", 404)
 
@@ -837,6 +844,56 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_error(str(exc))
                 return
         self._send_json({"ok": True})
+
+    def _api_summary_list_files(self):
+        """List .md files in the summaries directory, newest first."""
+        os.makedirs(_SUMMARIES_DIR, exist_ok=True)
+        files = []
+        for fname in os.listdir(_SUMMARIES_DIR):
+            if not fname.endswith(".md"):
+                continue
+            fpath = os.path.join(_SUMMARIES_DIR, fname)
+            try:
+                stat = os.stat(fpath)
+                files.append({
+                    "name": fname,
+                    "size": stat.st_size,
+                    "modified_at": stat.st_mtime,
+                })
+            except OSError:
+                continue
+        files.sort(key=lambda f: f["modified_at"], reverse=True)
+        self._send_json({"files": files})
+
+    def _api_summary_read_file(self):
+        """Return the content of a .md file from the summaries directory."""
+        from urllib.parse import parse_qs
+        qs = parse_qs(urlparse(self.path).query)
+        name = (qs.get("name") or [""])[0]
+        if not name or not name.endswith(".md") or "/" in name or ".." in name:
+            self._send_error("Invalid filename")
+            return
+        fpath = os.path.join(_SUMMARIES_DIR, name)
+        if not os.path.isfile(fpath):
+            self._send_error("File not found", 404)
+            return
+        with open(fpath, "r", encoding="utf-8") as f:
+            content = f.read()
+        self._send_json({"name": name, "content": content})
+
+    def _api_summary_export(self):
+        """Write a summary .md file to the summaries directory."""
+        body = self._body()
+        name = body.get("name", "")
+        content = body.get("content", "")
+        if not name or not name.endswith(".md") or "/" in name or ".." in name:
+            self._send_error("Invalid filename")
+            return
+        os.makedirs(_SUMMARIES_DIR, exist_ok=True)
+        fpath = os.path.join(_SUMMARIES_DIR, name)
+        with open(fpath, "w", encoding="utf-8") as f:
+            f.write(content)
+        self._send_json({"ok": True, "name": name})
 
     def _api_get_llm_provider(self):
         self._send_json({

@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, createChain, deleteChain } from './sync.js';
+import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -1976,10 +1976,30 @@ function toggleSummaryHistory() {
   }
 }
 
-function _renderSummaryHistory(body) {
+function _renderSummaryHistory(body, activeTab = 'snapshots') {
+  body.innerHTML = `
+    <div class="sum-history-tabs">
+      <button class="sum-history-tab${activeTab === 'snapshots' ? ' active' : ''}" data-tab="snapshots">📌 Snapshots</button>
+      <button class="sum-history-tab${activeTab === 'files' ? ' active' : ''}" data-tab="files">📁 Files</button>
+    </div>
+    <div id="sum-history-tab-content"></div>`;
+
+  body.querySelectorAll('.sum-history-tab').forEach(btn => {
+    btn.addEventListener('click', () => _renderSummaryHistory(body, btn.dataset.tab));
+  });
+
+  const content = body.querySelector('#sum-history-tab-content');
+  if (activeTab === 'snapshots') {
+    _renderSnapshotsTab(content, body);
+  } else {
+    _renderFilesTab(content, body);
+  }
+}
+
+function _renderSnapshotsTab(content, body) {
   const summaries = (chainData?.summaries || []).slice().reverse();
   if (!summaries.length) {
-    body.innerHTML = '<div class="sum-history-empty">No saved summaries yet. Generate and save a summary first.</div>';
+    content.innerHTML = '<div class="sum-history-empty">No saved snapshots yet. Generate and save a summary first.</div>';
     return;
   }
   const items = summaries.map(s => {
@@ -1993,25 +2013,23 @@ function _renderSummaryHistory(body) {
           ${scopeHtml}
         </div>
         <button class="sum-history-export" data-sid="${esc(s.id)}" title="Download as markdown file">📄</button>
-        <button class="sum-history-del" data-sid="${esc(s.id)}" title="Delete this summary">🗑</button>
+        <button class="sum-history-del" data-sid="${esc(s.id)}" title="Delete this snapshot">🗑</button>
       </div>`;
   }).join('');
-  body.innerHTML = `<div class="sum-history-list">${items}</div>`;
+  content.innerHTML = `<div class="sum-history-list">${items}</div>`;
 
-  body.querySelectorAll('.sum-history-export').forEach(btn => {
+  content.querySelectorAll('.sum-history-export').forEach(btn => {
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
-      const sid = btn.dataset.sid;
-      const entry = (chainData?.summaries || []).find(s => s.id === sid);
+      const entry = (chainData?.summaries || []).find(s => s.id === btn.dataset.sid);
       if (entry) _downloadSummaryFile(entry);
     });
   });
 
-  body.querySelectorAll('.sum-history-item').forEach(el => {
+  content.querySelectorAll('.sum-history-item').forEach(el => {
     el.addEventListener('click', (ev) => {
       if (ev.target.closest('.sum-history-del') || ev.target.closest('.sum-history-export')) return;
-      const sid = el.dataset.sid;
-      const entry = (chainData?.summaries || []).find(s => s.id === sid);
+      const entry = (chainData?.summaries || []).find(s => s.id === el.dataset.sid);
       if (!entry) return;
       _summaryHistoryMode = false;
       document.getElementById('btn-summary-history').classList.remove('active');
@@ -2022,15 +2040,15 @@ function _renderSummaryHistory(body) {
       document.getElementById('btn-summary-save').style.display = 'none';
     });
   });
-  body.querySelectorAll('.sum-history-del').forEach(btn => {
+
+  content.querySelectorAll('.sum-history-del').forEach(btn => {
     btn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
-      const sid = btn.dataset.sid;
       btn.textContent = '…';
       try {
-        await deleteSummary(sid);
-        chainData.summaries = (chainData.summaries || []).filter(s => s.id !== sid);
-        _renderSummaryHistory(body);
+        await deleteSummary(btn.dataset.sid);
+        chainData.summaries = (chainData.summaries || []).filter(s => s.id !== btn.dataset.sid);
+        _renderSummaryHistory(body, 'snapshots');
       } catch (e) {
         btn.textContent = '🗑';
         alert('Delete failed: ' + e.message);
@@ -2039,15 +2057,65 @@ function _renderSummaryHistory(body) {
   });
 }
 
-function _downloadSummaryFile(entry) {
+async function _renderFilesTab(content, body) {
+  content.innerHTML = '<div class="summary-loading">Loading files…</div>';
+  let files;
+  try {
+    files = await listSummaryFiles();
+  } catch (e) {
+    content.innerHTML = `<div class="summary-error">Error: ${esc(e.message)}</div>`;
+    return;
+  }
+  if (!files.length) {
+    content.innerHTML = '<div class="sum-history-empty">No markdown files in <code>summaries/</code> yet.<br>Use 📄 on a snapshot to export one.</div>';
+    return;
+  }
+  const items = files.map(f => {
+    const date = new Date(f.modified_at * 1000).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    const kb = (f.size / 1024).toFixed(1);
+    return `
+      <div class="sum-history-item" data-fname="${esc(f.name)}">
+        <div class="sum-history-item-body">
+          <div class="sum-history-date">${esc(date)} · ${esc(kb)} KB</div>
+          <div class="sum-history-headline">${esc(f.name)}</div>
+        </div>
+      </div>`;
+  }).join('');
+  content.innerHTML = `<div class="sum-history-list">${items}</div>`;
+
+  content.querySelectorAll('.sum-history-item').forEach(el => {
+    el.addEventListener('click', async () => {
+      el.style.opacity = '0.6';
+      try {
+        const md = await readSummaryFile(el.dataset.fname);
+        _summaryHistoryMode = false;
+        document.getElementById('btn-summary-history').classList.remove('active');
+        document.getElementById('summary-headline').textContent = el.dataset.fname;
+        body.innerHTML = `<pre class="sum-md-viewer">${esc(md)}</pre>`;
+        document.getElementById('btn-summary-save').style.display = 'none';
+      } catch (e) {
+        el.style.opacity = '';
+        alert('Could not read file: ' + e.message);
+      }
+    });
+  });
+}
+
+async function _downloadSummaryFile(entry) {
   const md = _summaryToMarkdown(entry);
+  const chainName = (chainData?.meta?.name || 'chain').replace(/\s+/g, '-').toLowerCase();
+  const date = new Date(entry.created_at).toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+  const filename = `summary_${chainName}_${date}.md`;
+
+  // Save to server summaries/ folder (best-effort; don't block download)
+  exportSummaryFile(filename, md).catch(() => {});
+
+  // Trigger browser download
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const chainName = (chainData?.meta?.name || 'chain').replace(/\s+/g, '-').toLowerCase();
-  const date = new Date(entry.created_at).toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
   a.href = url;
-  a.download = `summary_${chainName}_${date}.md`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
