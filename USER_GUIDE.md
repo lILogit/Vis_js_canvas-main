@@ -4,7 +4,7 @@
 
 The Causal Editor is a visual tool for building and exploring **causal chain diagrams** — graphs that model how one thing leads to another. Use it to map out cause-and-effect relationships in any domain: science, policy, engineering, personal decision-making, research hypotheses, and more.
 
-It combines a drag-and-drop graph editor with an AI assistant (Claude) that can fill gaps, suggest new nodes, critique your logic, and answer questions about your chain.
+It combines a drag-and-drop graph **editor** with an AI assistant (Claude) that can fill gaps, suggest new nodes, critique your logic, and answer questions about your chain.
 
 ---
 
