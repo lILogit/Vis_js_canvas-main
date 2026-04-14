@@ -969,12 +969,12 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"provider": label, "ok": False, "error": msg})
 
 
-def start(chain_path: str, port: int = 7331, open_browser: bool = True):
+def start(chain_path: str, port: int = 7331, open_browser: bool = True, host: str = "127.0.0.1"):
     global _chain, _chain_path
     _chain_path = chain_path
     _chain = chain_io.load(chain_path)
 
-    server = HTTPServer(("127.0.0.1", port), Handler)
+    server = HTTPServer((host, port), Handler)
     url = f"http://localhost:{port}"
     print(f"  Editor: {url}")
 

@@ -101,7 +101,7 @@ def cmd_open(args):
     print(f"\n  Opening editor at http://localhost:{args.port}")
     print(f"  Chain: {chain.meta.name}  |  {active_nodes} nodes  |  {active_edges} edges")
     print(f"\n  Editor open in browser. Press Ctrl+C to quit.\n")
-    start(args.file, port=args.port, open_browser=not args.no_browser)
+    start(args.file, port=args.port, open_browser=not args.no_browser, host=args.host)
 
 
 def cmd_list(args):
@@ -649,6 +649,7 @@ def build_parser():
     s = sub.add_parser("open", help="Open chain in browser editor")
     s.add_argument("file")
     s.add_argument("--port", type=int, default=7331)
+    s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--no-browser", action="store_true")
 
     # list

@@ -1,0 +1,26 @@
+services:
+  causal-editor:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-7331}:7331"
+    volumes:
+      - chains_data:/app/chains
+    environment:
+      # LLM provider — default: anthropic
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      # API keys — set in .env or Hostinger environment variables panel
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ZAI_API_KEY=${ZAI_API_KEY:-}
+      # Which chain to open on start (relative to /app)
+      - CHAIN_FILE=${CHAIN_FILE:-chains/default.causal.json}
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7331/api/chain')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  chains_data:

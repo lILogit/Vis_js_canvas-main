@@ -1,0 +1,16 @@
+.git
+.env
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+chains/backups/
+*.bak
+tests/
+demo.py
+*.svg
+Dockerfile
+docker-compose.yml
+.dockerignore
+entrypoint.sh
