@@ -41,7 +41,9 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''deleted''''\\) or d.get\\(''''error''''\\)\\)\")",
       "Bash(git rm:*)",
       "Bash(python3 cli.py info chains/i.causal.json)",
-      "Bash(python3 -:*)"
+      "Bash(python3 -:*)",
+      "Bash(python3 cli.py open chains/causal-editor.causal.json)",
+      "Bash(curl -s http://localhost:7331/ -o /dev/null -w \"%{http_code}\")"
     ]
   }
 }

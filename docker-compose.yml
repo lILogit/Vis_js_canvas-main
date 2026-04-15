@@ -13,10 +13,13 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ZAI_API_KEY=${ZAI_API_KEY:-}
+      # Login credentials — defaults to admin/admin if not set
+      - EDITOR_USERNAME=${EDITOR_USERNAME:-admin}
+      - EDITOR_PASSWORD=${EDITOR_PASSWORD:-admin}
       # Which chain to open on start (relative to /app)
       - CHAIN_FILE=${CHAIN_FILE:-chains/default.causal.json}
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7331/api/chain')"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7331/login')"]
       interval: 30s
       timeout: 10s
       retries: 3

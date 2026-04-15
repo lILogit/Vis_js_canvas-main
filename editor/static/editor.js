@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain } from './sync.js';
+import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, logout } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -1776,6 +1776,11 @@ function setupToolbar() {
     } catch (e) {
       setStatus('Reset failed: ' + e.message, 'error');
     }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    if (!confirm('Sign out?')) return;
+    await logout();
   });
 }
 

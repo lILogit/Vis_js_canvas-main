@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Causal Editor — Login</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --surface2: #0f3460;
+      --border: #2a2a4a;
+      --text: #e0e0e0;
+      --text-dim: #888;
+      --accent: #7c3aed;
+      --accent2: #22c55e;
+      --danger: #ef4444;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px 36px;
+      width: 340px;
+    }
+
+    .login-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 10px;
+      margin-bottom: 18px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 10px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    button[type="submit"]:hover { opacity: 0.88; }
+    button[type="submit"]:disabled { opacity: 0.5; cursor: default; }
+
+    #error-msg {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 14px;
+      min-height: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-title">Causal Editor</div>
+    <div class="login-subtitle">Sign in to continue</div>
+    <form id="login-form" autocomplete="on">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <button type="submit" id="btn-login">Sign in</button>
+    </form>
+    <div id="error-msg"></div>
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      const errEl = document.getElementById('error-msg');
+      errEl.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const resp = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+          }),
+        });
+        const data = await resp.json();
+        if (resp.ok && data.ok) {
+          window.location.replace('/');
+        } else {
+          errEl.textContent = data.error || 'Login failed.';
+        }
+      } catch {
+        errEl.textContent = 'Could not reach server.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+  </script>
+</body>
+</html>

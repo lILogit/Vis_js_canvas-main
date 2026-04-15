@@ -25,8 +25,22 @@ export function markClean() {
 
 export function isDirty() { return _dirty; }
 
+// Redirect to login page on 401 from any API call
+function _handleUnauthorized(resp) {
+  if (resp.status === 401) {
+    window.location.replace('/login');
+    throw new Error('Session expired. Please log in again.');
+  }
+  return resp;
+}
+
+export async function logout() {
+  await fetch('/auth/logout', { method: 'POST' });
+  window.location.replace('/login');
+}
+
 export async function loadChain() {
-  const resp = await fetch('/api/chain');
+  const resp = _handleUnauthorized(await fetch('/api/chain'));
   if (!resp.ok) throw new Error(`Load failed: ${resp.status}`);
   return resp.json();
 }
@@ -199,11 +213,11 @@ export async function resetDemo() {
 }
 
 async function _llmPost(endpoint, body) {
-  const resp = await fetch(endpoint, {
+  const resp = _handleUnauthorized(await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  });
+  }));
   const data = await resp.json();
   if (data.error) throw new Error(data.error);
   return data;

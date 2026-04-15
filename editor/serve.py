@@ -22,13 +22,54 @@ from chain.validate import validate
 
 _STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 _TEMPLATE = os.path.join(os.path.dirname(__file__), "template.html")
+_LOGIN_PAGE = os.path.join(os.path.dirname(__file__), "login.html")
 _SUMMARIES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "summaries")
+
+# Paths that do not require authentication
+_PUBLIC_PATHS = {"/login", "/auth/login"}
 
 # Shared state
 _chain: CausalChain = None
 _chain_path: str = None
 _chain_lock = threading.Lock()
 _last_modified: float = 0.0
+
+# ── Auth / session state ──────────────────────────────────────────────────
+_sessions: dict = {}  # token -> {"username": str, "expires": float}
+_SESSION_TTL = 8 * 3600  # 8 hours
+
+
+def _get_credentials() -> tuple[str, str]:
+    """Return (username, password) from env vars, defaulting to admin/admin."""
+    username = os.environ.get("EDITOR_USERNAME", "admin")
+    password = os.environ.get("EDITOR_PASSWORD", "admin")
+    return username, password
+
+
+def _create_session(username: str) -> str:
+    token = uuid.uuid4().hex
+    _sessions[token] = {"username": username, "expires": time.time() + _SESSION_TTL}
+    return token
+
+
+def _get_token_from_cookie(cookie_header: str) -> str | None:
+    for part in cookie_header.split(";"):
+        part = part.strip()
+        if part.startswith("session="):
+            return part[len("session="):]
+    return None
+
+
+def _check_auth(cookie_header: str) -> bool:
+    token = _get_token_from_cookie(cookie_header)
+    if not token:
+        return False
+    sess = _sessions.get(token)
+    if sess and sess["expires"] > time.time():
+        return True
+    if sess:
+        del _sessions[token]
+    return False
 
 
 def _subgraph(chain_data: dict, node_ids: list) -> dict:
@@ -152,11 +193,26 @@ class Handler(BaseHTTPRequestHandler):
 
         # WebSocket upgrade
         if self.headers.get("Upgrade", "").lower() == "websocket":
+            if not _check_auth(self.headers.get("Cookie", "")):
+                return  # silently drop unauthenticated WS connections
             self._ws_handshake()
             self._ws_loop()
             return
 
-        if path == "/" or path == "/editor":
+        # Auth gate — redirect browser requests, 401 for API/asset requests
+        if path not in _PUBLIC_PATHS:
+            if not _check_auth(self.headers.get("Cookie", "")):
+                if path.startswith("/api/") or path.startswith("/llm/") or path.startswith("/static/"):
+                    self._send_error("Unauthorized", 401)
+                else:
+                    self.send_response(302)
+                    self.send_header("Location", "/login")
+                    self.end_headers()
+                return
+
+        if path == "/login":
+            self._serve_file(_LOGIN_PAGE)
+        elif path == "/" or path == "/editor":
             self._serve_file(_TEMPLATE)
         elif path == "/decompose":
             self._serve_file(os.path.join(os.path.dirname(__file__), "decompose.html"))
@@ -182,6 +238,19 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
+
+        # Auth endpoints are always public
+        if path == "/auth/login":
+            self._auth_login()
+            return
+        if path == "/auth/logout":
+            self._auth_logout()
+            return
+
+        # All other POST endpoints require a valid session
+        if not _check_auth(self.headers.get("Cookie", "")):
+            self._send_error("Unauthorized", 401)
+            return
 
         if path == "/api/chain":
             self._api_save_chain()
@@ -225,6 +294,41 @@ class Handler(BaseHTTPRequestHandler):
             self._api_summary_export()
         else:
             self._send_error("Not found", 404)
+
+    # ── Auth endpoints ────────────────────────────────────────────────────────
+
+    def _auth_login(self):
+        body = self._body()
+        username_in = body.get("username", "").strip()
+        password_in = body.get("password", "")
+        expected_user, expected_pass = _get_credentials()
+        if username_in == expected_user and password_in == expected_pass:
+            token = _create_session(username_in)
+            resp_body = json.dumps({"ok": True, "username": username_in}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", len(resp_body))
+            self.send_header("Set-Cookie",
+                             f"session={token}; HttpOnly; Path=/; SameSite=Strict")
+            self.end_headers()
+            self.wfile.write(resp_body)
+        else:
+            self._send_error("Invalid username or password", 401)
+
+    def _auth_logout(self):
+        cookie_header = self.headers.get("Cookie", "")
+        token = _get_token_from_cookie(cookie_header)
+        if token:
+            _sessions.pop(token, None)
+        resp_body = json.dumps({"ok": True}).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", len(resp_body))
+        # Expire the cookie
+        self.send_header("Set-Cookie",
+                         "session=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0")
+        self.end_headers()
+        self.wfile.write(resp_body)
 
     # ── Static file serving ───────────────────────────────────────────────────
 
