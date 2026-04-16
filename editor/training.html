@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>CausalQuest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--bg2:#f1efe8;--bg3:#e8e6de;
+  --tx:#1a1a18;--tx2:#5f5e5a;--tx3:#888780;
+  --bd:rgba(0,0,0,0.13);--bd2:rgba(0,0,0,0.22);
+  --green:#3b6d11;--gbg:#eaf3de;
+  --red:#a32d2d;--rbg:#fcebeb;
+  --blue:#185fa5;--bbg:#e6f1fb;
+  --amber:#ba7517;--ambg:#faeeda;
+  --r:8px;--rl:12px;
+  --mono:'Courier New',monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a18;--bg2:#222220;--bg3:#2c2c2a;
+    --tx:#f1efe8;--tx2:#b4b2a9;--tx3:#888780;
+    --bd:rgba(255,255,255,0.12);--bd2:rgba(255,255,255,0.22);
+    --gbg:#173404;--rbg:#501313;--bbg:#042c53;--ambg:#412402;
+  }
+}
+body{font-family:var(--mono);background:var(--bg);color:var(--tx);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem}
+#app{width:100%;max-width:680px}
+
+/* progress */
+.prog-wrap{height:3px;background:var(--bd);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.prog-bar{height:100%;background:var(--tx3);border-radius:2px;transition:width .4s ease}
+
+/* outcome banner */
+.outcome{padding:8px 14px;background:var(--bg2);border:0.5px solid var(--bd);border-left:2px solid var(--tx3);border-radius:var(--r);margin-bottom:1.5rem;display:flex;gap:10px;align-items:flex-start}
+.outcome-label{font-size:10px;color:var(--tx3);white-space:nowrap;padding-top:2px}
+.outcome-val{font-size:12px;color:var(--tx);line-height:1.5}
+
+/* round badge */
+.round-meta{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.round-badge{font-size:10px;padding:3px 8px;border:0.5px solid var(--bd2);border-radius:4px;color:var(--tx3)}
+.q-counter{font-size:11px;color:var(--tx3)}
+
+/* question */
+.q-card{background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--rl);padding:1.25rem}
+.q-text{font-size:13px;line-height:1.7;color:var(--tx);margin-bottom:1.25rem}
+.q-node{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;background:var(--bg3);border:0.5px solid var(--bd2);border-radius:4px;font-size:11px;margin:0 2px}
+
+/* options */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg);border:0.5px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:100%}
+.opt:hover{border-color:var(--bd2);background:var(--bg2)}
+.opt-key{width:20px;height:20px;border-radius:4px;background:var(--bg3);border:0.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-weight:500}
+.opt-text{font-size:12px;line-height:1.5;color:var(--tx);padding-top:2px}
+.opt.correct{border-color:var(--green);background:var(--gbg)}
+.opt.correct .opt-key{background:var(--green);color:#fff;border-color:var(--green)}
+.opt.wrong{border-color:var(--red);background:var(--rbg)}
+.opt.wrong .opt-key{background:var(--red);color:#fff;border-color:var(--red)}
+.opt.reveal{border-color:var(--green);background:var(--gbg);opacity:.7}
+.opt.reveal .opt-key{background:var(--green);color:#fff;border-color:var(--green)}
+.opt:disabled{cursor:default}
+
+/* feedback */
+.feedback{margin-top:1rem;padding:12px 14px;border-radius:var(--r);font-size:12px;line-height:1.6;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--gbg);border:0.5px solid var(--green);color:var(--green)}
+.feedback.bad{background:var(--rbg);border:0.5px solid var(--red);color:var(--red)}
+.fb-head{font-weight:500;margin-bottom:4px}
+.fb-body{color:var(--tx2);font-size:11px}
+
+/* continue btn */
+.btn{margin-top:1rem;padding:8px 20px;background:var(--bg2);border:0.5px solid var(--bd2);border-radius:var(--r);font-size:12px;font-family:var(--mono);cursor:pointer;color:var(--tx);transition:background .15s;display:none}
+.btn:hover{background:var(--bg3)}
+.btn.show{display:inline-block}
+.btn-primary{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.btn-primary:hover{opacity:.85}
+
+/* intro */
+.intro{text-align:left;padding:1.5rem 0}
+.intro-title{font-size:22px;font-weight:500;margin-bottom:.5rem}
+.intro-sub{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:1.5rem}
+.scenario-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.sc-row{padding:10px 14px;background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--r);display:flex;gap:12px;align-items:flex-start}
+.sc-num{font-size:10px;color:var(--tx3);padding-top:1px;min-width:20px}
+.sc-info{}
+.sc-name{font-size:12px;font-weight:500;margin-bottom:2px}
+.sc-desc{font-size:11px;color:var(--tx2)}
+
+/* score screen */
+.score-wrap{padding:1.5rem 0}
+.score-big{font-size:48px;font-weight:500;line-height:1;margin-bottom:.25rem}
+.score-sub{font-size:13px;color:var(--tx2);margin-bottom:1.5rem}
+.level-badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;margin-bottom:1.5rem}
+.breakdown{display:flex;flex-direction:column;gap:6px;margin-bottom:1.5rem}
+.br-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--r)}
+.br-name{font-size:12px}
+.br-score{font-size:12px;color:var(--tx2)}
+.br-bar-wrap{width:80px;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.br-bar{height:100%;border-radius:2px;background:var(--tx3)}
+
+/* node icons inline */
+.ni{display:inline-flex;vertical-align:middle;margin-right:3px}
+
+/* screen transitions */
+.screen{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SCENARIOS = [
+  {
+    id:'A',
+    name:'Obchodní systém — latence',
+    knownOutcome:'[STATE] 7 zmeškaných obchodů (latence > 300 ms)',
+    color:'var(--ambg)',
+    borderColor:'var(--amber)'
+  },
+  {
+    id:'B',
+    name:'Server incident — OOM Kill',
+    knownOutcome:'[STATE] Výpadek produkce po nasazení v14.3',
+    color:'var(--rbg)',
+    borderColor:'var(--red)'
+  },
+  {
+    id:'C',
+    name:'RCDE framework — obecné znalosti',
+    knownOutcome:'[GOAL] Správně sestavený a validovaný kauzální model',
+    color:'var(--bbg)',
+    borderColor:'var(--blue)'
+  }
+];
+
+const QS = [
+  // SCENARIO A
+  {
+    scenario:0,
+    text:'Latence obchodního systému je trvale nad 300 ms již 2 hodiny. Jaký typ uzlu tento stav představuje?',
+    opts:['EVENT — okamžitá změna, kosočtverec','STATE — trvalá situace, obdélník','CONCEPT — abstraktní idea, elipsa','GOAL — žádoucí výsledek, trojúhelník'],
+    correct:1,
+    explanation:'Trvající situace, která trvá v čase = STATE (obdélník). EVENT by byl okamžitý přechod — např. "Latence překročila 300 ms v 14:22". Trvající podmínka je vždy STATE.'
+  },
+  {
+    scenario:0,
+    text:'Sestav přechod: [STATE] Chybějící DB index → [?] → [EVENT] Full table scan. Jaká vazba patří na místo otazníku?',
+    opts:['ZPŮSOBUJE — hlavní kauzální hrana','REALIZUJE — konstruktivní zásah','SPOUŠTÍ — stav spouští událost','UMOŽŇUJE — podmínka existence'],
+    correct:2,
+    explanation:'STATE spouští EVENT — to je přesně vazba SPOUŠTÍ (přerušovaná šipka). ZPŮSOBUJE se používá pro STATE→STATE nebo EVENT→STATE přechody. Zde stav (chybějící index) je podmínkou, která spouští konkrétní událost (scan).'
+  },
+  {
+    scenario:0,
+    text:'Kolega navrhuje: [STATE] Vysoké I/O → ZPŮSOBUJE → [STATE] Výpadek. Co je v tomto přechodu strukturálně špatně?',
+    opts:['Typ uzlu "Vysoké I/O" je nesprávný — měl by být EVENT','Vazba ZPŮSOBUJE je špatná — měla by být BLOKUJE','Chybí EVENT uzel uprostřed — STATE→STATE potřebuje přechod','Model je správně — vazba ZPŮSOBUJE mezi STATE uzly je povolena'],
+    correct:2,
+    explanation:'Pravidlo přechodu: STATE→STATE musí mít EVENT uzel uprostřed. Správně: STATE Vysoké I/O → PŘEKRAČUJE PRAH → EVENT Connection pool exhausted → ZPŮSOBUJE → STATE Výpadek. Bez EVENT chybí mechanismus změny.'
+  },
+  {
+    scenario:0,
+    text:'Modeluješ kauzální řetězec. V jakém pořadí postupuješ podle RCDE workflow?',
+    opts:['Root Cause → Causal Pathway → Decision Point → Effect','Effect → Root Cause → Causal Pathway → Decision Point','Decision Point → Root Cause → Causal Pathway → Effect','Root Cause → Effect → Causal Pathway → Decision Point'],
+    correct:1,
+    explanation:'RCDE workflow začíná vždy od Effect (dopadu) — zakotv, co se stalo nebo co chceš dosáhnout. Pak hledej Root Cause, propoj Pathway a vlož Decision Point. Začínat od Root bez znalosti Effectu vede k modelování všeho bez zaměření.'
+  },
+  // SCENARIO B
+  {
+    scenario:1,
+    text:'"Nasazení verze 14.3 proběhlo v pátek ve 14:22." Jaký typ uzlu tato informace reprezentuje?',
+    opts:['STATE — nasazení je trvalý stav systému','EVENT — okamžitá změna s časovým bodem','TASK — nasazení je pracovní aktivita','ASSET — nasazení je podmínka proveditelnosti'],
+    correct:1,
+    explanation:'Nasazení je historická okamžitá změna s konkrétním časovým bodem — to je EVENT (kosočtverec). TASK by bylo "Spusť deployment" jako aktivita. Samotný fakt nasazení v daném čase = EVENT v kauzálním modelu.'
+  },
+  {
+    scenario:1,
+    text:'[TASK] Rollback na v2.0 → [?] → [EVENT] OOM Kill. Rollback má zabránit OOM Killu. Jaká vazba?',
+    opts:['ZPŮSOBUJE — rollback způsobuje konec OOM Kill','BLOKUJE — rollback zabraňuje OOM Kill','UMOŽŇUJE — rollback umožňuje OOM Kill','SPOUŠTÍ — rollback spouští OOM Kill'],
+    correct:1,
+    explanation:'BLOKUJE (červená —|) je vazba pro preventivní nebo nápravnou akci, která zastavuje šíření negativního EVENT nebo STATE. TASK + BLOKUJE = prevence. TASK + REALIZUJE = oprava. Rollback přerušuje řetězec.'
+  },
+  {
+    scenario:1,
+    text:'"Nevíme, proč memory leak nenastal v testovacím prostředí." Jaký uzel použiješ v modelu?',
+    opts:['QUESTION — otevřená nejistota, hvězda','CONCEPT — abstraktní mechanismus','BLACKBOX — efekt znám, příčina ne','STATE červený — spekulativní podmínka'],
+    correct:2,
+    explanation:'BLACKBOX = víme co dělá (efekt: leak v prod, ne v testu), nevíme proč/jak (mechanismus neznámý). QUESTION = nevíme ani co se děje. Zde efekt znám, příčina není — to je přesně BLACKBOX (přerušovaný rámeček s ?).'
+  },
+  {
+    scenario:1,
+    text:'Kauzální cesta má 7 uzlů za sebou bez větvení. Co pravidlo taháku vyžaduje?',
+    opts:['Model je v pořádku, délka není omezena','Vlož GATE po 4–5 uzlech — long chains skrývají podmínky','Přidej DECISION uzel na začátek řetězce','Rozděl řetězec na dva samostatné diagramy'],
+    correct:1,
+    explanation:'Pravidlo hloubky: max 4–5 uzlů bez GATE. Dlouhé přímé řetězce skrývají latentní větvení. GATE s otázkou "Nastane vždy?" odhalí podmínky patřící do modelu. V herní mechanice: GATE = checkpoint s podmínkou AND/OR/XOR.'
+  },
+  // SCENARIO C
+  {
+    scenario:2,
+    text:'Model má všechny uzly zelené (>80% jistota). Jaká je hra penalizuje a proč?',
+    opts:['Zelená barva patří jen GOAL a STATE uzlům','Model přeskočil epistémii — reálný model VŽDY obsahuje nejistotu','Barvy se přiřazují pouze EVENT uzlům, ne STATE','Penalizace neexistuje — ověřený model je správný'],
+    correct:1,
+    explanation:'Penalizace –30 % za model se samými zelenými uzly. Barvy dělají epistémii viditelnou. Každý reálný model má nejistá místa. Pokud jsou všechny uzly zelené, nejistota nebyla identifikována — model je epistemicky slepý.'
+  },
+  {
+    scenario:2,
+    text:'DECISION "Výběr strategie" má jednu výstupní hranu vedoucí k TASK "Realizuj plán A". Co platí?',
+    opts:['Je to v pořádku — DECISION může mít jednu větev','DECISION musí mít ≥ 2 větve s různými efekty — jinak je to TASK','Přidej GATE před DECISION pro správnou strukturu','Každá větev DECISION potřebuje ASSET uzel'],
+    correct:1,
+    explanation:'DECISION = lidská volba mezi alternativami, vždy ≥ 2 výstupní větve s různými efekty. Jeden výstup = žádná volba = mělo by být TASK. Toto je jeden z nejčastějších anti-vzorů v modelování. Penalizace: –25 bodů za DECISION bez větvení.'
+  },
+  {
+    scenario:2,
+    text:'"Expanze na nové trhy" je v modelu označena jako STATE. Je toto správná klasifikace?',
+    opts:['Ano — expanze je výsledný trvalý stav firmy','Ne — abstraktní idea bez měřitelné hodnoty je CONCEPT','Ne — mělo by to být EVENT, ne STATE','Ne — správně je GOAL, protože to je žádoucí výsledek'],
+    correct:1,
+    explanation:'CONCEPT = abstraktní idea nebo vzor, nelze přímo měřit. "Přístup k 10 000 novým zákazníkům" je STATE — konkrétní, měřitelné. "Expanze" je CONCEPT. Pravidlo: pokud jde konkrétizovat a měřit, použij STATE. CONCEPT nech pro nezměřitelné abstrakce.'
+  },
+  {
+    scenario:2,
+    text:'Model obsahuje: [ASSET] Rozpočet pro expanzi → ZPŮSOBUJE → [DECISION] Výběr regionu. Co je špatně?',
+    opts:['ASSET nemůže být připojen přímo k DECISION uzlu','Vazba ZPŮSOBUJE je špatná — ASSET se váže vazbou UMOŽŇUJE','DECISION musí mít GATE jako vstupní uzel','Nic — model je strukturálně správný'],
+    correct:1,
+    explanation:'ASSET (válec) = podmínka proveditelnosti, váže se vždy UMOŽŇUJE, nikdy ZPŮSOBUJE. Rozpočet nezpůsobí rozhodnutí — umožňuje ho. Bez rozpočtu nelze rozhodovat, ale jeho existence sama o sobě rozhodnutí nezpůsobí. Anti-vzor: smíchání ZPŮSOBUJE a UMOŽŇUJE.'
+  }
+];
+
+let state = {
+  screen: 'intro', // intro | question | feedback | final
+  qi: 0,
+  score: 0,
+  selected: null,
+  answered: false,
+  roundScores: [0,0,0]
+};
+
+function getScenario(qi){ return SCENARIOS[QS[qi].scenario]; }
+
+function nodeShape(type){
+  const shapes = {
+    STATE:'<svg width="14" height="10" viewBox="0 0 14 10"><rect x="0.5" y="0.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    EVENT:'<svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,0.5 11.5,6 6,11.5 0.5,6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    DECISION:'<svg width="14" height="12" viewBox="0 0 14 12"><polygon points="7,0.5 13,3.5 13,8.5 7,11.5 1,8.5 1,3.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    TASK:'<svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="2" fill="currentColor"/></svg>',
+    GOAL:'<svg width="12" height="11" viewBox="0 0 12 11"><polygon points="6,0.5 11.5,10.5 0.5,10.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    BLACKBOX:'<svg width="14" height="10" viewBox="0 0 14 10"><rect x="0.5" y="0.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3,2"/></svg>',
+    QUESTION:'<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,0.5 8.2,4.5 12.5,4.5 9,7 10.2,11 7,8.5 3.8,11 5,7 1.5,4.5 5.8,4.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    GATE:'<svg width="14" height="12" viewBox="0 0 14 12"><polygon points="1,6 4,1 10,1 13,6 10,11 4,11" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+    ASSET:'<svg width="14" height="12" viewBox="0 0 14 12"><ellipse cx="7" cy="3" rx="6" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="3" x2="1" y2="9" stroke="currentColor" stroke-width="1.2"/><line x1="13" y1="3" x2="13" y2="9" stroke="currentColor" stroke-width="1.2"/><path d="M1,9 Q7,12 13,9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>'
+  };
+  return shapes[type]||'';
+}
+
+function levelInfo(pct){
+  if(pct>=92) return {label:'CAIGE Architekt',bg:'var(--gbg)',color:'var(--green)'};
+  if(pct>=75) return {label:'Stratég',bg:'var(--bbg)',color:'var(--blue)'};
+  if(pct>=58) return {label:'Analytik',bg:'var(--ambg)',color:'var(--amber)'};
+  return {label:'Kadet',bg:'var(--rbg)',color:'var(--red)'};
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.screen==='intro') app.innerHTML = renderIntro();
+  else if(state.screen==='question') app.innerHTML = renderQuestion();
+  else if(state.screen==='final') app.innerHTML = renderFinal();
+}
+
+function renderIntro(){
+  return `<div class="screen intro">
+<p style="font-size:10px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">CausalQuest v1</p>
+<div class="intro-title">Znáš výsledek.<br>Sestav cestu.</div>
+<div class="intro-sub">Každé kolo odhalí <strong>Known Outcome</strong> — cíl nebo dopad. Tvůj úkol: správně identifikovat uzly, vazby a strukturu kauzálního řetězce, který k němu vede.<br><br>12 otázek · 3 scénáře · bodový systém s penalizací za epistemické chyby.</div>
+<div class="scenario-list">
+${SCENARIOS.map((s,i)=>`<div class="sc-row"><div class="sc-num">0${i+1}</div><div class="sc-info"><div class="sc-name">${s.name}</div><div class="sc-desc">Výsledek: ${s.knownOutcome}</div></div></div>`).join('')}
+</div>
+<button class="btn btn-primary show" onclick="startGame()">Spustit hru →</button>
+</div>`;
+}
+
+function renderQuestion(){
+  const qi = state.qi;
+  const q = QS[qi];
+  const sc = getScenario(qi);
+  const prog = (qi/QS.length)*100;
+  const roundNum = q.scenario+1;
+  const roundQ = QS.filter(x=>x.scenario===q.scenario).indexOf(q)+1;
+
+  return `<div class="screen">
+<div class="prog-wrap"><div class="prog-bar" style="width:${prog}%"></div></div>
+<div class="outcome" style="border-left-color:${sc.borderColor};background:${sc.color}">
+  <span class="outcome-label">KNOWN OUTCOME</span>
+  <span class="outcome-val">${sc.knownOutcome}</span>
+</div>
+<div class="round-meta">
+  <span class="round-badge">Scénář ${roundNum}/3 — ${sc.name}</span>
+  <span class="q-counter">Otázka ${roundQ}/4</span>
+</div>
+<div class="q-card">
+  <div class="q-text">${q.text}</div>
+  <div class="opts" id="opts">
+    ${q.opts.map((o,i)=>`<button class="opt" id="opt${i}" onclick="answer(${i})" ${state.answered?'disabled':''}>
+      <span class="opt-key">${String.fromCharCode(65+i)}</span>
+      <span class="opt-text">${o}</span>
+    </button>`).join('')}
+  </div>
+  <div class="feedback" id="fb">
+    <div class="fb-head" id="fb-head"></div>
+    <div class="fb-body" id="fb-body"></div>
+  </div>
+  <button class="btn" id="cont-btn" onclick="next()">Pokračovat →</button>
+</div>
+</div>`;
+}
+
+function renderFinal(){
+  const pct = Math.round((state.score/QS.length)*100);
+  const lv = levelInfo(pct);
+  const rNames = SCENARIOS.map(s=>s.name.split('—')[0].trim());
+  const rScores = state.roundScores;
+  const rCounts = [4,4,4];
+
+  return `<div class="screen score-wrap">
+<p style="font-size:10px;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem">Výsledek</p>
+<div class="score-big">${state.score}<span style="font-size:20px;color:var(--tx3)">/${QS.length}</span></div>
+<div class="score-sub">${pct} % správných odpovědí</div>
+<div class="level-badge" style="background:${lv.bg};color:${lv.color}">Úroveň: ${lv.label}</div>
+<div class="breakdown">
+${rNames.map((n,i)=>`<div class="br-row">
+  <span class="br-name">${n}</span>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="br-bar-wrap"><div class="br-bar" style="width:${Math.round((rScores[i]/rCounts[i])*100)}%;background:${rScores[i]===rCounts[i]?'var(--green)':rScores[i]>=2?'var(--amber)':'var(--red)'}"></div></div>
+    <span class="br-score">${rScores[i]}/${rCounts[i]}</span>
+  </div>
+</div>`).join('')}
+</div>
+${pct<75?`<div style="padding:10px 14px;background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--r);font-size:11px;color:var(--tx2);margin-bottom:1rem;line-height:1.6">
+${pct<50?'Projdi tahák znovu — zaměř se na strukturální pravidla (STATE→EVENT→STATE) a typy vazeb.':'Dobrý základ! Procvič hlavně anti-vzory a epistémické barvení uzlů.'}</div>`:''}
+<button class="btn show" onclick="restartGame()">Hrát znovu</button>
+</div>`;
+}
+
+function startGame(){
+  state = {screen:'question',qi:0,score:0,selected:null,answered:false,roundScores:[0,0,0]};
+  render();
+}
+
+function answer(idx){
+  if(state.answered) return;
+  state.answered = true;
+  state.selected = idx;
+  const q = QS[state.qi];
+  const correct = idx===q.correct;
+  if(correct){
+    state.score++;
+    state.roundScores[q.scenario]++;
+  }
+
+  // style buttons
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.disabled = true;
+    if(i===q.correct) b.classList.add(correct&&i===idx?'correct':'reveal');
+    if(i===idx&&!correct) b.classList.add('wrong');
+  });
+
+  // feedback
+  const fb = document.getElementById('fb');
+  const fbHead = document.getElementById('fb-head');
+  const fbBody = document.getElementById('fb-body');
+  fb.classList.add('show', correct?'ok':'bad');
+  fbHead.textContent = correct ? '✓ Správně' : '✕ Špatně — správně je: '+q.opts[q.correct];
+  fbBody.textContent = q.explanation;
+
+  document.getElementById('cont-btn').classList.add('show');
+}
+
+function next(){
+  state.qi++;
+  state.answered = false;
+  state.selected = null;
+  if(state.qi>=QS.length){
+    state.screen = 'final';
+  }
+  render();
+}
+
+function restartGame(){
+  state = {screen:'intro',qi:0,score:0,selected:null,answered:false,roundScores:[0,0,0]};
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

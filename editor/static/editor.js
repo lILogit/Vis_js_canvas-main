@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, logout } from './sync.js';
+import { markDirty, isDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, logout } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -294,7 +294,7 @@ function renderGraph(data) {
   document.getElementById('btn-cluster')?.classList.remove('active');
 
   const visNodes = (data.nodes || []).filter(n => !n.deprecated).map(nodeToVis);
-  const visEdges = (data.edges || []).map(edgeToVis);
+  const visEdges = (data.edges || []).filter(e => !e.deprecated).map(edgeToVis);
   showChainPanel();
 
   if (network) {
@@ -487,7 +487,7 @@ function showNodePanel(n) {
   document.getElementById('btn-explain').addEventListener('click', () => runExplain(n.id));
   document.getElementById('btn-ask-llm').addEventListener('click', () => showAskDialog(n.id));
   document.getElementById('btn-flag').addEventListener('click', () => toggleFlag(n.id, 'node'));
-  document.getElementById('btn-delete-node').addEventListener('click', () => deleteSelected());
+  document.getElementById('btn-delete-node').addEventListener('click', () => deleteSelected(n.id, 'node'));
 }
 
 function showEdgePanel(e) {
@@ -538,7 +538,7 @@ function showEdgePanel(e) {
   document.getElementById('btn-apply-edge').addEventListener('click', () => applyEdgeEdits(e.id));
   document.getElementById('btn-contradict').addEventListener('click', () => showContradictDialog(e.id));
   document.getElementById('btn-flag-edge').addEventListener('click', () => toggleFlag(e.id, 'edge'));
-  document.getElementById('btn-delete-edge').addEventListener('click', () => deleteSelected());
+  document.getElementById('btn-delete-edge').addEventListener('click', () => deleteSelected(e.id, 'edge'));
 }
 
 // ── Edit helpers ──────────────────────────────────────────────────────────
@@ -581,23 +581,27 @@ function toggleFlag(id, type) {
 
 // ── Delete (soft) ─────────────────────────────────────────────────────────
 
-function deleteSelected() {
-  if (!selectedId) return;
+function deleteSelected(id = null, type = null) {
+  // id/type can be passed directly from panel buttons (vis-network fires deselectEdge
+  // on mousedown outside the canvas, clearing selectedId before the click handler runs)
+  id   = id   ?? selectedId;
+  type = type ?? selectedType;
+  if (!id) return;
 
-  const label = selectedType === 'node'
-    ? (chainData.nodes.find(n => n.id === selectedId)?.label || selectedId)
-    : selectedId;
+  const label = type === 'node'
+    ? (chainData.nodes.find(n => n.id === id)?.label || id)
+    : id;
 
-  if (!confirm(`Delete ${selectedType} "${label}"?\n(Soft-delete: sets deprecated=true)`)) return;
+  if (!confirm(`Delete ${type} "${label}"?\n(Soft-delete: sets deprecated=true)`)) return;
 
-  if (selectedType === 'node') {
-    const node = chainData.nodes.find(n => n.id === selectedId);
+  if (type === 'node') {
+    const node = chainData.nodes.find(n => n.id === id);
     if (!node) return;
     node.deprecated = true;
-    nodes.remove(selectedId);
+    nodes.remove(id);
     // Deprecate all connected edges
     chainData.edges.forEach(e => {
-      if ((e.from === selectedId || e.to === selectedId || e.from_id === selectedId || e.to_id === selectedId) && !e.deprecated) {
+      if ((e.from === id || e.to === id || e.from_id === id || e.to_id === id) && !e.deprecated) {
         e.deprecated = true;
         edges.remove(e.id);
       }
@@ -606,18 +610,18 @@ function deleteSelected() {
       timestamp: new Date().toISOString(),
       action: 'node_edit',
       actor: 'user',
-      payload: { id: selectedId, deprecated: true },
+      payload: { id, deprecated: true },
     });
   } else {
-    const edge = chainData.edges.find(e => e.id === selectedId);
+    const edge = chainData.edges.find(e => e.id === id);
     if (!edge) return;
     edge.deprecated = true;
-    edges.remove(selectedId);
+    edges.remove(id);
     chainData.history.push({
       timestamp: new Date().toISOString(),
       action: 'edge_edit',
       actor: 'user',
-      payload: { id: selectedId, deprecated: true },
+      payload: { id, deprecated: true },
     });
   }
 
@@ -1715,6 +1719,15 @@ function setupToolbar() {
           const filename = el.dataset.filename;
           if (el.classList.contains('active')) { cswOverlay.classList.remove('visible'); return; }
           cswOverlay.classList.remove('visible');
+          // Auto-save unsaved changes (e.g. soft-deletes) before switching
+          if (isDirty()) {
+            try {
+              await saveChain(chainData);
+            } catch (err) {
+              setStatus('Save before switch failed: ' + err.message, 'error');
+              return;
+            }
+          }
           setStatus('Switching chain…');
           try {
             const data = await switchChain(filename);

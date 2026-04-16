@@ -43,7 +43,11 @@
       "Bash(python3 cli.py info chains/i.causal.json)",
       "Bash(python3 -:*)",
       "Bash(python3 cli.py open chains/causal-editor.causal.json)",
-      "Bash(curl -s http://localhost:7331/ -o /dev/null -w \"%{http_code}\")"
+      "Bash(curl -s http://localhost:7331/ -o /dev/null -w \"%{http_code}\")",
+      "Bash(python3 cli.py open chains/causal-editor.causal.json --no-browser)",
+      "Bash(curl -s http://localhost:7331/login -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s http://localhost:7331/training -o /dev/null -w \"%{http_code}\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('chains/test-smoke.causal.json'\\)\\); [print\\(e\\) for e in d['edges']]\")"
     ]
   }
 }

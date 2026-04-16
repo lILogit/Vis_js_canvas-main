@@ -4,7 +4,7 @@
     "name": "Causal Editor",
     "domain": "custom",
     "created_at": "2026-03-27T13:49:22.916321",
-    "updated_at": "2026-03-27T15:11:45.559126",
+    "updated_at": "2026-04-16T09:17:35.192017",
     "version": 1,
     "author": "",
     "description": ""
@@ -38,7 +38,7 @@
     },
     {
       "id": "2eb422b4",
-      "label": "framework",
+      "label": "causal chain",
       "description": "observation to causal chain",
       "type": "blackbox",
       "archetype": "mechanism",
@@ -285,83 +285,5 @@
       }
     }
   ],
-  "summaries": [
-    {
-      "id": "1ac5rpal",
-      "created_at": "2026-03-27T14:11:45.555Z",
-      "headline": "Observations, human interaction, and explicit rules feed a causal framework that produces forecasts, which in turn sharpen future observations in a self-improving loop.",
-      "scope": null,
-      "data": {
-        "headline": "Observations, human interaction, and explicit rules feed a causal framework that produces forecasts, which in turn sharpen future observations in a self-improving loop.",
-        "goal": {
-          "label": "Causal Forecast",
-          "plain": "Success looks like a reliable, improving causal forecast — a structured prediction of how events will unfold — that gets better over time as the system learns from its own outputs."
-        },
-        "critical_path": [
-          {
-            "step": 1,
-            "label": "Observation",
-            "role": "root_cause",
-            "plain": "Everything starts with observing and filtering real-world signals; this is the raw input that kicks the whole process into motion."
-          },
-          {
-            "step": 2,
-            "label": "Rules",
-            "role": "moderator",
-            "plain": "A set of rules amplifies and shapes how the framework processes observations, acting as a quality or structure multiplier on the analysis."
-          },
-          {
-            "step": 3,
-            "label": "human interaction",
-            "role": "moderator",
-            "plain": "Human input instantiates the framework — meaning people provide concrete cases or judgments that make the abstract process real and grounded."
-          },
-          {
-            "step": 4,
-            "label": "framework",
-            "role": "mechanism",
-            "plain": "The core black-box mechanism that transforms observations, rules, and human input into a structured causal chain leading to a forecast."
-          },
-          {
-            "step": 5,
-            "label": "Causal Forecast",
-            "role": "effect",
-            "plain": "The output: a causal forecast that represents the system's best structured prediction of how things will play out."
-          },
-          {
-            "step": 6,
-            "label": "Observation",
-            "role": "root_cause",
-            "plain": "The forecast feeds back into observation, amplifying the quality of future inputs and closing a self-reinforcing improvement loop."
-          }
-        ],
-        "tasks": [],
-        "decisions": [],
-        "risks": [
-          {
-            "label": "framework (blackbox, confidence 0.7)",
-            "plain": "The core transformation step is a black box — its internal logic is not transparent. If it malfunctions or drifts, errors will propagate invisibly into every forecast, and the feedback loop will amplify those errors over time."
-          },
-          {
-            "label": "Rules (blackbox, confidence 0.7)",
-            "plain": "The rules governing the framework are also opaque. If they are outdated, biased, or misapplied, they will systematically skew the framework's output without any clear signal that something is wrong."
-          },
-          {
-            "label": "Causal Forecast → Observation feedback loop",
-            "plain": "The forecast amplifies future observations, which is powerful but risky: a poor-quality forecast can bias what gets observed next, creating a self-reinforcing cycle of compounding errors rather than genuine improvement."
-          },
-          {
-            "label": "forecast improval criteria (concept, confidence 0.7)",
-            "plain": "The criteria for deciding whether a forecast has actually improved are currently just a concept without concrete definition. Without clear improvement metrics, there is no reliable way to know if the system is getting better or worse."
-          }
-        ],
-        "open_questions": [
-          "What exactly are the 'forecast improvement criteria'? Until these are concretely defined, it is impossible to objectively evaluate whether the feedback loop is making forecasts better or just reinforcing existing patterns.",
-          "What happens inside the 'framework' black box? Its internal logic is unknown, which is a significant gap — understanding it is essential for debugging failures or deliberately improving performance.",
-          "What are the 'Rules' and who sets them? They influence the framework but their origin and update process are undefined, creating a hidden governance risk.",
-          "How is 'human interaction' structured and validated? It is marked as an effect but acts as a moderator — the nature, frequency, and quality control of human input needs clarification."
-        ]
-      }
-    }
-  ]
+  "summaries": []
 }
