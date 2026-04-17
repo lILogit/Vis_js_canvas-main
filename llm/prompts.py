@@ -7,8 +7,22 @@ Edge relations: CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|\
 PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO. \
 Return only valid JSON. No preamble. No markdown."""
 
+CAUSAL_RULES = """\
+CAUSAL MODELLING RULES (enforce strictly):
+- STATE→STATE direct links are forbidden — insert an EVENT node between them
+- DECISION must have ≥2 output branches leading to different outcomes
+- ASSET connects only via ENABLES or REQUIRES — never CAUSES
+- GATE requires a defined condition (AND/OR/XOR); suggest a GATE when a linear path exceeds 4 nodes without branching
+- Every DECISION/GATE branch must terminate at a STATE or GOAL (no dead ends)
+- Prefer precise edge types: TRIGGERS (state→event onset), AMPLIFIES/REDUCES (modulation), BLOCKS (prevention), ENABLES (prerequisite removal)
+- Assign archetype to every suggested node: root_cause | mechanism | effect | moderator | evidence | question
+- Every new node suggestion must also include connects_from or connects_to referencing an existing node_id — never suggest a floating node with no connections\
+"""
+
 ENRICH_GAPS = """Given this causal chain:
 {chain_json}
+
+{rules}
 
 Find up to {n} missing intermediary nodes — places where the causal \
 jump between two connected nodes skips an important step.
@@ -19,7 +33,9 @@ Return JSON:
     {{
       "between_from": "<node_id>",
       "between_to": "<node_id>",
-      "missing_node": {{"label": "...", "type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate", "description": "..."}},
+      "missing_node": {{"label": "...", "type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate", "archetype": "root_cause|mechanism|effect|moderator|evidence|question|null", "description": "..."}},
+      "relation_in": "CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO",
+      "relation_out": "CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO",
       "reasoning": "<one sentence why this node is missing>"
     }}
   ]
@@ -64,6 +80,8 @@ Return JSON:
 SUGGEST_NODES = """Given this causal chain:
 {chain_json}
 
+{rules}
+
 Suggest {n} new nodes or edges that would make this chain more complete, \
 accurate, or actionable. Prioritize: missing causes, missing effects, \
 unresolved black boxes, and nodes with no outbound edges.
@@ -74,6 +92,7 @@ Return JSON:
     {{
       "type": "node | edge",
       "node_type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate",
+      "archetype": "root_cause|mechanism|effect|moderator|evidence|question|null",
       "label": "...",
       "description": "...",
       "connects_from": "<node_id or null>",

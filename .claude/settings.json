@@ -50,7 +50,9 @@
       "Bash(python3 -c \"import json; d=json.load\\(open\\('chains/test-smoke.causal.json'\\)\\); [print\\(e\\) for e in d['edges']]\")",
       "Bash(grep -r \"\\\\\"link\\\\|\\\\\"ref\\\\|\\\\\"reference\" /home/nemo/Documents/Vis_js_canvas-main/chains/*.json)",
       "Bash(python3 -m pytest tests/ -v)",
-      "Bash(python3 -m py_compile chain/schema.py chain/io.py)"
+      "Bash(python3 -m py_compile chain/schema.py chain/io.py)",
+      "Bash(python3 -m py_compile llm/prompts.py llm/enrichment.py editor/serve.py)",
+      "Bash(python3 -m py_compile editor/serve.py llm/prompts.py llm/enrichment.py)"
     ]
   }
 }

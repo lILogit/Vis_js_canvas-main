@@ -4,7 +4,7 @@ from datetime import datetime
 from chain.schema import CausalChain, Node, Edge
 from chain.io import to_dict, save
 from llm import client
-from llm.prompts import ENRICH_GAPS, ENRICH_WEIGHTS, ENRICH_SCOPE
+from llm.prompts import ENRICH_GAPS, ENRICH_WEIGHTS, ENRICH_SCOPE, CAUSAL_RULES
 
 
 def _chain_json(chain: CausalChain) -> str:
@@ -13,7 +13,7 @@ def _chain_json(chain: CausalChain) -> str:
 
 def enrich_gaps(chain: CausalChain, n: int = 5) -> list:
     """Find missing intermediary nodes. Returns list of gap dicts."""
-    prompt = ENRICH_GAPS.format(chain_json=_chain_json(chain), n=n)
+    prompt = ENRICH_GAPS.format(chain_json=_chain_json(chain), n=n, rules=CAUSAL_RULES)
     result = client.call(prompt)
     return result.get("gaps", [])
 
@@ -45,6 +45,7 @@ def apply_gaps(chain: CausalChain, gaps: list, selected: list = None) -> int:
             label=mn.get("label", ""),
             description=mn.get("description", ""),
             type=mn.get("type", "state"),
+            archetype=mn.get("archetype") or None,
             source="llm",
         )
         chain.nodes.append(node)
@@ -54,8 +55,8 @@ def apply_gaps(chain: CausalChain, gaps: list, selected: list = None) -> int:
 
         # Insert node between from and to: from→node, node→to
         if from_id and to_id:
-            e1 = Edge(from_id=from_id, to_id=node.id, relation="CAUSES", source="llm")
-            e2 = Edge(from_id=node.id, to_id=to_id, relation="CAUSES", source="llm")
+            e1 = Edge(from_id=from_id, to_id=node.id, relation=gap.get("relation_in", "CAUSES"), source="llm")
+            e2 = Edge(from_id=node.id, to_id=to_id, relation=gap.get("relation_out", "CAUSES"), source="llm")
             chain.edges.append(e1)
             chain.edges.append(e2)
 

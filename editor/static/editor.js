@@ -923,7 +923,7 @@ function addPreviewToGraph(suggestions) {
       const eaId = `_preview_edge_${i}_a`;
       edges.add({
         id: eaId, from: s.connects_from, to: nId,
-        label: 'CAUSES',
+        label: s.relation_in || 'CAUSES',
         color: { color: '#8b5cf6', inherit: false },
         dashes: [6, 3], width: 2,
         arrows: { to: { enabled: true, scaleFactor: 0.8 } },
@@ -934,7 +934,7 @@ function addPreviewToGraph(suggestions) {
       const ebId = `_preview_edge_${i}_b`;
       edges.add({
         id: ebId, from: nId, to: s.connects_to,
-        label: 'CAUSES',
+        label: s.relation_out || 'CAUSES',
         color: { color: '#8b5cf6', inherit: false },
         dashes: [6, 3], width: 2,
         arrows: { to: { enabled: true, scaleFactor: 0.8 } },
@@ -956,7 +956,7 @@ function addPreviewToGraph(suggestions) {
       _previewEdgeIds.push(eId);
 
     } else {
-      // Standalone node with no known connections
+      // Node suggestion (kind === 'node') — may have connects_from / connects_to
       const nId = `_preview_node_${i}`;
       nodes.add({
         id: nId,
@@ -969,6 +969,31 @@ function addPreviewToGraph(suggestions) {
         font: { size: 13, face: 'Courier New', color: '#c4b5fd' },
       });
       _previewNodeIds.push(nId);
+
+      if (s.connects_from) {
+        const eId = `_preview_edge_${i}_from`;
+        edges.add({
+          id: eId, from: s.connects_from, to: nId,
+          label: s.relation || 'CAUSES',
+          color: { color: '#8b5cf6', inherit: false },
+          dashes: [6, 3], width: 2,
+          arrows: { to: { enabled: true, scaleFactor: 0.8 } },
+          font: { size: 10, color: '#8b5cf6' },
+        });
+        _previewEdgeIds.push(eId);
+      }
+      if (s.connects_to) {
+        const eId = `_preview_edge_${i}_to`;
+        edges.add({
+          id: eId, from: nId, to: s.connects_to,
+          label: s.relation || 'CAUSES',
+          color: { color: '#8b5cf6', inherit: false },
+          dashes: [6, 3], width: 2,
+          arrows: { to: { enabled: true, scaleFactor: 0.8 } },
+          font: { size: 10, color: '#8b5cf6' },
+        });
+        _previewEdgeIds.push(eId);
+      }
     }
   }
 }
@@ -1040,14 +1065,15 @@ async function applyPreviewSuggestions(selectedIndices) {
       const id = shortId();
       const node = {
         id, label: s.label, description: s.description || '', type: s.node_type || 'state',
+        archetype: s.archetype || null,
         confidence: 0.7, source: 'llm', deprecated: false, flagged: false,
         tags: [], created_at: now,
       };
       chainData.nodes.push(node);
       nodes.add(nodeToVis(node));
 
-      const e1 = { id: shortId(), from: s.connects_from, to: id, relation: 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
-      const e2 = { id: shortId(), from: id, to: s.connects_to, relation: 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
+      const e1 = { id: shortId(), from: s.connects_from, to: id, relation: s.relation_in || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
+      const e2 = { id: shortId(), from: id, to: s.connects_to, relation: s.relation_out || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
       chainData.edges.push(e1, e2);
       edges.add(edgeToVis(e1));
       edges.add(edgeToVis(e2));
@@ -1055,17 +1081,30 @@ async function applyPreviewSuggestions(selectedIndices) {
       chainData.history.push({ timestamp: now, action: 'enrich', actor: 'llm', payload: { type: 'gap', node_id: id } });
 
     } else if (s.kind === 'edge' && s.connects_from && s.connects_to) {
-      const edge = { id: shortId(), from: s.connects_from, to: s.connects_to, relation: s.relation || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
+      const edge = { id: shortId(), from: s.connects_from, to: s.connects_to, relation: s.relation || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: s.description || '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
       chainData.edges.push(edge);
       edges.add(edgeToVis(edge));
       chainData.history.push({ timestamp: now, action: 'edge_add', actor: 'llm', payload: { edge_id: edge.id } });
 
     } else if (s.label) {
       const id = shortId();
-      const node = { id, label: s.label, description: s.description || '', type: s.node_type || 'state', confidence: 0.7, source: 'llm', deprecated: false, flagged: false, tags: [], created_at: now };
+      const node = { id, label: s.label, description: s.description || '', type: s.node_type || 'state', archetype: s.archetype || null, confidence: 0.7, source: 'llm', deprecated: false, flagged: false, tags: [], created_at: now };
       chainData.nodes.push(node);
       nodes.add(nodeToVis(node));
       chainData.history.push({ timestamp: now, action: 'node_add', actor: 'llm', payload: { node_id: id } });
+
+      if (s.connects_from) {
+        const edge = { id: shortId(), from: s.connects_from, to: id, relation: s.relation || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: s.description || '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
+        chainData.edges.push(edge);
+        edges.add(edgeToVis(edge));
+        chainData.history.push({ timestamp: now, action: 'edge_add', actor: 'llm', payload: { edge_id: edge.id } });
+      }
+      if (s.connects_to) {
+        const edge = { id: shortId(), from: id, to: s.connects_to, relation: s.relation || 'CAUSES', weight: 0.5, confidence: 0.5, direction: 'forward', condition: null, evidence: s.description || '', deprecated: false, flagged: false, version: 1, source: 'llm', created_at: now };
+        chainData.edges.push(edge);
+        edges.add(edgeToVis(edge));
+        chainData.history.push({ timestamp: now, action: 'edge_add', actor: 'llm', payload: { edge_id: edge.id } });
+      }
     }
   }
 
@@ -1162,17 +1201,42 @@ function showSuggestionsOverlay(suggestions, wScore = null) {
     }
   }
 
+  const nodeLabel = (id) => {
+    if (!id) return id;
+    const n = chainData.nodes.find(n => n.id === id && !n.deprecated);
+    return n ? n.label : id;
+  };
+
   list.innerHTML = suggestions.map((s, i) => {
-    const kindTag = `<span class="s-badge">${s.kind === 'gap_node' ? 'gap node' : s.kind}</span>`;
+    const isEdge = s.kind === 'edge';
+    const kindLabel = s.kind === 'gap_node' ? 'gap node' : s.kind;
+    const kindTag = `<span class="s-badge">${kindLabel}</span>`;
     const klassTag = s.klass ? `<span class="klass-badge klass-${s.klass.toLowerCase()}">${s.klass}</span>` : '';
+    const archetypeTag = s.archetype ? `<span class="s-badge" style="opacity:0.7">${s.archetype}</span>` : '';
+
+    let displayLabel, connectsHtml;
+    if (isEdge && s.connects_from && s.connects_to) {
+      displayLabel = `${esc(nodeLabel(s.connects_from))} —[${esc(s.relation || 'CAUSES')}]→ ${esc(nodeLabel(s.connects_to))}`;
+      connectsHtml = '';
+    } else {
+      displayLabel = esc(s.label);
+      if (s.kind === 'gap_node' && s.connects_from && s.connects_to) {
+        connectsHtml = `<div class="s-connects">${esc(nodeLabel(s.connects_from))} → [new] → ${esc(nodeLabel(s.connects_to))}</div>`;
+      } else if (s.connects_from || s.connects_to) {
+        connectsHtml = `<div class="s-connects">${s.connects_from ? esc(nodeLabel(s.connects_from)) + ' →' : ''} [new] ${s.connects_to ? '→ ' + esc(nodeLabel(s.connects_to)) : ''}</div>`;
+      } else {
+        connectsHtml = '';
+      }
+    }
+
     return `
       <div class="suggestion-item">
         <label>
           <input type="checkbox" class="s-check" data-idx="${i}" checked>
-          <span class="s-label">${esc(s.label)}</span>
-          ${kindTag}${klassTag}
+          <span class="s-label">${displayLabel}</span>
+          ${kindTag}${archetypeTag}${klassTag}
         </label>
-        ${s.connects_from ? `<div class="s-connects">${esc(s.connects_from)} → [new] → ${esc(s.connects_to)}</div>` : ''}
+        ${connectsHtml}
         <div class="s-reason">${esc(s.reasoning || '')}</div>
       </div>`;
   }).join('');

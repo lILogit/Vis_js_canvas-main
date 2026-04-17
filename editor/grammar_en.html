@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tahák — Modelování kauzálních řetězců v2</title>
+<title>Cheat Sheet — Causal Chain Modelling v2</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Courier New',monospace;background:#f8f7f4;color:#1a1a18;padding:1.5rem;max-width:900px;margin:0 auto}
@@ -92,378 +92,378 @@ h1{font-size:16px;font-family:var(--font-mono);font-weight:500;color:var(--color
 </head>
 <body>
 <div class="wrap">
-<h1>Tahák — modelování kauzálních řetězců</h1>
-<div class="subtitle">RCDE framework · v2 · causal_chain_tahak_v2</div>
+<h1>Cheat Sheet — Causal Chain Modelling</h1>
+<div class="subtitle">RCDE framework · v2 · causal_chain_cheatsheet_v2</div>
 <div style="margin-bottom:1.25rem;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-  <a href="/training" style="font-size:11px;font-family:var(--font-mono);color:var(--color-text-info);text-decoration:none;border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:4px 10px;display:inline-block" onmouseover="this.style.borderColor='var(--color-border-secondary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">▶ Procvičit — CausalQuest trénink</a>
-  <a href="/grammar/en" style="font-size:11px;font-family:var(--font-mono);color:var(--color-text-tertiary);text-decoration:none;border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:4px 10px;display:inline-block" onmouseover="this.style.borderColor='var(--color-border-secondary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">🇬🇧 English</a>
+  <a href="/training" style="font-size:11px;font-family:var(--font-mono);color:var(--color-text-info);text-decoration:none;border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:4px 10px;display:inline-block" onmouseover="this.style.borderColor='var(--color-border-secondary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">▶ Practice — CausalQuest training</a>
+  <a href="/grammar" style="font-size:11px;font-family:var(--font-mono);color:var(--color-text-tertiary);text-decoration:none;border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:4px 10px;display:inline-block" onmouseover="this.style.borderColor='var(--color-border-secondary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">🇨🇿 Česky</a>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="show('nodes',this)">Uzly</button>
-  <button class="tab" onclick="show('edges',this)">Vazby</button>
+  <button class="tab active" onclick="show('nodes',this)">Nodes</button>
+  <button class="tab" onclick="show('edges',this)">Edges</button>
   <button class="tab" onclick="show('flow',this)">Workflow</button>
-  <button class="tab" onclick="show('rules',this)">Pravidla</button>
-  <button class="tab" onclick="show('antipatterns',this)">Anti-vzory</button>
+  <button class="tab" onclick="show('rules',this)">Rules</button>
+  <button class="tab" onclick="show('antipatterns',this)">Anti-patterns</button>
 </div>
 
-<!-- UZLY -->
+<!-- NODES -->
 <div id="nodes" class="panel active">
-  <p class="section-label">Kategorie uzlů</p>
+  <p class="section-label">Node categories</p>
   <div class="grid2">
     <div class="card">
       <div class="card-icon"><svg width="36" height="28" viewBox="0 0 36 28"><rect x="2" y="4" width="32" height="20" rx="3" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">STATE — stav</div>
-        <div class="card-type">obdélník</div>
-        <div class="card-desc">Trvalá situace, podmínka, výsledek. Nemění se okamžitě — trvá v čase.</div>
-        <div><span class="tag">Přetížený server</span><span class="tag">Chronický stres</span></div>
+        <div class="card-name">STATE</div>
+        <div class="card-type">rectangle</div>
+        <div class="card-desc">Persistent situation, condition, or outcome. Does not change instantly — endures over time.</div>
+        <div><span class="tag">Overloaded server</span><span class="tag">Chronic stress</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><polygon points="18,2 34,16 18,30 2,16" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">EVENT — událost</div>
-        <div class="card-type">kosočtverec</div>
-        <div class="card-desc">Okamžitá změna nebo spouštěč. Přechod mezi stavy. Má časový bod.</div>
-        <div><span class="tag">Padl server</span><span class="tag">Nasazení v2.1</span></div>
+        <div class="card-name">EVENT</div>
+        <div class="card-type">diamond</div>
+        <div class="card-desc">Instant change or trigger. Transition between states. Has a point in time.</div>
+        <div><span class="tag">Server crash</span><span class="tag">Deploy v2.1</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><polygon points="18,2 32,9 32,23 18,30 4,23 4,9" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">DECISION — rozhodnutí</div>
-        <div class="card-type">šestiúhelník</div>
-        <div class="card-desc">Lidská volba mezi alternativami. Vždy má ≥ 2 výstupní větve s různými efekty.</div>
-        <div><span class="tag">Výběr řešení</span></div>
+        <div class="card-name">DECISION</div>
+        <div class="card-type">hexagon</div>
+        <div class="card-desc">Human choice between alternatives. Always has ≥ 2 output branches with different effects.</div>
+        <div><span class="tag">Choose solution</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><circle cx="18" cy="16" r="9" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/><circle cx="18" cy="16" r="3" fill="var(--color-text-secondary)"/></svg></div>
       <div class="card-body">
-        <div class="card-name">TASK — úkol</div>
-        <div class="card-type">kruh / tečka</div>
-        <div class="card-desc">Konkrétní pracovní aktivita. Nemá větvení — jen vstup a výstup.</div>
+        <div class="card-name">TASK</div>
+        <div class="card-type">circle / dot</div>
+        <div class="card-desc">Specific work activity. No branching — just input and output.</div>
         <div><span class="tag">Rollback v2.0</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><polygon points="18,2 34,30 2,30" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">GOAL — cíl</div>
-        <div class="card-type">trojúhelník</div>
-        <div class="card-desc">Žádoucí koncový stav nebo výsledek. Kotví pravý okraj diagramu.</div>
-        <div><span class="tag">Růst tržeb 20 %</span></div>
+        <div class="card-name">GOAL</div>
+        <div class="card-type">triangle</div>
+        <div class="card-desc">Desired end state or outcome. Anchors the right edge of the diagram.</div>
+        <div><span class="tag">Revenue growth 20%</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="28" viewBox="0 0 36 28"><ellipse cx="18" cy="14" rx="15" ry="10" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">CONCEPT — koncept</div>
-        <div class="card-type">elipsa</div>
-        <div class="card-desc">Abstraktní idea nebo vzor. Nelze přímo měřit, ale ovlivňuje systém.</div>
-        <div><span class="tag">Toxická kultura</span></div>
+        <div class="card-name">CONCEPT</div>
+        <div class="card-type">ellipse</div>
+        <div class="card-desc">Abstract idea or pattern. Cannot be measured directly, but influences the system.</div>
+        <div><span class="tag">Toxic culture</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="36" viewBox="0 0 36 36"><polygon points="18,2 21,13 32,13 23,20 26,31 18,24 10,31 13,20 4,13 15,13" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">QUESTION — otázka</div>
-        <div class="card-type">hvězda</div>
-        <div class="card-desc">Otevřená nejistota vyžadující výzkum. Kde nevíme, co se děje.</div>
-        <div><span class="tag">Jaký trh zvolit?</span></div>
+        <div class="card-name">QUESTION</div>
+        <div class="card-type">star</div>
+        <div class="card-desc">Open uncertainty requiring research. Where we don't know what is happening.</div>
+        <div><span class="tag">Which market to enter?</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><rect x="4" y="6" width="28" height="20" rx="5" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-dasharray="4,3"/><text x="18" y="20" font-size="11" text-anchor="middle" fill="var(--color-text-secondary)" font-family="monospace">?</text></svg></div>
       <div class="card-body">
-        <div class="card-name">BLACKBOX — černá skříňka</div>
-        <div class="card-type">přerušovaný rámeček</div>
-        <div class="card-desc">Mechanismus neznámé příčiny. Víme co dělá, ne proč / jak.</div>
-        <div><span class="tag">Proč leak nevznikl v testu?</span></div>
+        <div class="card-name">BLACKBOX</div>
+        <div class="card-type">dashed rectangle</div>
+        <div class="card-desc">Mechanism of unknown cause. We know what it does, not why / how.</div>
+        <div><span class="tag">Why no leak in test?</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><polygon points="4,16 12,4 24,4 32,16 24,28 12,28" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/><line x1="18" y1="10" x2="18" y2="18" stroke="var(--color-text-secondary)" stroke-width="1.5"/><circle cx="18" cy="22" r="1.5" fill="var(--color-text-secondary)"/></svg></div>
       <div class="card-body">
-        <div class="card-name">GATE — brána</div>
-        <div class="card-type">šestiúhelník s !</div>
-        <div class="card-desc">Podmíněný průchod. Řetězec pokračuje jen při splnění podmínky (AND/OR/XOR).</div>
-        <div><span class="tag">Je to kritické?</span></div>
+        <div class="card-name">GATE</div>
+        <div class="card-type">hexagon with !</div>
+        <div class="card-desc">Conditional gate. Chain continues only when the condition is met (AND/OR/XOR).</div>
+        <div><span class="tag">Is it critical?</span></div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon"><svg width="36" height="32" viewBox="0 0 36 32"><ellipse cx="18" cy="9" rx="13" ry="5" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/><line x1="5" y1="9" x2="5" y2="23" stroke="var(--color-text-secondary)" stroke-width="1.5"/><line x1="31" y1="9" x2="31" y2="23" stroke="var(--color-text-secondary)" stroke-width="1.5"/><path d="M5,23 Q18,31 31,23" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"/></svg></div>
       <div class="card-body">
-        <div class="card-name">ASSET — aktivum</div>
-        <div class="card-type">válec</div>
-        <div class="card-desc">Zdroj, který musí existovat pro průchod řetězcem. Podmínka proveditelnosti.</div>
-        <div><span class="tag">Rozpočet pro expanzi</span></div>
+        <div class="card-name">ASSET</div>
+        <div class="card-type">cylinder</div>
+        <div class="card-desc">Resource that must exist for the chain to proceed. Feasibility condition.</div>
+        <div><span class="tag">Expansion budget</span></div>
       </div>
     </div>
   </div>
   <div class="divider"></div>
-  <p class="section-label">Barvy uzlů — míra jistoty</p>
+  <p class="section-label">Node colours — certainty level</p>
   <div class="col-legend">
-    <div class="col-chip"><div class="col-dot" style="background:#3B6D11"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Zelená &gt; 80 %</strong> — fakt / prokázané</div></div>
-    <div class="col-chip"><div class="col-dot" style="background:#185FA5"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Modrá 60–80 %</strong> — konsensus / pravděpodobné</div></div>
-    <div class="col-chip"><div class="col-dot" style="background:#BA7517"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Oranžová 40–60 %</strong> — pracovní hypotéza</div></div>
-    <div class="col-chip"><div class="col-dot" style="background:#A32D2D"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Červená &lt; 40 %</strong> — spekulace / neznámé</div></div>
+    <div class="col-chip"><div class="col-dot" style="background:#3B6D11"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Green &gt; 80%</strong> — fact / proven</div></div>
+    <div class="col-chip"><div class="col-dot" style="background:#185FA5"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Blue 60–80%</strong> — consensus / probable</div></div>
+    <div class="col-chip"><div class="col-dot" style="background:#BA7517"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Orange 40–60%</strong> — working hypothesis</div></div>
+    <div class="col-chip"><div class="col-dot" style="background:#A32D2D"></div><div class="col-text"><strong style="color:var(--color-text-primary)">Red &lt; 40%</strong> — speculation / unknown</div></div>
   </div>
   <div style="padding:10px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary)">
     <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.7">
-      <strong style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)">Pravidlo:</strong> Barva je vlastnost jistoty, tvar je vlastnost role. Červená QUESTION je nejistá hypotéza. Zelená BLACKBOX je ověřená neznámá. Kombinace jsou záměrné.
+      <strong style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)">Rule:</strong> Colour is a property of certainty, shape is a property of role. A red QUESTION is an uncertain hypothesis. A green BLACKBOX is a verified unknown. Combinations are intentional.
     </div>
   </div>
   <div class="divider"></div>
-  <p class="section-label">Archetypy uzlů — sémantická role</p>
-  <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:12px">Sémantická role, kterou můžete přiřadit jakémukoliv uzlu.</div>
+  <p class="section-label">Node archetypes — semantic role</p>
+  <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:12px">Semantic role you can assign to any node.</div>
   <div class="grid2">
     <div class="card">
       <div class="card-icon" style="font-size:18px">⬆</div>
       <div class="card-body">
-        <div class="card-name">kořenová_příčina</div>
-        <div class="card-desc">Primární hybatel řetězce.</div>
+        <div class="card-name">root_cause</div>
+        <div class="card-desc">Primary driver of the chain.</div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon" style="font-size:18px">⚙</div>
       <div class="card-body">
-        <div class="card-name">mechanismus</div>
-        <div class="card-desc">Proces, kterým jedna věc vytváří druhou.</div>
+        <div class="card-name">mechanism</div>
+        <div class="card-desc">Process by which one thing creates another.</div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon" style="font-size:18px">⬇</div>
       <div class="card-body">
-        <div class="card-name">následek</div>
-        <div class="card-desc">Výsledný dopad v dolní části řetězce.</div>
+        <div class="card-name">effect</div>
+        <div class="card-desc">Resulting impact at the bottom of the chain.</div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon" style="font-size:18px">⇄</div>
       <div class="card-body">
-        <div class="card-name">moderátor</div>
-        <div class="card-desc">Proměnná, která mění sílu vztahu mezi A a B.</div>
+        <div class="card-name">moderator</div>
+        <div class="card-desc">Variable that changes the strength of the relationship between A and B.</div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon" style="font-size:18px">◉</div>
       <div class="card-body">
-        <div class="card-name">důkaz</div>
-        <div class="card-desc">Empirické pozorování podporující danou vazbu.</div>
+        <div class="card-name">evidence</div>
+        <div class="card-desc">Empirical observation supporting a given link.</div>
       </div>
     </div>
     <div class="card">
       <div class="card-icon" style="font-size:18px">?</div>
       <div class="card-body">
-        <div class="card-name">otázka</div>
-        <div class="card-desc">Bod, který vyžaduje další zkoumání.</div>
+        <div class="card-name">question</div>
+        <div class="card-desc">Point that requires further investigation.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- VAZBY -->
+<!-- EDGES -->
 <div id="edges" class="panel">
-  <p class="section-label">Základní vazby (povinné)</p>
+  <p class="section-label">Core edges (required)</p>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="20" viewBox="0 0 80 20"><line x1="2" y1="10" x2="66" y2="10" stroke="var(--color-text-secondary)" stroke-width="2"/><polygon points="66,5 78,10 66,15" fill="var(--color-text-secondary)"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">ZPŮSOBUJE</div>
-      <div class="edge-sub">šedá / neutrální — hlavní linka</div>
-      <div class="edge-desc">A přímo produkuje B. Základní kauzální hrana. Výchozí volba pro každou vazbu.</div>
+      <div class="edge-name">CAUSES</div>
+      <div class="edge-sub">grey / neutral — main spine</div>
+      <div class="edge-desc">A directly produces B. Primary causal edge. Default choice for every connection.</div>
     </div>
   </div>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="20" viewBox="0 0 80 20"><line x1="2" y1="10" x2="66" y2="10" stroke="#3B6D11" stroke-width="2"/><polygon points="66,5 78,10 66,15" fill="#3B6D11"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">UMOŽŇUJE / VYŽADUJE</div>
-      <div class="edge-sub">zelená — podmínka existence</div>
-      <div class="edge-desc">Bez A nemůže B nastat. Neříká, že A přímo způsobí B — jen odstraní bariéru.</div>
+      <div class="edge-name">ENABLES / REQUIRES</div>
+      <div class="edge-sub">green — existence condition</div>
+      <div class="edge-desc">Without A, B cannot occur. Does not say A directly causes B — only removes the barrier.</div>
     </div>
   </div>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="20" viewBox="0 0 80 20"><line x1="2" y1="10" x2="72" y2="10" stroke="#A32D2D" stroke-width="2"/><line x1="72" y1="5" x2="72" y2="15" stroke="#A32D2D" stroke-width="2.5"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">BLOKUJE</div>
-      <div class="edge-sub">červená — přerušení —|</div>
-      <div class="edge-desc">A zamezuje B. Intervence TASK nebo DECISION typicky blokuje negativní EVENT.</div>
+      <div class="edge-name">BLOCKS</div>
+      <div class="edge-sub">red — interruption —|</div>
+      <div class="edge-desc">A prevents B. A TASK or DECISION intervention typically blocks a negative EVENT.</div>
     </div>
   </div>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="20" viewBox="0 0 80 20"><line x1="2" y1="10" x2="66" y2="10" stroke="#185FA5" stroke-width="2"/><polygon points="66,5 78,10 66,15" fill="#185FA5"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">REALIZUJE</div>
-      <div class="edge-sub">modrá — konstruktivní zásah</div>
-      <div class="edge-desc">TASK nebo DECISION aktivně buduje B. Opak BLOKUJE — opravuje místo brání.</div>
+      <div class="edge-name">REDUCES</div>
+      <div class="edge-sub">blue — constructive intervention</div>
+      <div class="edge-desc">TASK or DECISION actively addresses B. The opposite of BLOCKS — repairs instead of prevents.</div>
     </div>
   </div>
   <div class="divider"></div>
-  <p class="section-label">Rozšířené vazby (intenzita a mechanismus)</p>
+  <p class="section-label">Extended edges (intensity and mechanism)</p>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="20" viewBox="0 0 80 20"><line x1="2" y1="10" x2="66" y2="10" stroke="var(--color-text-secondary)" stroke-width="2"/><polygon points="66,5 78,10 66,15" fill="var(--color-text-secondary)"/><text x="26" y="8" font-size="8" fill="var(--color-text-tertiary)" font-family="monospace">▲</text></svg></div>
     <div class="edge-info">
-      <div class="edge-name">ZESILUJE / SNIŽUJE</div>
-      <div class="edge-sub">šedá se symbolem ▲ / ▼</div>
-      <div class="edge-desc">A moduluje intenzitu B, ale B by existovalo i bez A. Typické pro feedback smyčky.</div>
+      <div class="edge-name">AMPLIFIES / REDUCES</div>
+      <div class="edge-sub">grey with symbol ▲ / ▼</div>
+      <div class="edge-desc">A modulates the intensity of B, but B would exist without A. Typical for feedback loops.</div>
     </div>
   </div>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="22" viewBox="0 0 80 22"><line x1="2" y1="11" x2="66" y2="11" stroke="var(--color-text-secondary)" stroke-width="2" stroke-dasharray="5,3"/><polygon points="66,6 78,11 66,16" fill="var(--color-text-secondary)"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">SPOUŠTÍ</div>
-      <div class="edge-sub">šedá přerušovaná — trigger</div>
-      <div class="edge-desc">A je podmínkou pro EVENT B. Odlišení od ZPŮSOBUJE: stav spouští událost, ne jiný stav.</div>
+      <div class="edge-name">TRIGGERS</div>
+      <div class="edge-sub">grey dashed — trigger</div>
+      <div class="edge-desc">A is the condition for EVENT B. Distinction from CAUSES: a state triggers an event, not another state.</div>
     </div>
   </div>
   <div class="edge-row">
     <div class="edge-vis"><svg width="80" height="22" viewBox="0 0 80 22"><line x1="2" y1="11" x2="66" y2="11" stroke="#BA7517" stroke-width="2"/><polygon points="66,6 78,11 66,16" fill="#BA7517"/><line x1="36" y1="5" x2="36" y2="17" stroke="#BA7517" stroke-width="1.5"/></svg></div>
     <div class="edge-info">
-      <div class="edge-name">PŘEKRAČUJE PRAH</div>
-      <div class="edge-sub">oranžová — threshold crossing</div>
-      <div class="edge-desc">Použij, když kauzální vliv závisí na dosažení konkrétní hodnoty (OOM Kill, kritický stres).</div>
+      <div class="edge-name">THRESHOLD CROSSING</div>
+      <div class="edge-sub">orange — threshold crossing</div>
+      <div class="edge-desc">Use when the causal effect depends on reaching a specific value (OOM Kill, critical stress).</div>
     </div>
   </div>
   <div class="divider"></div>
   <div style="padding:10px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary)">
     <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.7">
-      <strong style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)">Matice STATE→EVENT:</strong> Pokud vidíš STATE → ZPŮSOBUJE → STATE, zeptej se: "Co se změnilo?" — chybí EVENT uzel uprostřed. STATE → SPOUŠTÍ → EVENT → ZPŮSOBUJE → STATE je správná forma.
+      <strong style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)">STATE→EVENT matrix:</strong> If you see STATE → CAUSES → STATE, ask: "What changed?" — an EVENT node is missing in the middle. STATE → TRIGGERS → EVENT → CAUSES → STATE is the correct form.
     </div>
   </div>
 </div>
 
 <!-- WORKFLOW -->
 <div id="flow" class="panel">
-  <p class="section-label">RCDE workflow — 4 kroky</p>
+  <p class="section-label">RCDE workflow — 4 steps</p>
   <div class="step">
     <div class="step-num" style="background:var(--color-background-danger);color:var(--color-text-danger)">4</div>
     <div class="step-body">
-      <div class="step-title">EFFECT — definuj dopad (začni zde)</div>
-      <div class="step-q">"Co se stalo nebo co chceme dosáhnout?"</div>
-      <div class="step-tip">Umísti GOAL nebo výsledný STATE doprava dolů. Pokud dopad ještě nenastal, jde o GOAL (trojúhelník). Pokud nastal, STATE nebo EVENT.</div>
+      <div class="step-title">EFFECT — define the impact (start here)</div>
+      <div class="step-q">"What happened, or what do we want to achieve?"</div>
+      <div class="step-tip">Place GOAL or result STATE to the bottom right. If the impact has not yet occurred, it is a GOAL (triangle). If it has, STATE or EVENT.</div>
     </div>
   </div>
   <div class="step">
     <div class="step-num" style="background:var(--color-background-info);color:var(--color-text-info)">1</div>
     <div class="step-body">
-      <div class="step-title">ROOT CAUSE — najdi kořen</div>
-      <div class="step-q">"Odkud problém pramení? Co to spustilo?"</div>
-      <div class="step-tip">Umísti doleva nahoru STATE nebo EVENT. Pokud kořen neznáš, vlož QUESTION (hvězda) — je to legitimní uzel, ne chyba. Ptej se "Proč?" max. 5×.</div>
+      <div class="step-title">ROOT CAUSE — find the root</div>
+      <div class="step-q">"Where does the problem originate? What triggered it?"</div>
+      <div class="step-tip">Place STATE or EVENT to the top left. If the root is unknown, insert a QUESTION (star) — it is a legitimate node, not an error. Ask "Why?" at most 5 times.</div>
     </div>
   </div>
   <div class="step">
     <div class="step-num" style="background:var(--color-background-success);color:var(--color-text-success)">2</div>
     <div class="step-body">
-      <div class="step-title">CAUSAL PATHWAY — propoj cestu</div>
-      <div class="step-q">"Jak kořen vede k dopadu?"</div>
-      <div class="step-tip">Spoj Root a Effect uzly přes STATE / EVENT. Každý STATE→STATE přechod potřebuje EVENT uprostřed. Max. 4–5 uzlů mezi kořenem a bránou — jinak vlož GATE.</div>
+      <div class="step-title">CAUSAL PATHWAY — connect the path</div>
+      <div class="step-q">"How does the root lead to the impact?"</div>
+      <div class="step-tip">Connect Root and Effect nodes via STATE / EVENT. Every STATE→STATE transition needs an EVENT in the middle. Max 4–5 nodes between root and gate — otherwise insert a GATE.</div>
     </div>
   </div>
   <div class="step">
     <div class="step-num" style="background:var(--color-background-warning);color:var(--color-text-warning)">3</div>
     <div class="step-body">
-      <div class="step-title">DECISION POINT — vlož zásah</div>
-      <div class="step-q">"Kde se řetězec dá přerušit nebo přesměrovat?"</div>
-      <div class="step-tip">Vlož DECISION nebo TASK na místo, kde je vliv na řetězec. TASK + BLOKUJE = prevence. TASK + REALIZUJE = oprava. DECISION vždy větví na ≥ 2 výstupy s různými dopady.</div>
+      <div class="step-title">DECISION POINT — insert intervention</div>
+      <div class="step-q">"Where can the chain be interrupted or redirected?"</div>
+      <div class="step-tip">Insert DECISION or TASK at the point where influence on the chain is possible. TASK + BLOCKS = prevention. TASK + REDUCES = repair. DECISION always branches into ≥ 2 outputs with different impacts.</div>
     </div>
   </div>
   <div class="divider"></div>
-  <p class="section-label">Kontrolní seznam před dokončením</p>
+  <p class="section-label">Pre-completion checklist</p>
   <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px">
     <div style="font-size:12px;color:var(--color-text-secondary);line-height:2;font-family:var(--font-mono)">
-      ☐ Každý STATE→STATE přechod má EVENT uzel<br>
-      ☐ Každá DECISION má ≥ 2 větvení s efekty<br>
-      ☐ Každá GATE má definovanou podmínku (AND/OR/XOR)<br>
-      ☐ Každý BLACKBOX má barvu jistoty<br>
-      ☐ GOAL uzel uzavírá pravý konec diagramu<br>
-      ☐ QUESTION uzly jsou označeny jako výzkumné úkoly<br>
-      ☐ ASSET uzly mají vazbu UMOŽŇUJE na navazující uzel
+      ☐ Every STATE→STATE transition has an EVENT node<br>
+      ☐ Every DECISION has ≥ 2 branches with effects<br>
+      ☐ Every GATE has a defined condition (AND/OR/XOR)<br>
+      ☐ Every BLACKBOX has a certainty colour<br>
+      ☐ GOAL node closes the right end of the diagram<br>
+      ☐ QUESTION nodes are marked as research tasks<br>
+      ☐ ASSET nodes have an ENABLES link to the following node
     </div>
   </div>
 </div>
 
-<!-- PRAVIDLA -->
+<!-- RULES -->
 <div id="rules" class="panel">
-  <p class="section-label">Strukturální pravidla</p>
+  <p class="section-label">Structural rules</p>
   <div class="rule-row" style="border-color:#185FA5">
-    <div class="rule-title">Pravidlo přechodu: stav → událost → stav</div>
-    <div class="rule-body">Dva STATE uzly nemohou být přímo propojeny přes ZPŮSOBUJE bez mezilehlého EVENT. STATE "Memory Leak" → EVENT "OOM Kill" → STATE "Výpadek" — správně. STATE → STATE — chyba.</div>
+    <div class="rule-title">Transition rule: state → event → state</div>
+    <div class="rule-body">Two STATE nodes cannot be directly connected via CAUSES without an intermediate EVENT. STATE "Memory Leak" → EVENT "OOM Kill" → STATE "Outage" — correct. STATE → STATE — error.</div>
   </div>
   <div class="rule-row" style="border-color:#3B6D11">
-    <div class="rule-title">Pravidlo hloubky: max 4 uzly bez GATE</div>
-    <div class="rule-body">Pokud kauzální cesta obsahuje více než 4 uzly bez větvení nebo GATE, vlož GATE s podmínkou. Dlouhé přímé řetězce skrývají latentní větvení.</div>
+    <div class="rule-title">Depth rule: max 4 nodes without GATE</div>
+    <div class="rule-body">If a causal path contains more than 4 nodes without branching or a GATE, insert a GATE with a condition. Long straight chains hide latent branching.</div>
   </div>
   <div class="rule-row" style="border-color:#BA7517">
-    <div class="rule-title">Pravidlo úplnosti: každá větev má Effect</div>
-    <div class="rule-body">Každá výstupní větev DECISION nebo GATE musí skončit u STATE, GOAL nebo zpětné smyčky. Slepé větve = neúplné modelování.</div>
+    <div class="rule-title">Completeness rule: every branch has an Effect</div>
+    <div class="rule-body">Every output branch of a DECISION or GATE must end at STATE, GOAL, or a feedback loop. Dead-end branches = incomplete modelling.</div>
   </div>
   <div class="rule-row" style="border-color:#A32D2D">
-    <div class="rule-title">Pravidlo BLACKBOX: zapiš symptom, ne příčinu</div>
-    <div class="rule-body">BLACKBOX obsahuje popis efektu, ne domněnku o příčině. Správně: "Leak nenastal v testu". Špatně: "Pravděpodobně chybný mock".</div>
+    <div class="rule-title">BLACKBOX rule: write the symptom, not the cause</div>
+    <div class="rule-body">BLACKBOX contains a description of the effect, not an assumption about the cause. Correct: "Leak did not appear in test". Incorrect: "Probably a broken mock".</div>
   </div>
   <div class="rule-row" style="border-color:rgba(0,0,0,0.22)">
-    <div class="rule-title">Pravidlo ASSET: podmínka, ne příčina</div>
-    <div class="rule-body">ASSET (válec) uzel používej jen tehdy, když jeho absence zastaví řetězec. Spojuj ho vazbou UMOŽŇUJE, nikdy ZPŮSOBUJE.</div>
+    <div class="rule-title">ASSET rule: condition, not cause</div>
+    <div class="rule-body">Use an ASSET (cylinder) node only when its absence stops the chain. Connect it with ENABLES, never CAUSES.</div>
   </div>
   <div class="rule-row" style="border-color:rgba(0,0,0,0.22)">
-    <div class="rule-title">Pravidlo konzistence barev</div>
-    <div class="rule-body">Barva uzlu se vztahuje k jistotě jeho obsahu, nikoli k typu uzlu. Pokud STATE "Chronický stres" je jen hypotéza (60 %), je modrý — bez ohledu na tvar.</div>
+    <div class="rule-title">Colour consistency rule</div>
+    <div class="rule-body">Node colour relates to the certainty of its content, not the node type. If STATE "Chronic stress" is only a hypothesis (60%), it is blue — regardless of shape.</div>
   </div>
   <div class="divider"></div>
-  <p class="section-label">Temporální orientace</p>
+  <p class="section-label">Temporal orientation</p>
   <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
       <svg width="200" height="20" viewBox="0 0 200 20"><line x1="10" y1="10" x2="190" y2="10" stroke="var(--color-text-tertiary)" stroke-width="1"/><polygon points="186,5 198,10 186,15" fill="var(--color-text-tertiary)"/><text x="10" y="8" font-size="8" fill="var(--color-text-tertiary)" font-family="monospace">ROOT</text><text x="85" y="8" font-size="8" fill="var(--color-text-tertiary)" font-family="monospace">PATHWAY</text><text x="158" y="8" font-size="8" fill="var(--color-text-tertiary)" font-family="monospace">EFFECT</text></svg>
-      <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">čas →</span>
+      <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">time →</span>
     </div>
-    <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6">Root vlevo, Effect vpravo. DECISION a TASK se umísťují na místo v timeline, kde k zásahu reálně dochází — ne vždy na konec. Zpětné smyčky mohou vést zpět doleva.</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6">Root on the left, Effect on the right. DECISION and TASK are placed at the point in the timeline where the intervention actually occurs — not always at the end. Feedback loops may lead back to the left.</div>
   </div>
 </div>
 
-<!-- ANTI-VZORY -->
+<!-- ANTI-PATTERNS -->
 <div id="antipatterns" class="panel">
-  <p class="section-label">Časté chyby</p>
+  <p class="section-label">Common mistakes</p>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">State–State bez eventu</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">"Chronický stres → Kolaps" — chybí EVENT. Správně: "Chronický stres → snižuje → Kvalita spánku → spouští → Kolaps".</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">State–State without event</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">"Chronic stress → Collapse" — missing EVENT. Correct: "Chronic stress → reduces → Sleep quality → triggers → Collapse".</div>
     </div>
   </div>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Decision bez větvení</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">DECISION uzel s jednou výstupní hranou není rozhodnutí — je to TASK. Pokud neexistují alespoň dvě volby s různými dopady, změň tvar.</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Decision without branching</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">A DECISION node with one output edge is not a decision — it's a TASK. If there aren't at least two choices with different impacts, change the shape.</div>
     </div>
   </div>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Všechno zelené</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Pokud jsou všechny uzly zelené (&gt; 80 %), diagram nedělá epistémii viditelnou. Každý model má nejistá místa — najdi je a obarvi oranžově nebo červeně.</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Everything green</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">If all nodes are green (&gt; 80%), the diagram does not make epistemics visible. Every model has uncertain areas — find them and colour them orange or red.</div>
     </div>
   </div>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">CONCEPT jako náhrada za STATE</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">"Expanze" je CONCEPT, ale "Přístup k 10 000 novým zákazníkům" je STATE. Pokud jde konkrétizovat, použij STATE. CONCEPT nech pro nezměřitelné abstrakce.</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">CONCEPT as a substitute for STATE</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">"Expansion" is a CONCEPT, but "Access to 10,000 new customers" is a STATE. If it can be made concrete, use STATE. Leave CONCEPT for unmeasurable abstractions.</div>
     </div>
   </div>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Řetězec bez GATE po 5+ uzlech</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Příliš přímý řetězec = přeskočená větvení nebo podmínky. Vlož GATE s otázkou "Nastane vždy?" — pokud ne, existuje podmínka, která patří do modelu.</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Chain without GATE after 5+ nodes</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Too straight a chain = skipped branching or conditions. Insert a GATE with the question "Does this always happen?" — if not, there is a condition that belongs in the model.</div>
     </div>
   </div>
   <div class="anti-row">
     <div style="color:#A32D2D;font-size:16px;line-height:1.3;flex-shrink:0">✕</div>
     <div>
-      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Smíchání ZPŮSOBUJE a UMOŽŇUJE</div>
-      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">ASSET "Rozpočet" → ZPŮSOBUJE → "Expanze" je chyba. Správně: ASSET "Rozpočet" → UMOŽŇUJE → DECISION "Výběr regionu". Bez rozpočtu nelze rozhodovat, ale rozpočet sám expanzi nezpůsobí.</div>
+      <div style="font-size:12px;font-weight:500;font-family:monospace;color:var(--color-text-primary);margin-bottom:3px">Mixing CAUSES and ENABLES</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">ASSET "Budget" → CAUSES → "Expansion" is an error. Correct: ASSET "Budget" → ENABLES → DECISION "Choose region". Without a budget you cannot decide, but the budget alone will not cause expansion.</div>
     </div>
   </div>
 </div>

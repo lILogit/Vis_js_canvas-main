@@ -218,6 +218,8 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_file(os.path.join(os.path.dirname(__file__), "decompose.html"))
         elif path == "/grammar":
             self._serve_file(os.path.join(os.path.dirname(__file__), "grammar.html"))
+        elif path == "/grammar/en":
+            self._serve_file(os.path.join(os.path.dirname(__file__), "grammar_en.html"))
         elif path == "/training" or path == "/training.html":
             self._serve_file(os.path.join(os.path.dirname(__file__), "training.html"))
         elif path == "/api/chain":
@@ -679,8 +681,8 @@ class Handler(BaseHTTPRequestHandler):
             chain_data = chain_io.to_dict(_chain) if _chain else {}
         try:
             from llm import client as llm_client
-            from llm.prompts import SUGGEST_NODES
-            prompt = SUGGEST_NODES.format(chain_json=json.dumps(chain_data, indent=2), n=n)
+            from llm.prompts import SUGGEST_NODES, CAUSAL_RULES
+            prompt = SUGGEST_NODES.format(chain_json=json.dumps(chain_data, indent=2), n=n, rules=CAUSAL_RULES)
             result = llm_client.call(prompt)
             self._send_json({"suggestions": result.get("suggestions", [])})
         except Exception as exc:
@@ -725,10 +727,10 @@ class Handler(BaseHTTPRequestHandler):
             chain_data = _subgraph(chain_data, node_ids)
         try:
             from llm import client as llm_client
-            from llm.prompts import ENRICH_GAPS, SUGGEST_NODES, CRITIQUE_CHAIN
+            from llm.prompts import ENRICH_GAPS, SUGGEST_NODES, CRITIQUE_CHAIN, CAUSAL_RULES
 
             if mode == "gaps":
-                prompt = ENRICH_GAPS.format(chain_json=json.dumps(chain_data, indent=2), n=5)
+                prompt = ENRICH_GAPS.format(chain_json=json.dumps(chain_data, indent=2), n=5, rules=CAUSAL_RULES)
                 result = llm_client.call(prompt)
                 suggestions = []
                 for g in result.get("gaps", []):
@@ -737,9 +739,12 @@ class Handler(BaseHTTPRequestHandler):
                         "kind": "gap_node",
                         "label": mn.get("label", ""),
                         "node_type": mn.get("type", "state"),
+                        "archetype": mn.get("archetype") or None,
                         "description": mn.get("description", ""),
                         "connects_from": g.get("between_from"),
                         "connects_to": g.get("between_to"),
+                        "relation_in": g.get("relation_in", "CAUSES"),
+                        "relation_out": g.get("relation_out", "CAUSES"),
                         "reasoning": g.get("reasoning", ""),
                     })
             elif mode == "critique":
@@ -778,14 +783,15 @@ class Handler(BaseHTTPRequestHandler):
                             "reasoning": f"[{severity}] {description}",
                         })
             else:  # suggest
-                prompt = SUGGEST_NODES.format(chain_json=json.dumps(chain_data, indent=2), n=5)
+                prompt = SUGGEST_NODES.format(chain_json=json.dumps(chain_data, indent=2), n=5, rules=CAUSAL_RULES)
                 result = llm_client.call(prompt)
                 suggestions = []
                 for s in result.get("suggestions", []):
                     suggestions.append({
                         "kind": s.get("type", "node"),
                         "label": s.get("label", ""),
-                        "node_type": "state",
+                        "node_type": s.get("node_type", "state"),
+                        "archetype": s.get("archetype") or None,
                         "description": s.get("description", ""),
                         "connects_from": s.get("connects_from"),
                         "connects_to": s.get("connects_to"),
