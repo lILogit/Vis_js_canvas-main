@@ -1,0 +1,14 @@
+[project]
+name = "ccf"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+ccf = "ccf.cli:main"
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

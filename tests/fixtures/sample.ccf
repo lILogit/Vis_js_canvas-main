@@ -1,0 +1,13 @@
+GRAPH:Causal Editor|custom|812828fe
+N:n0=Rules[blackbox/mechanism]
+N:n1=Observation[event/root_cause]"observe / filter / "
+N:n2=causal chain[blackbox/mechanism]"observation to causal chain"@cluster-demo.causal.json
+N:n3=human interaction[event/effect]
+N:n4=Causal Forecast[goal/effect]
+N:n5=forecast improval criteria[concept/question]
+E:n1->n2 TRIGGERS
+E:n0->n2 AMPLIFIES
+E:n3->n2 INSTANTIATES
+E:n2->n4 CAUSES
+E:n5->n2 AMPLIFIES
+E:n4->n1 AMPLIFIES

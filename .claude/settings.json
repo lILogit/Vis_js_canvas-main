@@ -52,7 +52,13 @@
       "Bash(python3 -m pytest tests/ -v)",
       "Bash(python3 -m py_compile chain/schema.py chain/io.py)",
       "Bash(python3 -m py_compile llm/prompts.py llm/enrichment.py editor/serve.py)",
-      "Bash(python3 -m py_compile editor/serve.py llm/prompts.py llm/enrichment.py)"
+      "Bash(python3 -m py_compile editor/serve.py llm/prompts.py llm/enrichment.py)",
+      "Bash(python3 -c ' *)",
+      "Bash(PYTHONPATH=src python3 -m pytest tests/test_ccf.py -v)",
+      "Bash(python3 -m mypy src/ccf --strict)",
+      "Bash(PYTHONPATH=src python3 -m ccf.cli ratio chains/causal-editor.causal.json)",
+      "Bash(PYTHONPATH=src python3 -m ccf.cli roundtrip chains/causal-editor.causal.json)",
+      "Bash(PYTHONPATH=src python3 -m pytest tests/test_ccf.py -q)"
     ]
   }
 }
