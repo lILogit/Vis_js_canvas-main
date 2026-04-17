@@ -72,8 +72,8 @@ function confidenceColor(c) {
 function nodeToVis(n) {
   const shape = TYPE_SHAPE[n.type] || 'box';
   const color = n.deprecated ? '#444' : confidenceColor(n.confidence);
-  const borderColor = n.flagged ? '#ef4444' : (n.source === 'llm' ? '#8b5cf6' : '#555');
-  const borderDashes = n.source === 'llm' ? [5, 3] : false;
+  const borderColor = n.flagged ? '#ef4444' : (n.chain_link ? '#06b6d4' : (n.source === 'llm' ? '#8b5cf6' : '#555'));
+  const borderDashes = n.chain_link ? [4, 3] : (n.source === 'llm' ? [5, 3] : false);
   const conf = n.confidence ?? 0.5;
 
   const tipLines = [
@@ -83,6 +83,7 @@ function nodeToVis(n) {
     `confidence: ${conf.toFixed(2)}  source: ${n.source || 'user'}`,
     n.flagged ? '⚑ flagged' : null,
     n.deprecated ? '(deprecated)' : null,
+    n.chain_link ? `🔗 linked → ${n.chain_link}` : null,
   ].filter(Boolean).join('<br>');
 
   return {
@@ -471,6 +472,15 @@ function showNodePanel(n) {
       <label>Source</label>
       <input value="${n.source}" readonly style="opacity:0.5">
     </div>
+    <div class="field">
+      <label>Chain link</label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <select id="pi-chain-link" style="flex:1">
+          <option value="">— none —</option>
+        </select>
+        <button id="btn-open-chain-link" style="flex-shrink:0" ${n.chain_link ? '' : 'disabled'}>Open →</button>
+      </div>
+    </div>
     <div class="llm-actions">
       <button id="btn-explain">Explain this node</button>
       <button id="btn-ask-llm">Ask LLM...</button>
@@ -488,6 +498,32 @@ function showNodePanel(n) {
   document.getElementById('btn-ask-llm').addEventListener('click', () => showAskDialog(n.id));
   document.getElementById('btn-flag').addEventListener('click', () => toggleFlag(n.id, 'node'));
   document.getElementById('btn-delete-node').addEventListener('click', () => deleteSelected(n.id, 'node'));
+
+  // Populate chain-link dropdown async
+  (async () => {
+    const sel = document.getElementById('pi-chain-link');
+    if (!sel) return;
+    try {
+      const { chains } = await listChains();
+      sel.innerHTML = '<option value="">— none —</option>' +
+        chains.map(c => `<option value="${esc(c.filename)}"${(n.chain_link || '') === c.filename ? ' selected' : ''}>${esc(c.filename.replace(/\.causal\.json$/, ''))}</option>`).join('');
+      document.getElementById('btn-open-chain-link').disabled = !sel.value;
+    } catch (_) {}
+  })();
+
+  document.getElementById('pi-chain-link').addEventListener('change', e => {
+    document.getElementById('btn-open-chain-link').disabled = !e.target.value;
+  });
+
+  document.getElementById('btn-open-chain-link').addEventListener('click', async () => {
+    const link = document.getElementById('pi-chain-link').value;
+    if (!link) return;
+    if (isDirty()) await saveChain(chainData);
+    const data = await switchChain(link);
+    chainData = data;
+    renderGraph(chainData);
+    document.getElementById('chain-name').textContent = data.meta?.name || link;
+  });
 }
 
 function showEdgePanel(e) {
@@ -551,6 +587,7 @@ function applyNodeEdits(nodeId) {
   node.archetype   = document.getElementById('pi-archetype').value || null;
   node.description = document.getElementById('pi-desc').value;
   node.confidence  = parseFloat(document.getElementById('pi-conf').value);
+  node.chain_link  = document.getElementById('pi-chain-link').value || null;
   nodes.update(nodeToVis(node));
   markDirty();
   updateStatusBar();
@@ -1879,12 +1916,7 @@ async function runSummarize() {
   headline.textContent = '';
   saveBtn.style.display = 'none';
 
-  const hasSaved = (chainData?.summaries || []).length > 0;
-  if (hasSaved) {
-    _showSummaryChoice(overlay, body);
-    return;
-  }
-  await _generateSummary(overlay, body, headline, saveBtn);
+  _showSummaryChoice(overlay, body);
 }
 
 function _showSummaryChoice(overlay, body) {
@@ -1895,10 +1927,10 @@ function _showSummaryChoice(overlay, body) {
         <span class="sum-choice-label">Generate new summary</span>
         <span class="sum-choice-hint">Run AI analysis on current chain state</span>
       </button>
-      <button id="sum-choice-history" class="sum-choice-btn">
+      <button id="sum-choice-history" class="sum-choice-btn" ${(chainData?.summaries || []).length === 0 ? 'disabled' : ''}>
         <span class="sum-choice-icon">📂</span>
         <span class="sum-choice-label">Open from history</span>
-        <span class="sum-choice-hint">${(chainData?.summaries || []).length} saved snapshot${(chainData?.summaries || []).length !== 1 ? 's' : ''}</span>
+        <span class="sum-choice-hint">${(chainData?.summaries || []).length > 0 ? `${(chainData?.summaries || []).length} saved snapshot${(chainData?.summaries || []).length !== 1 ? 's' : ''}` : 'No saved snapshots yet'}</span>
       </button>
     </div>`;
   overlay.classList.add('visible');

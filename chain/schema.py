@@ -21,6 +21,7 @@ class Node:
     source: str = "user"  # user|llm|import
     deprecated: bool = False
     flagged: bool = False
+    chain_link: Optional[str] = None  # filename of linked chain, e.g. "sleep-cognition.causal.json"
 
 
 @dataclass

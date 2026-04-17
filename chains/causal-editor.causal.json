@@ -4,7 +4,7 @@
     "name": "Causal Editor",
     "domain": "custom",
     "created_at": "2026-03-27T13:49:22.916321",
-    "updated_at": "2026-04-16T09:17:35.192017",
+    "updated_at": "2026-04-17T10:31:22.617053",
     "version": 1,
     "author": "",
     "description": ""
@@ -21,7 +21,8 @@
       "created_at": "2026-03-27T12:49:35.018Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": null
     },
     {
       "id": "f75b515b",
@@ -34,7 +35,8 @@
       "created_at": "2026-03-27T12:51:34.755Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": null
     },
     {
       "id": "2eb422b4",
@@ -47,7 +49,8 @@
       "created_at": "2026-03-27T12:52:08.891Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": "cluster-demo.causal.json"
     },
     {
       "id": "b38aaf6c",
@@ -60,7 +63,8 @@
       "created_at": "2026-03-27T13:15:00.280Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": null
     },
     {
       "id": "6e8fa6ac",
@@ -73,7 +77,8 @@
       "created_at": "2026-03-27T13:17:26.226Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": null
     },
     {
       "id": "6b71449e",
@@ -86,7 +91,8 @@
       "created_at": "2026-03-27T14:08:30.086Z",
       "source": "user",
       "deprecated": false,
-      "flagged": false
+      "flagged": false,
+      "chain_link": null
     }
   ],
   "edges": [

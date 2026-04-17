@@ -36,6 +36,7 @@ def load(path: str) -> CausalChain:
             source=n.get("source", "user"),
             deprecated=n.get("deprecated", False),
             flagged=n.get("flagged", False),
+            chain_link=n.get("chain_link", None),
         ))
 
     edges = []
@@ -75,6 +76,7 @@ def to_dict(chain: CausalChain) -> dict:
             "source": n.source,
             "deprecated": n.deprecated,
             "flagged": n.flagged,
+            "chain_link": n.chain_link,
         })
 
     edges = []
