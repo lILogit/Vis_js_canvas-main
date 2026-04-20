@@ -89,11 +89,18 @@ editor/
   decompose.html        ← standalone Knowledge Decomposer page (/decompose route)
   grammar.html          ← standalone Chain Grammar System page (/grammar route)
   static/
-    editor.js           ← vis-network init, visual encoding, enrich/import/ingest preview, RCDE cluster, summary save/history
-    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, etc.)
+    editor.js           ← vis-network init, visual encoding, enrich/import/ingest preview, RCDE cluster, summary save/history, CCF panel
+    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, importChain, loadChainCcf, etc.)
     style.css           ← dark theme
     decompose.js        ← Knowledge Decomposer vis-network; epistemic class coloring
     decompose.css       ← Decomposer layout + klass badge styles
+src/
+  ccf/
+    ccf.py              ← compress(graph) → CCF v1 string; restore(ccf) → dict; to_prompt()
+    defaults.py         ← NODE_DEFAULTS, EDGE_DEFAULTS, META_DEFAULTS
+    grammar.py          ← VALID_TYPES, VALID_ARCHETYPES, VALID_RELATIONS frozensets
+    cli.py              ← CLI: compress / restore / roundtrip / ratio
+    __init__.py         ← public API re-exports
 llm/
   client.py             ← Claude API wrapper; strips markdown; parses JSON
   prompts.py            ← all prompt templates: ENRICH, GAP, TEXT_TO_CHAIN,
@@ -120,8 +127,10 @@ tests/                  ← pytest; 42 tests across schema, validate, io, note
 **Server API endpoints:**
 - `GET /api/chain` — load current chain; auto-reloads from disk if mtime changed
 - `GET /api/chains` — list all `.causal.json` files in `chains/` (excludes `*-seed.causal.json`)
+- `GET /api/chain/ccf` — return CCF v1 compressed text for the current chain (active nodes/edges only; invalid archetypes normalised to `mechanism`)
 - `POST /api/chain` — save chain from browser
 - `POST /api/chain/switch` — hot-swap active chain without server restart; body: `{filename}`; rejects seed files
+- `POST /api/chain/import` — accept a `.causal.json` payload, save to `chains/` (auto-incrementing slug), switch to it; body: `{chain}`
 - `POST /api/demo/reset` — copies `*-seed.causal.json` over matching chain files, reloads if active; returns `{reset: [filenames], chain}`
 - `POST /api/validate` — run structural validation
 - `POST /api/summary/save` — append a summary snapshot to `chain.summaries` and persist; body: `{entry}`
@@ -167,11 +176,15 @@ Free text body.
 
 ## Browser UI features
 
-Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `⊞ Cluster` | `Save ⌘S`
+Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `⬆ Import` (upload `.causal.json`) | `⬇ Export` (download `.causal.json`) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `⊞ Cluster` | `Save ⌘S`
 
 **Chain switcher** — lists all non-seed chains from `GET /api/chains` as cards; clicking one calls `POST /api/chain/switch` and re-renders the graph without page reload. Hover a card to reveal a 🗑 delete button (backs up then removes the file; seed files are protected).
 
 **New chain** — `＋ New` button opens a modal with Name + Domain fields; calls `POST /api/chain/new`, saves an empty chain and switches to it immediately.
+
+**Import chain** — `⬆ Import` opens a file picker; the selected `.causal.json` is read client-side, POSTed to `POST /api/chain/import`, saved to `chains/` with an auto-incrementing slug if a name collision occurs, and switched to immediately.
+
+**Export chain** — `⬇ Export` serialises the current `chainData` to JSON and triggers a browser download named `<chain-slug>.causal.json`. No server round-trip.
 
 **Reset demo** — `↺ Reset demo` button calls `POST /api/demo/reset`; backs up current chain then restores from `*-seed.causal.json`. Seed files are excluded from the chain switcher and cannot be switched to directly.
 
@@ -188,6 +201,8 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty ch
 **Polygon lasso** — overlay canvas; click to place vertices, **double-click** or **Enter** to close polygon and select all enclosed nodes (persists selection); `Escape` cancels. Selection can then be used with Find gaps / Suggest / Summary (scoped to selected nodes) or deleted with `Delete`/`Backspace`. Multi-node selection also works with **Ctrl+click** (or **Cmd+click**).
 
 **Selection-scoped LLM features** — `Find gaps`, `Suggest`, and `📋 Summary` check `network.getSelectedNodes()` before calling the server. If ≥1 real nodes are selected, only that subgraph (selected nodes + edges between them) is sent to the LLM; the loading message shows the count. Deselect all to revert to full-chain scope.
+
+**Chain Structure panel** — collapsible `<details>` section at the bottom of the Inspector sidebar. Calls `GET /api/chain/ccf` and displays the CCF v1 text in a scrollable monospace block. The summary line shows a `NN · NE` badge (active node/edge counts). A **Copy** button copies the CCF to clipboard. Refreshes automatically on load, chain switch, import, new-chain creation, and manual save. Server-side: filters deprecated items, normalises null/invalid archetypes to `mechanism` before calling `ccf.compress()`.
 
 **Keyboard shortcuts:** `⌘S`/`Ctrl+S` save | `Delete`/`Backspace` soft-delete selected | `Escape` cancel lasso / close any overlay | `Enter` finish lasso polygon (≥3 points) | `Ctrl+click` / `Cmd+click` multi-select nodes
 
@@ -212,6 +227,30 @@ All prompts are named constants in `llm/prompts.py`. System prompt always includ
 
 CLI enrichment modes (`python3 cli.py enrich <file> --mode`): `full | gaps | weights | scope`
 Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both use preview flow. `📋 Summary` uses a separate read-only modal (no preview nodes). All three are selection-scoped when nodes are selected (`POST /llm/enrich-preview` and `POST /llm/summarize` accept optional `node_ids`; server calls `_subgraph()` to filter chain data).
+
+## CCF v1 — Causal Compact Format
+
+Text serialisation of a causal graph. ~15× smaller than `.causal.json`. Used by the Chain Structure inspector panel and `to_prompt()` for LLM context embedding. Module: `src/ccf/`.
+
+```
+GRAPH:<name>|<domain>|<short_id>
+N:<alias>=<label>[<type>/<archetype>]"<description>"@<chain_link>~<confidence>{tag1,tag2}!~dep
+E:<from_alias>-><to_alias> <relation>,<weight>,<confidence>
+```
+
+- Aliases are ordinal (`n0`, `n1`, …); generated fresh on `restore()` with new UUIDs
+- Fields at default values are omitted (confidence 0.7 for nodes, weight/confidence 0.5 for edges)
+- `!` = flagged, `~dep` = deprecated
+- `compress()` raises `ValueError` on missing required fields, invalid enums, or dangling edges
+- Before compressing in the browser endpoint, deprecated items are filtered and null/unknown archetypes are normalised to `mechanism`
+
+CLI (requires `pip install -e .` or `python -m ccf`):
+```bash
+python -m ccf compress chains/<name>.causal.json [--out file.ccf]
+python -m ccf restore file.ccf [--out chains/<name>.causal.json]
+python -m ccf roundtrip chains/<name>.causal.json   # verify lossless
+python -m ccf ratio chains/<name>.causal.json        # print compression ratio
+```
 
 ## .causal.json format
 

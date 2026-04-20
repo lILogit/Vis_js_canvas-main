@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, isDirty, saveChain, loadChain, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, logout } from './sync.js';
+import { markDirty, isDirty, saveChain, loadChain, loadChainCcf, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, importChain, logout } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -255,10 +255,28 @@ async function checkLlmStatus() {
   }
 }
 
+async function refreshChainCcf() {
+  const pre = document.getElementById('chain-ccf-pre');
+  const badge = document.getElementById('chain-ccf-badge');
+  if (!pre) return;
+  try {
+    const ccf = await loadChainCcf();
+    pre.textContent = ccf;
+    const lines = ccf.split('\n');
+    const nNodes = lines.filter(l => l.startsWith('N:')).length;
+    const nEdges = lines.filter(l => l.startsWith('E:')).length;
+    if (badge) badge.textContent = `${nNodes}N · ${nEdges}E`;
+  } catch {
+    pre.textContent = '(unavailable)';
+    if (badge) badge.textContent = '';
+  }
+}
+
 async function init() {
   chainData = await loadChain();
   renderGraph(chainData);
   updateStatusBar();
+  refreshChainCcf();
   document.getElementById('chain-name').textContent = chainData.meta?.name || 'Untitled';
   document.title = `Causal Editor — ${chainData.meta?.name || 'Untitled'}`;
 
@@ -1619,9 +1637,18 @@ function setupToolbar() {
     try {
       await saveChain(chainData);
       setStatus('saved');
+      refreshChainCcf();
     } catch (e) {
       setStatus('save error: ' + e.message, 'error');
     }
+  });
+
+  document.getElementById('btn-ccf-copy').addEventListener('click', () => {
+    const text = document.getElementById('chain-ccf-pre').textContent;
+    navigator.clipboard.writeText(text).then(
+      () => setStatus('CCF copied to clipboard'),
+      () => setStatus('Copy failed', 'error'),
+    );
   });
   document.getElementById('btn-fit').addEventListener('click', () =>
     network?.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } }));
@@ -1835,6 +1862,7 @@ function setupToolbar() {
             chainData = data;
             renderGraph(chainData);
             document.getElementById('chain-name').textContent = data.meta?.name || filename;
+            refreshChainCcf();
             setStatus('loaded ' + (data.meta?.name || filename));
           } catch (err) {
             setStatus('switch failed: ' + err.message, 'error');
@@ -1867,6 +1895,7 @@ function setupToolbar() {
       document.getElementById('chain-name').textContent = r.chain.meta?.name || name;
       document.getElementById('nc-name').value = '';
       document.getElementById('nc-domain').value = '';
+      refreshChainCcf();
       setStatus('Created: ' + (r.chain.meta?.name || name));
     } catch (e) {
       setStatus('Create failed: ' + e.message, 'error');
@@ -1889,6 +1918,47 @@ function setupToolbar() {
       setStatus('Demo reset — ' + (r.reset || []).join(', '));
     } catch (e) {
       setStatus('Reset failed: ' + e.message, 'error');
+    }
+  });
+
+  // Export chain as .causal.json download
+  document.getElementById('btn-export-chain').addEventListener('click', () => {
+    if (!chainData) { setStatus('No chain loaded', 'error'); return; }
+    const name = chainData.meta?.name || 'chain';
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'chain';
+    const filename = slug + '.causal.json';
+    const blob = new Blob([JSON.stringify(chainData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus('Exported: ' + filename);
+  });
+
+  // Import chain from .causal.json file
+  document.getElementById('btn-import-chain').addEventListener('click', () => {
+    document.getElementById('import-chain-input').click();
+  });
+  document.getElementById('import-chain-input').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    e.target.value = '';
+    setStatus('Importing ' + file.name + '…');
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const r = await importChain(parsed);
+      chainData = r.chain;
+      renderGraph(chainData);
+      document.getElementById('chain-name').textContent = r.chain.meta?.name || file.name;
+      clearPreviewItems();
+      document.getElementById('suggestions-overlay').classList.remove('visible');
+      refreshChainCcf();
+      setStatus('Imported: ' + r.filename);
+    } catch (e) {
+      setStatus('Import failed: ' + e.message, 'error');
     }
   });
 
@@ -2312,39 +2382,76 @@ function _renderSummary(r) {
 
   // Goal
   if (r.goal) {
+    const signal = r.goal.success_signal
+      ? `<span class="sum-signal">✓ ${esc(r.goal.success_signal)}</span>` : '';
     parts.push(`
       <div class="sum-section sum-goal">
         <div class="sum-section-title">🎯 Goal</div>
         <div class="sum-item">
           <span class="sum-label">${esc(r.goal.label || '')}</span>
           <span class="sum-plain">${esc(r.goal.plain || '')}</span>
+          ${signal}
         </div>
       </div>`);
   }
 
+  // Next action
+  if (r.next_action) {
+    const na = r.next_action;
+    parts.push(`
+      <div class="sum-section sum-next-action">
+        <div class="sum-section-title">▶ Do This First</div>
+        <div class="sum-item">
+          <span class="sum-label">${esc(na.label || '')}</span>
+          <span class="sum-plain">${esc(na.why_now || '')}</span>
+          <span class="sum-plain">${esc(na.expected_effect || '')}</span>
+        </div>
+      </div>`);
+  }
+
+  // Reasoning block
+  if (r.reasoning) {
+    const rn = r.reasoning;
+    const rows = [
+      ['Root cause',    rn.root_cause],
+      ['Pathway',       rn.causal_pathway],
+      ['Decision point', rn.decision_point],
+      ['Effect',        rn.effect],
+      ['Why it holds',  rn.why_this_chain_holds],
+    ].filter(([, v]) => v).map(([k, v]) => `
+      <div class="sum-reasoning-row">
+        <span class="sum-reasoning-key">${esc(k)}</span>
+        <span class="sum-plain">${esc(v)}</span>
+      </div>`).join('');
+    if (rows) {
+      parts.push(`<div class="sum-section sum-reasoning"><div class="sum-section-title">🧠 Reasoning</div>${rows}</div>`);
+    }
+  }
+
   // Critical path
   if (r.critical_path?.length) {
-    const steps = r.critical_path.map(s => `
-      <div class="sum-step">
-        <span class="sum-step-num">${s.step}</span>
-        <div class="sum-step-body">
-          <span class="sum-label">${esc(s.label || '')}</span>
-          <span class="sum-role sum-role-${(s.role || '').replace('_', '-')}">${esc(s.role || '')}</span>
-          <span class="sum-plain">${esc(s.plain || '')}</span>
-        </div>
-      </div>`).join('');
-    parts.push(`
-      <div class="sum-section sum-path">
-        <div class="sum-section-title">🛤 Critical Path</div>
-        ${steps}
-      </div>`);
+    const steps = r.critical_path.map(s => {
+      const edgeIn = s.edge_in ? `<span class="sum-edge-in">↳ via ${esc(s.edge_in)}</span>` : '';
+      return `
+        <div class="sum-step">
+          <span class="sum-step-num">${s.step}</span>
+          <div class="sum-step-body">
+            ${edgeIn}
+            <span class="sum-label">${esc(s.label || '')}</span>
+            <span class="sum-role sum-role-${(s.role || '').replace('_', '-')}">${esc(s.role || '')}</span>
+            <span class="sum-plain">${esc(s.plain || '')}</span>
+          </div>
+        </div>`;
+    }).join('');
+    parts.push(`<div class="sum-section sum-path"><div class="sum-section-title">🛤 Critical Path</div>${steps}</div>`);
   }
 
   // Tasks
   if (r.tasks?.length) {
     const items = r.tasks.map(t => {
+      const tier = t.tier ? `<span class="sum-tier sum-tier-${esc(t.tier)}">${esc(t.tier)}</span>` : '';
       const req = t.requires?.length ? `<span class="sum-requires">requires: ${t.requires.map(x => esc(x)).join(', ')}</span>` : '';
-      return `<div class="sum-item"><span class="sum-label">${esc(t.label || '')}</span>${req}<span class="sum-plain">${esc(t.plain || '')}</span></div>`;
+      return `<div class="sum-item">${tier}<span class="sum-label">${esc(t.label || '')}</span>${req}<span class="sum-plain">${esc(t.plain || '')}</span></div>`;
     }).join('');
     parts.push(`<div class="sum-section sum-tasks"><div class="sum-section-title">⚡ Tasks</div>${items}</div>`);
   }
@@ -2360,20 +2467,47 @@ function _renderSummary(r) {
     parts.push(`<div class="sum-section sum-decisions"><div class="sum-section-title">🔀 Decisions</div>${items}</div>`);
   }
 
-  // Risks
-  if (r.risks?.length) {
-    const items = r.risks.map(risk => `
-      <div class="sum-item sum-risk-item">
-        <span class="sum-label">${esc(risk.label || '')}</span>
-        <span class="sum-plain">${esc(risk.plain || '')}</span>
+  // Leverage points
+  if (r.leverage_points?.length) {
+    const items = r.leverage_points.map(lp => `
+      <div class="sum-item">
+        <span class="sum-label">${esc(lp.label || '')}</span>
+        <span class="sum-plain">${esc(lp.plain || '')}</span>
       </div>`).join('');
-    parts.push(`<div class="sum-section sum-risks"><div class="sum-section-title">⚠ Risks</div>${items}</div>`);
+    parts.push(`<div class="sum-section sum-leverage"><div class="sum-section-title">⚖ Leverage Points</div>${items}</div>`);
+  }
+
+  // Assumptions
+  if (r.assumptions?.length) {
+    const items = r.assumptions.map(a => `
+      <div class="sum-item">
+        <span class="sum-plain">${esc(a.plain || '')}</span>
+        <span class="sum-assumption-risk">If wrong: ${esc(a.risk || '')}</span>
+      </div>`).join('');
+    parts.push(`<div class="sum-section sum-assumptions"><div class="sum-section-title">⚠ Assumptions</div>${items}</div>`);
+  }
+
+  // Falsifiers
+  if (r.falsifiers?.length) {
+    const items = r.falsifiers.map(f => `<div class="sum-falsifier">${esc(f)}</div>`).join('');
+    parts.push(`<div class="sum-section sum-falsifiers"><div class="sum-section-title">🔬 Falsifiers</div>${items}</div>`);
   }
 
   // Open questions
   if (r.open_questions?.length) {
     const items = r.open_questions.map(q => `<div class="sum-question">${esc(q)}</div>`).join('');
     parts.push(`<div class="sum-section sum-questions"><div class="sum-section-title">❓ Open Questions</div>${items}</div>`);
+  }
+
+  // Confidence
+  if (r.confidence) {
+    const score = r.confidence.overall != null
+      ? `<span class="sum-confidence-score">${Math.round(r.confidence.overall * 100)}%</span>` : '';
+    const weak = r.confidence.weakest_link
+      ? `<span class="sum-weakest">Weakest: ${esc(r.confidence.weakest_link)}</span>` : '';
+    if (score || weak) {
+      parts.push(`<div class="sum-section sum-confidence"><div class="sum-section-title">📊 Confidence</div>${score}${weak}</div>`);
+    }
   }
 
   return parts.join('') || '<div class="summary-loading">Nothing to summarize yet.</div>';

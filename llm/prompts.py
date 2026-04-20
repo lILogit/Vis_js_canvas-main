@@ -302,27 +302,42 @@ Rules:
 SUMMARIZE_CHAIN = """Given this causal chain:
 {chain_json}
 
-Produce a structured briefing designed for a reader who has NOT seen the graph.
-Minimize cognitive load: lead with the goal, then the critical path, then supporting details.
+Produce a structured briefing for a reader who has NOT seen the graph.
+Lead with the single most actionable move, then the causal logic, then supporting detail.
 
-Return JSON:
+Return JSON (omit any section whose array would be empty):
 {{
   "headline": "One sentence: what causal story this chain tells",
   "goal": {{
-    "label": "the GOAL node label (or the most terminal effect if no GOAL exists)",
-    "plain": "plain-language description of what success looks like"
+    "label": "GOAL node label, or most terminal effect if no GOAL exists",
+    "plain": "plain-language description of what success looks like",
+    "success_signal": "the observable event or metric that confirms the goal is reached"
+  }},
+  "next_action": {{
+    "label": "the single unblocked TASK or DECISION the owner should act on now",
+    "why_now": "one sentence: what is currently unblocked and what it gates",
+    "expected_effect": "one sentence: immediate downstream consequence of taking this action"
+  }},
+  "reasoning": {{
+    "root_cause": "the primary driver at the start of the causal spine",
+    "causal_pathway": "2-3 sentences tracing root→mechanism→effect in plain language",
+    "decision_point": "the key DECISION or GATE that most changes outcomes (null if none)",
+    "effect": "the most significant downstream consequence if the chain fires correctly",
+    "why_this_chain_holds": "the single core assumption that makes the whole chain valid"
   }},
   "critical_path": [
     {{
       "step": 1,
       "label": "node label",
       "role": "root_cause | mechanism | effect | moderator",
+      "edge_in": "relation type of the incoming edge (CAUSES|ENABLES|TRIGGERS etc.), null for step 1",
       "plain": "one sentence explaining this step in plain language"
     }}
   ],
   "tasks": [
     {{
       "label": "TASK node label",
+      "tier": "NOW | NEXT | PARK",
       "requires": ["ASSET labels this task needs"],
       "plain": "what this action does and when it fires"
     }}
@@ -336,24 +351,40 @@ Return JSON:
       ]
     }}
   ],
-  "risks": [
+  "leverage_points": [
     {{
-      "label": "node or edge label that represents a risk",
-      "plain": "what could go wrong and its downstream impact"
+      "label": "node or edge where a small change produces outsized effect",
+      "plain": "why this is a high-leverage intervention point"
     }}
+  ],
+  "assumptions": [
+    {{
+      "plain": "a belief the chain relies on that is not encoded as a node",
+      "risk": "what happens if this assumption is wrong"
+    }}
+  ],
+  "falsifiers": [
+    "an observable event or measurement that, if seen, would invalidate this chain's core logic"
   ],
   "open_questions": [
     "plain-language statement of each unresolved QUESTION node or identified gap"
-  ]
+  ],
+  "confidence": {{
+    "overall": 0.0,
+    "weakest_link": "the single node or edge with the lowest confidence or thinnest evidence, and why"
+  }}
 }}
 
 Rules:
-- critical_path: 3-7 steps covering the main causal spine from root to goal; skip peripheral nodes
-- tasks: only include TASK-type nodes; omit if none exist
-- decisions: include DECISION and GATE nodes; omit if none exist
-- risks: BLOCKS edges and low-confidence nodes (< 0.4) are primary risk signals; omit section if no clear risks
-- open_questions: include QUESTION nodes and flagged nodes; omit section if empty
-- plain language: no graph jargon, no node ids, write as if explaining to a smart non-expert"""
+- critical_path: 3-7 steps on the main causal spine root→goal; include edge_in for every step after step 1; skip peripheral nodes
+- tasks: tier=NOW if all ASSET requirements are already present; tier=NEXT if one hop away; tier=PARK otherwise; omit section if no TASK nodes
+- decisions: include DECISION and GATE nodes; omit section if none exist
+- leverage_points: prefer nodes that are bottlenecks (high in-degree + high out-degree) or moderators on BLOCKS/AMPLIFIES edges
+- assumptions: surface beliefs implicit in high-weight edges that lack an evidence field; omit section if all edges have evidence
+- falsifiers: derive from BLOCKS edges, low-confidence nodes (< 0.4), and QUESTION nodes; omit section if none
+- open_questions: QUESTION-type nodes and flagged nodes; omit section if none
+- confidence.overall: weighted mean of active edge confidences; weakest_link must name a specific element
+- plain language throughout: no node ids, no graph jargon, write for a smart non-expert"""
 
 MERGE_OVERLAP = """Given two causal chains:
 Chain A: {chain_a_json}

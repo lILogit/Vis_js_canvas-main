@@ -13,6 +13,9 @@
 <div id="toolbar">
   <button id="btn-switch-chain" title="Switch chain">⎇ Chain</button>
   <button id="btn-new-chain" title="Create a new empty chain">＋ New</button>
+  <button id="btn-import-chain" title="Import a .causal.json file from disk">⬆ Import</button>
+  <button id="btn-export-chain" title="Download current chain as .causal.json">⬇ Export</button>
+  <input type="file" id="import-chain-input" accept=".json,.causal.json" style="display:none">
   <span id="chain-name" class="chain-name">Loading...</span>
   <button id="btn-reset-demo" class="danger-dim" title="Restore demo chain to its initial seed state">↺ Reset demo</button>
   <div class="sep"></div>
@@ -64,6 +67,13 @@
       <p style="color:#666;font-size:12px;padding:8px 0">Click a node or edge to inspect.</p>
     </div>
     <div id="llm-response"></div>
+    <details id="chain-ccf-details">
+      <summary id="chain-ccf-summary">Chain Structure <span id="chain-ccf-badge"></span></summary>
+      <div id="chain-ccf-body">
+        <pre id="chain-ccf-pre"></pre>
+        <button id="btn-ccf-copy" title="Copy CCF to clipboard">Copy</button>
+      </div>
+    </details>
   </div>
 
 </div>

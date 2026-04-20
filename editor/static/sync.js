@@ -45,6 +45,12 @@ export async function loadChain() {
   return resp.json();
 }
 
+export async function loadChainCcf() {
+  const resp = _handleUnauthorized(await fetch('/api/chain/ccf'));
+  if (!resp.ok) throw new Error(`CCF load failed: ${resp.status}`);
+  return (await resp.json()).ccf || '';
+}
+
 export async function listChains() {
   const resp = await fetch('/api/chains');
   if (!resp.ok) throw new Error(`List failed: ${resp.status}`);
@@ -184,6 +190,17 @@ export async function exportSummaryFile(name, content) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, content }),
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+export async function importChain(chainJson) {
+  const resp = await fetch('/api/chain/import', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chain: chainJson }),
   });
   const data = await resp.json();
   if (data.error) throw new Error(data.error);

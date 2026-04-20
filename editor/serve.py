@@ -230,6 +230,8 @@ class Handler(BaseHTTPRequestHandler):
             self._api_llm_status()
         elif path == "/api/llm-provider":
             self._api_get_llm_provider()
+        elif path == "/api/chain/ccf":
+            self._api_chain_ccf()
         elif path == "/api/summary/files":
             self._api_summary_list_files()
         elif path == "/api/summary/file":
@@ -296,6 +298,8 @@ class Handler(BaseHTTPRequestHandler):
             self._api_summary_delete()
         elif path == "/api/summary/export":
             self._api_summary_export()
+        elif path == "/api/chain/import":
+            self._api_import_chain()
         else:
             self._send_error("Not found", 404)
 
@@ -434,6 +438,51 @@ class Handler(BaseHTTPRequestHandler):
                 except Exception:
                     pass
         self._send_json({"chains": result})
+
+    def _api_chain_ccf(self):
+        """Return the CCF v1 compressed representation of the current chain (active nodes/edges only)."""
+        with _chain_lock:
+            chain_data = chain_io.to_dict(_chain) if _chain else None
+        if not chain_data:
+            self._send_error("No chain loaded", 404)
+            return
+        try:
+            import sys as _sys
+            _src = os.path.join(os.path.dirname(os.path.dirname(__file__)), "src")
+            if _src not in _sys.path:
+                _sys.path.insert(0, _src)
+            from ccf import compress as _ccf_compress
+            from ccf.grammar import VALID_ARCHETYPES, VALID_TYPES
+
+            # Build a clean copy: active items only, normalized enums
+            active_nodes = [
+                n for n in chain_data.get("nodes", []) if not n.get("deprecated")
+            ]
+            active_ids = {n["id"] for n in active_nodes}
+            active_edges = [
+                e for e in chain_data.get("edges", [])
+                if not e.get("deprecated")
+                and e.get("from") in active_ids
+                and e.get("to") in active_ids
+            ]
+            normalized_nodes = []
+            for n in active_nodes:
+                if n.get("archetype") not in VALID_ARCHETYPES or n.get("type") not in VALID_TYPES:
+                    n = dict(n)
+                    if n.get("archetype") not in VALID_ARCHETYPES:
+                        n["archetype"] = "mechanism"
+                    if n.get("type") not in VALID_TYPES:
+                        n["type"] = "state"
+                normalized_nodes.append(n)
+            clean = {
+                "meta": chain_data.get("meta", {}),
+                "nodes": normalized_nodes,
+                "edges": active_edges,
+            }
+            ccf_text = _ccf_compress(clean)
+            self._send_json({"ccf": ccf_text})
+        except Exception as exc:
+            self._send_error(str(exc))
 
     def _api_switch_chain(self):
         global _chain, _chain_path, _last_modified
@@ -625,6 +674,38 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"deleted": filename, "next_chain": next_chain_data})
             except Exception as exc:
                 self._send_error(str(exc))
+
+    def _api_import_chain(self):
+        """Accept a .causal.json payload, save to chains/, and switch to it."""
+        global _chain, _chain_path, _last_modified
+        body = self._body()
+        chain_json = body.get("chain")
+        if not isinstance(chain_json, dict):
+            self._send_error("Missing or invalid 'chain' field", 400)
+            return
+        if "meta" not in chain_json or "nodes" not in chain_json or "edges" not in chain_json:
+            self._send_error("Invalid chain format: missing meta, nodes, or edges", 400)
+            return
+        chains_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chains")
+        name = chain_json.get("meta", {}).get("name", "imported")
+        slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-') or 'imported'
+        filename = f"{slug}.causal.json"
+        path = os.path.join(chains_dir, filename)
+        counter = 1
+        while os.path.exists(path):
+            filename = f"{slug}-{counter}.causal.json"
+            path = os.path.join(chains_dir, filename)
+            counter += 1
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(chain_json, f, indent=2, ensure_ascii=False)
+            with _chain_lock:
+                _chain = chain_io.load(path)
+                _chain_path = path
+                _last_modified = os.path.getmtime(path)
+            self._send_json({"filename": filename, "chain": chain_io.to_dict(_chain)})
+        except Exception as exc:
+            self._send_error(str(exc))
 
     # ── LLM endpoints ─────────────────────────────────────────────────────────
 

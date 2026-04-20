@@ -4,7 +4,7 @@
     "name": "test-smoke",
     "domain": "custom",
     "created_at": "2026-03-19T22:55:49.101457",
-    "updated_at": "2026-04-17T14:03:00.300854",
+    "updated_at": "2026-04-20T11:06:18.392976",
     "version": 1,
     "author": "",
     "description": "+ přesouvání hodnot mezi trhy CNB\n"
@@ -804,7 +804,7 @@
       "confidence": 0.7,
       "created_at": "2026-03-22T13:37:01.862Z",
       "source": "llm",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "chain_link": null
     },
@@ -874,7 +874,7 @@
       "confidence": 0.7,
       "created_at": "2026-04-17T11:39:44.689Z",
       "source": "llm",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "chain_link": null
     },
@@ -888,7 +888,7 @@
       "confidence": 0.7,
       "created_at": "2026-04-17T11:39:44.689Z",
       "source": "llm",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "chain_link": null
     }
@@ -1976,7 +1976,7 @@
       "direction": "forward",
       "condition": null,
       "evidence": "The market process by which supply, demand, central bank activity, and macro signals are aggregated into a spot price for gold.",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "version": 1,
       "created_at": "2026-04-17T11:39:44.689Z",
@@ -1992,7 +1992,7 @@
       "direction": "forward",
       "condition": null,
       "evidence": "Lower overall variance in portfolio returns resulting from the low or negative correlation of gold with equities and bonds.",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "version": 1,
       "created_at": "2026-04-17T11:39:44.689Z",
@@ -2008,7 +2008,7 @@
       "direction": "forward",
       "condition": null,
       "evidence": "Policy decision by central banks to either increase gold reserves (accumulation) or sell existing holdings (liquidation), each producing materially different effects on gold supply and price.",
-      "deprecated": false,
+      "deprecated": true,
       "flagged": false,
       "version": 1,
       "created_at": "2026-04-17T11:39:44.689Z",
@@ -3655,6 +3655,42 @@
       "actor": "user",
       "payload": {
         "id": "c50a62ff",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-04-20T09:05:05.830Z",
+      "action": "edge_edit",
+      "actor": "user",
+      "payload": {
+        "id": "0b5e0226",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-04-20T09:05:08.766Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "ceaded91",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-04-20T09:05:11.261Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "2f6cc5ae",
+        "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-04-20T09:05:14.021Z",
+      "action": "node_edit",
+      "actor": "user",
+      "payload": {
+        "id": "ad05a5bb",
         "deprecated": true
       }
     }

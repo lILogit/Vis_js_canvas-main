@@ -1,0 +1,906 @@
+{
+  "meta": {
+    "id": "f57d4c07",
+    "name": "Knowldge I",
+    "domain": "custom",
+    "created_at": "2026-04-20T15:10:40.479010",
+    "updated_at": "2026-04-20T16:10:11.518190",
+    "version": 1,
+    "author": "",
+    "description": "Created from text decomposition.\ncausal chain max fitness probability path "
+  },
+  "nodes": [
+    {
+      "id": "ec73ce5c",
+      "label": "Cognitive Process",
+      "description": "Loop process involving thoughts, ideas, stress scenarios, and movement between unconscious and conscious states.",
+      "type": "blackbox",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.72,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "519071a2",
+      "label": "Cognitive Load",
+      "description": "Working memory burden (approx. 5–7 chunks) that constrains active cognitive processing capacity.",
+      "type": "state",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.88,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "b148f875",
+      "label": "Happiness",
+      "description": "Overall subjective well-being state enabled by supportive cognition, work satisfaction, and aligned activity planning.",
+      "type": "goal",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.85,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "95892ffc",
+      "label": "Work Satisfaction",
+      "description": "Degree of fulfillment from work role, environment, compensation, and autonomy; primary amplifier of happiness.",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.87,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "a3661e73",
+      "label": "Turnover Intention",
+      "description": "Conscious desire to change jobs or start a venture, triggered by dissatisfaction and preceding concrete decision-making.",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.85,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "ecdf6f0a",
+      "label": "Job Change or Startup Decision",
+      "description": "Decision to change employment or launch a venture, spanning worst-case to ideal scenarios.",
+      "type": "decision",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.82,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "bf3a1ceb",
+      "label": "Expectation vs Reality Gap",
+      "description": "Discrepancy between anticipated and actual outcomes across life domains; large gaps reduce happiness.",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.86,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "bd825316",
+      "label": "Scenario Awareness",
+      "description": "Cognitive state of being informed about worst-case, optimal, and ideal outcome paths enabling calibrated decision-making.",
+      "type": "state",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": "knowledge-chain-2.causal.json"
+    },
+    {
+      "id": "ea9fdc17",
+      "label": "Asset Inventory System",
+      "description": "Decision support system (instance: Gemini app URL) for cataloguing skills, cashflow, income, and local resources.",
+      "type": "task",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.65,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": true,
+      "chain_link": null
+    },
+    {
+      "id": "f927d62b",
+      "label": "Conditional Activity Planner",
+      "description": "GPS-log staypoint-based tool that defines locations as activities and proactively searches new activities near them.",
+      "type": "task",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.35,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": true,
+      "chain_link": null
+    },
+    {
+      "id": "ee4e2f81",
+      "label": "Passive Income",
+      "description": "Revenue stream requiring minimal ongoing effort, generated via automated mechanisms resolved by job/startup decision.",
+      "type": "asset",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "1ff74272",
+      "label": "Lost Opportunity",
+      "description": "Failure to capture value along worst, optimal, or ideal paths due to insufficient monitoring or decision support.",
+      "type": "event",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.78,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "e827715e",
+      "label": "Path Comparison Framework",
+      "description": "Structured method contrasting worst, optimal, and ideal scenarios to surface trade-offs and inform action prioritization.",
+      "type": "task",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.79,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "74fe27fb",
+      "label": "Decision Quality",
+      "description": "Degree to which a life decision is well-reasoned, risk-aware, and goal-aligned; improved by scenario awareness.",
+      "type": "concept",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.83,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "1c9754e1",
+      "label": "Expectation Management Practices",
+      "description": "Deliberate reframing, renegotiation, scope reduction, and buffer planning to align expectations with likely outcomes.",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.81,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "6e7e3763",
+      "label": "Observed Life Outcomes",
+      "description": "Measured current reality across domains such as income, time use, relationship quality, and health metrics.",
+      "type": "state",
+      "archetype": "evidence",
+      "tags": [],
+      "confidence": 0.82,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "c95d502d",
+      "label": "Health",
+      "description": "Physical and mental health status that amplifies overall happiness and is itself amplified by activity planning.",
+      "type": "state",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.84,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "b17aa225",
+      "from": "519071a2",
+      "to": "ec73ce5c",
+      "relation": "BLOCKS",
+      "weight": 0.82,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "High working-memory burden constrains loop processing and idea generation.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "66326aca",
+      "from": "ec73ce5c",
+      "to": "b148f875",
+      "relation": "ENABLES",
+      "weight": 0.78,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Supportive cognition is a prerequisite for sustained well-being.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "f5ddc71b",
+      "from": "ec73ce5c",
+      "to": "bd825316",
+      "relation": "ENABLES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Active cognitive processing enables awareness of outcome path distributions.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "b168a1ca",
+      "from": "95892ffc",
+      "to": "b148f875",
+      "relation": "AMPLIFIES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Fulfillment from work is a primary driver of subjective well-being.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "c4ed83f9",
+      "from": "95892ffc",
+      "to": "a3661e73",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Dissatisfaction with work role triggers the desire to change jobs or start a venture.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "9c30c72a",
+      "from": "a3661e73",
+      "to": "ecdf6f0a",
+      "relation": "CAUSES",
+      "weight": 0.78,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Conscious desire to leave precedes and precipitates the concrete decision.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "e1246337",
+      "from": "95892ffc",
+      "to": "ecdf6f0a",
+      "relation": "CAUSES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Low satisfaction directly motivates employment or venture change decisions.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "1fccba6b",
+      "from": "ecdf6f0a",
+      "to": "ee4e2f81",
+      "relation": "RESOLVES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Startup or new role creates pathways to automated revenue streams.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "b252e4d6",
+      "from": "bf3a1ceb",
+      "to": "b148f875",
+      "relation": "REDUCES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Large discrepancy between expectation and reality diminishes subjective well-being.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "02d3f4d8",
+      "from": "6e7e3763",
+      "to": "bf3a1ceb",
+      "relation": "CAUSES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Measured reality confronts expectations, generating a perceptible gap.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "5d96d780",
+      "from": "1c9754e1",
+      "to": "bf3a1ceb",
+      "relation": "REDUCES",
+      "weight": 0.78,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Reframing and buffer planning close the gap between expectation and outcome.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "e7dade5d",
+      "from": "ea9fdc17",
+      "to": "ecdf6f0a",
+      "relation": "ENABLES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Catalogued assets provide the informational base for employment or venture decisions.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "102e6403",
+      "from": "ea9fdc17",
+      "to": "1ff74272",
+      "relation": "RESOLVES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Systematic asset tracking prevents overlooked value capture.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "3c159b17",
+      "from": "ea9fdc17",
+      "to": "bd825316",
+      "relation": "ENABLES",
+      "weight": 0.65,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Inventoried assets inform the range of viable outcome scenarios.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "c8952b04",
+      "from": "bd825316",
+      "to": "74fe27fb",
+      "relation": "AMPLIFIES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Knowing worst, optimal, and ideal paths makes decisions more risk-aware.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "fc40bfad",
+      "from": "bd825316",
+      "to": "1ff74272",
+      "relation": "REDUCES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Awareness of outcome paths reduces the probability of missing optimal routes.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "4d5a5360",
+      "from": "bd825316",
+      "to": "bf3a1ceb",
+      "relation": "REDUCES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Calibrated scenario knowledge aligns expectations closer to likely reality.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "17db8806",
+      "from": "74fe27fb",
+      "to": "ecdf6f0a",
+      "relation": "AMPLIFIES",
+      "weight": 0.73,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Higher decision quality improves alignment of chosen path with personal goals.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "1095a469",
+      "from": "e827715e",
+      "to": "bd825316",
+      "relation": "CAUSES",
+      "weight": 0.74,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Structured comparison of scenarios builds cognitive awareness of outcome distributions.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "7d9cc3c7",
+      "from": "e827715e",
+      "to": "1ff74272",
+      "relation": "RESOLVES",
+      "weight": 0.71,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Explicit worst/optimal/ideal comparison surfaces overlooked paths.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "23b74387",
+      "from": "f927d62b",
+      "to": "b148f875",
+      "relation": "AMPLIFIES",
+      "weight": 0.68,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Location-aware activity scheduling increases engagement and well-being.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "f048c0b9",
+      "from": "f927d62b",
+      "to": "c95d502d",
+      "relation": "AMPLIFIES",
+      "weight": 0.66,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Proactive activity discovery near staypoints promotes physical and mental health.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    },
+    {
+      "id": "43e67fc1",
+      "from": "c95d502d",
+      "to": "b148f875",
+      "relation": "AMPLIFIES",
+      "weight": 0.83,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Physical and mental health are foundational amplifiers of subjective well-being.",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-20T15:10:40.479010",
+      "source": "llm"
+    }
+  ],
+  "history": [],
+  "summaries": [
+    {
+      "id": "lb9he9df",
+      "created_at": "2026-04-20T13:55:56.290Z",
+      "headline": "Achieving lasting happiness requires reducing cognitive overload, closing expectation-reality gaps, and making high-quality career decisions supported by scenario awareness and structured planning tools.",
+      "scope": null,
+      "data": {
+        "headline": "Achieving lasting happiness requires reducing cognitive overload, closing expectation-reality gaps, and making high-quality career decisions supported by scenario awareness and structured planning tools.",
+        "goal": {
+          "label": "Happiness",
+          "plain": "Success looks like a sustained state of subjective well-being, where work is fulfilling, health is strong, expectations align with reality, and life decisions are made with clarity and purpose."
+        },
+        "critical_path": [
+          {
+            "step": 1,
+            "label": "Cognitive Load",
+            "role": "root_cause",
+            "plain": "When working memory is overloaded — holding too many concerns at once — the mind's ability to think clearly, generate ideas, and process situations is blocked, undermining everything downstream."
+          },
+          {
+            "step": 2,
+            "label": "Cognitive Process",
+            "role": "mechanism",
+            "plain": "When cognitive load is manageable, the mental loop of processing thoughts, stress scenarios, and ideas can function properly, enabling both well-being and strategic self-awareness."
+          },
+          {
+            "step": 3,
+            "label": "Scenario Awareness",
+            "role": "moderator",
+            "plain": "Clear thinking produces awareness of the realistic range of outcomes — worst case, optimal, and ideal — which calibrates expectations and sharpens decision-making."
+          },
+          {
+            "step": 4,
+            "label": "Decision Quality",
+            "role": "moderator",
+            "plain": "Understanding the full landscape of possible outcomes makes career and life decisions more risk-aware and better aligned with personal goals."
+          },
+          {
+            "step": 5,
+            "label": "Job Change or Startup Decision",
+            "role": "mechanism",
+            "plain": "A well-informed decision to change jobs or start a venture is the pivotal action point — influenced by work satisfaction, scenario awareness, and available assets — and opens the path to passive income."
+          },
+          {
+            "step": 6,
+            "label": "Work Satisfaction",
+            "role": "mechanism",
+            "plain": "How fulfilled a person feels at work directly amplifies happiness and, when low, triggers the desire to seek change — making it both a driver of well-being and a catalyst for career decisions."
+          },
+          {
+            "step": 7,
+            "label": "Happiness",
+            "role": "effect",
+            "plain": "Happiness is the culmination of supportive thinking, satisfying work, good health, and expectations that match lived reality — all reinforcing each other over time."
+          }
+        ],
+        "tasks": [
+          {
+            "label": "Asset Inventory System",
+            "requires": [],
+            "plain": "This tool catalogues personal skills, cash flow, income sources, and local resources (using something like the Gemini app). It fires before major career decisions to ensure you know what you actually have to work with — preventing overlooked opportunities and grounding your options in real assets."
+          },
+          {
+            "label": "Path Comparison Framework",
+            "requires": [],
+            "plain": "This is a structured thinking exercise that explicitly maps out worst-case, optimal, and ideal outcome scenarios side by side. It activates during career or life planning to surface hidden trade-offs and make sure the best path isn't missed by default."
+          },
+          {
+            "label": "Conditional Activity Planner",
+            "requires": [],
+            "plain": "A GPS-based tool that identifies your regular locations and proactively suggests nearby activities. It runs as a background life-management layer to boost engagement, physical health, and overall well-being through better use of time and place."
+          }
+        ],
+        "decisions": [
+          {
+            "label": "Job Change or Startup Decision",
+            "plain": "The central life decision of whether to stay in current employment, switch jobs, or launch a venture. It matters because it determines access to passive income, work satisfaction, and long-term happiness — and the quality of this decision depends heavily on how informed and scenario-aware the person is.",
+            "branches": [
+              {
+                "label": "Stay / do nothing",
+                "outcome": "Persistent work dissatisfaction continues to reduce happiness and may amplify the expectation-reality gap."
+              },
+              {
+                "label": "Change jobs",
+                "outcome": "Potential to restore work satisfaction and well-being if the move is well-researched and assets are properly inventoried."
+              },
+              {
+                "label": "Launch a startup or venture",
+                "outcome": "Highest potential for passive income and autonomy, but also highest risk — scenario awareness and asset inventory are critical to success."
+              }
+            ]
+          }
+        ],
+        "risks": [
+          {
+            "label": "Cognitive Load blocks Cognitive Process",
+            "plain": "If mental overload is not addressed, the entire chain breaks at the first step — strategic thinking, scenario awareness, and good decision-making all depend on having enough mental bandwidth to function."
+          },
+          {
+            "label": "Expectation vs Reality Gap reduces Happiness",
+            "plain": "When what someone expects from life — career, income, relationships — diverges sharply from what actually happens, well-being suffers directly. Without active expectation management or scenario awareness, this gap can persist undetected."
+          },
+          {
+            "label": "Conditional Activity Planner (low confidence: 0.35, flagged)",
+            "plain": "This tool has very low confidence and is flagged as uncertain. Relying on it to improve health and happiness may not deliver results — it is the weakest link in the system and should be treated as experimental rather than foundational."
+          },
+          {
+            "label": "Asset Inventory System (flagged)",
+            "plain": "Despite moderate confidence, this tool is flagged — meaning its implementation or effectiveness is uncertain. If it fails to catalogue assets accurately, career decisions will be made on incomplete information, increasing the risk of poor outcomes."
+          },
+          {
+            "label": "Lost Opportunity",
+            "plain": "Without the scenario framework, asset inventory, and scenario awareness working together, valuable paths — whether career moves, income streams, or life improvements — can be missed entirely, with no mechanism to recover them."
+          }
+        ],
+        "open_questions": [
+          "The Asset Inventory System is flagged as uncertain — it is unclear whether the current implementation (e.g., a Gemini app URL) is reliable or complete enough to actually support major career decisions.",
+          "The Conditional Activity Planner has very low confidence (0.35) and is flagged — it is unresolved whether this GPS-based tool is practically buildable, effective, or even necessary given the other levers in the system.",
+          "The Scenario Awareness node links to an external chain file ('knowledge-chain-2.causal.json') — the content of that chain is not included here, meaning a key part of how scenario awareness is built and sustained is currently invisible in this briefing."
+        ]
+      }
+    },
+    {
+      "id": "6wpyoj70",
+      "created_at": "2026-04-20T14:10:11.511Z",
+      "headline": "Unmanaged cognitive overload blocks the clear thinking needed to make high-quality career decisions, which are the pivotal lever for reaching lasting happiness through work satisfaction, health, and realistic expectations.",
+      "scope": null,
+      "data": {
+        "headline": "Unmanaged cognitive overload blocks the clear thinking needed to make high-quality career decisions, which are the pivotal lever for reaching lasting happiness through work satisfaction, health, and realistic expectations.",
+        "goal": {
+          "label": "Happiness",
+          "plain": "A sustained state of subjective well-being where work feels fulfilling, health is strong, life decisions are made with clarity, and what you expect from life roughly matches what actually happens.",
+          "success_signal": "Stable self-reported well-being alongside measurable improvements in work fulfillment, health metrics, and a narrowing gap between anticipated and actual life outcomes."
+        },
+        "next_action": {
+          "label": "Path Comparison Framework",
+          "why_now": "This structured exercise requires no external tools or assets to begin, and it directly builds the scenario awareness that sharpens every downstream decision — especially the high-stakes job-change or startup choice.",
+          "expected_effect": "Running a deliberate worst-case / optimal / ideal comparison immediately reduces the risk of missing valuable paths and calibrates expectations closer to reality, which cuts two of the biggest threats to happiness at once."
+        },
+        "reasoning": {
+          "root_cause": "Cognitive Load — when working memory is overloaded, the mind cannot process ideas, stress scenarios, or strategic options clearly, and everything downstream degrades.",
+          "causal_pathway": "When cognitive load is manageable, the mental processing loop runs cleanly and produces scenario awareness — a calibrated understanding of realistic outcome ranges. That awareness improves the quality of the career decision (stay, change jobs, or launch a venture), which determines access to work satisfaction and passive income, the two strongest direct amplifiers of happiness. In parallel, scenario awareness closes the expectation-reality gap, removing one of happiness's biggest suppressors.",
+          "decision_point": "Job Change or Startup Decision — this is the single action point where cognitive clarity, scenario knowledge, and inventoried assets either converge into a well-aligned life move or collapse into a poorly informed gamble.",
+          "effect": "A high-quality, well-informed career decision unlocks work satisfaction (the primary happiness amplifier), creates pathways to passive income, and prevents the lost-opportunity cost that compounds when viable paths are never seen.",
+          "why_this_chain_holds": "The chain is valid only if reducing cognitive load actually frees up enough mental capacity for genuine strategic reflection — if overload is chronic or structural rather than situational, clearing it once will not sustain the downstream benefits."
+        },
+        "critical_path": [
+          {
+            "step": 1,
+            "label": "Cognitive Load",
+            "role": "root_cause",
+            "edge_in": null,
+            "plain": "Overloaded working memory is the upstream bottleneck — when it is too full, clear thinking, idea generation, and strategic self-awareness are all suppressed."
+          },
+          {
+            "step": 2,
+            "label": "Cognitive Process",
+            "role": "mechanism",
+            "edge_in": "BLOCKS",
+            "plain": "When cognitive load is reduced, the mental loop of processing thoughts, stress, and ideas can function properly — this is the engine that powers both emotional well-being and strategic awareness."
+          },
+          {
+            "step": 3,
+            "label": "Scenario Awareness",
+            "role": "moderator",
+            "edge_in": "ENABLES",
+            "plain": "Functioning cognition produces a clear-eyed view of realistic outcome ranges — worst case, optimal, and ideal — which is the foundation of good decision-making and expectation alignment."
+          },
+          {
+            "step": 4,
+            "label": "Decision Quality",
+            "role": "moderator",
+            "edge_in": "AMPLIFIES",
+            "plain": "Knowing the full landscape of possible outcomes makes any major career or life choice more risk-aware and better matched to personal goals."
+          },
+          {
+            "step": 5,
+            "label": "Job Change or Startup Decision",
+            "role": "mechanism",
+            "edge_in": "AMPLIFIES",
+            "plain": "The pivotal career decision — shaped by work dissatisfaction, scenario clarity, and available assets — is the action that opens or closes the path to work fulfillment and passive income."
+          },
+          {
+            "step": 6,
+            "label": "Work Satisfaction",
+            "role": "mechanism",
+            "edge_in": "CAUSES",
+            "plain": "Fulfillment from work is both a direct amplifier of happiness and a trigger for change when it is absent — making it simultaneously a driver of well-being and a catalyst for the career decision."
+          },
+          {
+            "step": 7,
+            "label": "Happiness",
+            "role": "effect",
+            "edge_in": "AMPLIFIES",
+            "plain": "Happiness is the convergence point of supportive thinking, satisfying work, good health, and expectations that match lived reality — all reinforcing each other over time."
+          }
+        ],
+        "tasks": [
+          {
+            "label": "Path Comparison Framework",
+            "tier": "NOW",
+            "requires": [],
+            "plain": "A structured thinking exercise that maps worst-case, optimal, and ideal outcome scenarios side by side. It should be run before any major career or life planning session to surface hidden trade-offs and prevent the default omission of the best available path."
+          },
+          {
+            "label": "Asset Inventory System",
+            "tier": "NOW",
+            "requires": [],
+            "plain": "A cataloguing tool for personal skills, cash flow, income sources, and local resources. It should be activated before the job-change or startup decision to ensure choices are grounded in real, fully visible assets rather than assumptions. Note: currently flagged as uncertain in its implementation — treat output as a starting point requiring verification."
+          },
+          {
+            "label": "Conditional Activity Planner",
+            "tier": "PARK",
+            "requires": [],
+            "plain": "A GPS-based tool that identifies regular locations and proactively suggests nearby activities to boost engagement and physical health. Very low confidence and flagged as unproven — treat as experimental and do not build core well-being strategy around it until validated."
+          }
+        ],
+        "decisions": [
+          {
+            "label": "Job Change or Startup Decision",
+            "plain": "The central life decision of whether to remain in current employment, switch to a different job, or launch a venture. It is the most consequential action point in the chain because it determines work satisfaction, access to passive income, and long-term happiness — and its quality depends entirely on how informed and scenario-aware the person is when making it.",
+            "branches": [
+              {
+                "label": "Stay / do nothing",
+                "outcome": "Persistent work dissatisfaction continues to suppress happiness and widen the expectation-reality gap, with no resolution mechanism."
+              },
+              {
+                "label": "Change jobs",
+                "outcome": "Potential to restore work satisfaction and well-being if the move is grounded in inventoried assets and scenario-aware planning."
+              },
+              {
+                "label": "Launch a startup or venture",
+                "outcome": "Highest potential for passive income and autonomy, but also highest risk — scenario awareness and a complete asset inventory are prerequisites for a non-destructive outcome."
+              }
+            ]
+          }
+        ],
+        "leverage_points": [
+          {
+            "label": "Scenario Awareness",
+            "plain": "This single node sits at the intersection of multiple input paths (cognitive process, asset inventory, and path comparison framework) and simultaneously improves decision quality, reduces the expectation-reality gap, and cuts the risk of lost opportunities — making it the highest-return point to invest in across the whole system."
+          },
+          {
+            "label": "Cognitive Load",
+            "plain": "Because it sits at the very start of the causal spine and BLOCKS the entire processing loop, even a modest reduction in cognitive overload unlocks cascading improvements in scenario awareness, decision quality, and emotional well-being — small change, large downstream effect."
+          },
+          {
+            "label": "Expectation vs Reality Gap",
+            "plain": "This node is attacked from three independent directions (scenario awareness, expectation management practices, and observed life outcomes), meaning coordinated effort on even two of them produces compounding reductions in one of the most direct suppressors of happiness."
+          }
+        ],
+        "assumptions": [
+          {
+            "plain": "Reducing cognitive load is something the person can actually do through intentional practice rather than requiring structural life changes (e.g., fewer responsibilities, different environment).",
+            "risk": "If cognitive overload is driven by unchangeable external demands, the entire causal spine stalls at step one and no downstream intervention will hold."
+          },
+          {
+            "plain": "Work satisfaction is primarily within the individual's control to change via a career decision, rather than being determined by systemic or market factors outside their reach.",
+            "risk": "If job market conditions, industry dynamics, or personal constraints severely limit viable alternatives, the job-change decision cannot deliver the expected improvement in satisfaction or happiness."
+          },
+          {
+            "plain": "Scenario awareness, once built, persists long enough to actually influence the career decision rather than fading before action is taken.",
+            "risk": "If insight from scenario planning decays quickly under resumed cognitive load, the investment in the Path Comparison Framework produces no lasting behavioral change."
+          }
+        ],
+        "falsifiers": [
+          "A person successfully reduces cognitive load and completes the Path Comparison Framework, but their decision quality and work satisfaction remain unchanged — this would break the core causal spine between clear thinking and better outcomes.",
+          "The Conditional Activity Planner is deployed and used consistently, but shows no measurable improvement in health or happiness scores — confirming its low-confidence (0.35) status and invalidating its role in the well-being chain.",
+          "Work satisfaction improves following a job change or startup launch, but happiness does not increase — which would challenge the assumption that work fulfillment is a primary driver of subjective well-being in this person's case.",
+          "The Asset Inventory System is completed accurately, but the subsequent career decision is no better informed or aligned with goals — suggesting the tool's contribution to decision quality is overstated."
+        ],
+        "open_questions": [
+          "The Asset Inventory System is flagged as uncertain — it is unclear whether the current implementation (referenced as a Gemini app URL) is reliable, complete, or stable enough to actually support a major career decision without introducing false confidence.",
+          "The Conditional Activity Planner has very low confidence (0.35) and is flagged — it is unresolved whether this GPS-based tool is practically buildable, behaviorally effective, or even necessary given the stronger levers already in the system.",
+          "Scenario Awareness links to an external chain file ('knowledge-chain-2.causal.json') that is not included here — this means the mechanism by which scenario awareness is actually built and sustained is currently invisible, leaving a critical gap in the briefing."
+        ],
+        "confidence": {
+          "overall": 0.7,
+          "weakest_link": "Conditional Activity Planner — with a node confidence of only 0.35 and a flagged status, this is the least substantiated element in the system; its edges to happiness and health carry the same low evidential weight, meaning any strategy that depends on this tool rests on a very thin foundation."
+        }
+      }
+    }
+  ]
+}
