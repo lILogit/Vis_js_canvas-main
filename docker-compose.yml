@@ -6,6 +6,7 @@ services:
       - "${HOST_PORT:-7331}:7331"
     volumes:
       - chains_data:/app/chains
+      - summaries_data:/app/summaries
     environment:
       # LLM provider — default: anthropic
       - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
@@ -27,3 +28,4 @@ services:
 
 volumes:
   chains_data:
+  summaries_data:

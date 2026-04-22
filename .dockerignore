@@ -6,10 +6,8 @@ __pycache__
 *.pyo
 .pytest_cache
 chains/backups/
+chains/*-seed.causal.json
+summaries/
+notes/
 *.bak
-tests/
-demo.py
 *.svg
-Dockerfile
-docker-compose.yml
-.dockerignore

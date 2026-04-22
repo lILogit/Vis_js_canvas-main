@@ -9,8 +9,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Persistent storage for chain files
-VOLUME ["/app/chains"]
+# Install the ccf package (src/ccf) so the CLI tool and imports work cleanly
+RUN pip install --no-cache-dir -e .
+
+# Persistent storage for chain files and summaries
+VOLUME ["/app/chains", "/app/summaries"]
 
 EXPOSE 7331
 

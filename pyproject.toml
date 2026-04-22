@@ -7,6 +7,9 @@ dependencies = []
 [project.scripts]
 ccf = "ccf.cli:main"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.mypy]
 strict = true
 
