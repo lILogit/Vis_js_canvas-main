@@ -284,6 +284,8 @@ class Handler(BaseHTTPRequestHandler):
             self._api_get_llm_provider()
         elif path == "/api/chain/ccf":
             self._api_chain_ccf()
+        elif path == "/api/chain/mermaid":
+            self._api_chain_mermaid()
         elif path == "/api/summary/files":
             self._api_summary_list_files()
         elif path == "/api/summary/file":
@@ -535,6 +537,32 @@ class Handler(BaseHTTPRequestHandler):
             }
             ccf_text = _ccf_compress(clean)
             self._send_json({"ccf": ccf_text})
+        except Exception as exc:
+            self._send_error(str(exc))
+
+    def _api_chain_mermaid(self):
+        """Return a Mermaid flowchart representation of the current chain."""
+        with _chain_lock:
+            chain_data = chain_io.to_dict(_chain) if _chain else None
+        if not chain_data:
+            self._send_error("No chain loaded", 404)
+            return
+        try:
+            active_nodes = [n for n in chain_data.get("nodes", []) if not n.get("deprecated")]
+            active_ids = {n["id"] for n in active_nodes}
+            active_edges = [
+                e for e in chain_data.get("edges", [])
+                if not e.get("deprecated")
+                and e.get("from") in active_ids
+                and e.get("to") in active_ids
+            ]
+            lines = ["flowchart TD"]
+            for n in active_nodes:
+                label = n.get("label", n["id"]).replace('"', "'")
+                lines.append(f'    {n["id"]}["{label}"]')
+            for e in active_edges:
+                lines.append(f'    {e["from"]} -->|{e["relation"]}| {e["to"]}')
+            self._send_json({"mermaid": "\n".join(lines)})
         except Exception as exc:
             self._send_error(str(exc))
 

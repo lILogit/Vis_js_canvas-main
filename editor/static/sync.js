@@ -51,6 +51,12 @@ export async function loadChainCcf() {
   return (await resp.json()).ccf || '';
 }
 
+export async function loadChainMermaid() {
+  const resp = _handleUnauthorized(await fetch('/api/chain/mermaid'));
+  if (!resp.ok) throw new Error(`Mermaid load failed: ${resp.status}`);
+  return (await resp.json()).mermaid || '';
+}
+
 export async function listChains() {
   const resp = await fetch('/api/chains');
   if (!resp.ok) throw new Error(`List failed: ${resp.status}`);

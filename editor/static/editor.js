@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, isDirty, saveChain, loadChain, loadChainCcf, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmNoteChain, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, importChain, logout } from './sync.js';
+import { markDirty, isDirty, saveChain, loadChain, loadChainMermaid, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmNoteChain, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, importChain, logout } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -273,19 +273,43 @@ async function checkLlmStatus() {
   }
 }
 
+let _mermaidReady = false;
+let _mermaidZoom = 1.0;
+const MERMAID_ZOOM_STEP = 0.2;
+const MERMAID_ZOOM_MIN  = 0.2;
+const MERMAID_ZOOM_MAX  = 4.0;
+
+function _initMermaid() {
+  if (_mermaidReady || !window.mermaid) return;
+  window.mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+  _mermaidReady = true;
+}
+
+function _applyMermaidZoom() {
+  const svg = document.querySelector('#chain-mermaid-render svg');
+  if (svg) svg.style.zoom = _mermaidZoom;
+}
+
 async function refreshChainCcf() {
-  const pre = document.getElementById('chain-ccf-pre');
+  const renderDiv = document.getElementById('chain-mermaid-render');
+  const srcSpan = document.getElementById('chain-mermaid-src');
   const badge = document.getElementById('chain-ccf-badge');
-  if (!pre) return;
+  if (!renderDiv) return;
   try {
-    const ccf = await loadChainCcf();
-    pre.textContent = ccf;
-    const lines = ccf.split('\n');
-    const nNodes = lines.filter(l => l.startsWith('N:')).length;
-    const nEdges = lines.filter(l => l.startsWith('E:')).length;
+    const mermaidText = await loadChainMermaid();
+    if (srcSpan) srcSpan.textContent = mermaidText;
+    const lines = mermaidText.split('\n');
+    const nNodes = lines.filter(l => /^\s+\w+\[/.test(l)).length;
+    const nEdges = lines.filter(l => l.includes('-->')).length;
     if (badge) badge.textContent = `${nNodes}N · ${nEdges}E`;
+    _initMermaid();
+    _mermaidZoom = 1.0;
+    const uid = 'cm-' + Date.now();
+    const { svg } = await window.mermaid.render(uid, mermaidText);
+    renderDiv.innerHTML = svg;
+    _applyMermaidZoom();
   } catch {
-    pre.textContent = '(unavailable)';
+    renderDiv.innerHTML = '<span style="color:#666;font-size:11px;padding:8px;display:block">(unavailable)</span>';
     if (badge) badge.textContent = '';
   }
 }
@@ -2063,12 +2087,105 @@ function setupToolbar() {
   });
 
   document.getElementById('btn-ccf-copy').addEventListener('click', () => {
-    const text = document.getElementById('chain-ccf-pre').textContent;
+    const text = document.getElementById('chain-mermaid-src').textContent;
     navigator.clipboard.writeText(text).then(
-      () => setStatus('CCF copied to clipboard'),
+      () => setStatus('Mermaid source copied to clipboard'),
       () => setStatus('Copy failed', 'error'),
     );
   });
+
+  document.getElementById('btn-mermaid-zoom-in').addEventListener('click', () => {
+    _mermaidZoom = Math.min(MERMAID_ZOOM_MAX, +(_mermaidZoom + MERMAID_ZOOM_STEP).toFixed(2));
+    _applyMermaidZoom();
+  });
+  document.getElementById('btn-mermaid-zoom-out').addEventListener('click', () => {
+    _mermaidZoom = Math.max(MERMAID_ZOOM_MIN, +(_mermaidZoom - MERMAID_ZOOM_STEP).toFixed(2));
+    _applyMermaidZoom();
+  });
+  document.getElementById('btn-mermaid-zoom-reset').addEventListener('click', () => {
+    _mermaidZoom = 1.0;
+    _applyMermaidZoom();
+  });
+  document.getElementById('chain-mermaid-render').addEventListener('wheel', e => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? MERMAID_ZOOM_STEP : -MERMAID_ZOOM_STEP;
+    _mermaidZoom = Math.min(MERMAID_ZOOM_MAX, Math.max(MERMAID_ZOOM_MIN, +(_mermaidZoom + delta).toFixed(2)));
+    _applyMermaidZoom();
+  }, { passive: false });
+  document.getElementById('btn-mermaid-download').addEventListener('click', async () => {
+    try {
+      const mermaid = await loadChainMermaid();
+      const blob = new Blob([mermaid], { type: 'text/markdown' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (chainData?.meta?.name || 'chain').toLowerCase().replace(/\s+/g, '-') + '.md';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus('Mermaid diagram downloaded');
+    } catch (err) {
+      setStatus('Mermaid download failed: ' + err.message, 'error');
+    }
+  });
+
+  // ── Mermaid fullscreen ────────────────────────────────────────
+  let _fsZoom = 1.0;
+  function _applyFsZoom() {
+    const svg = document.querySelector('#mermaid-fs-body svg');
+    if (svg) svg.style.zoom = _fsZoom;
+  }
+  function openMermaidFullscreen() {
+    const src = document.getElementById('chain-mermaid-render').innerHTML;
+    const body = document.getElementById('mermaid-fs-body');
+    body.innerHTML = src;
+    _fsZoom = 1.0;
+    _applyFsZoom();
+    document.getElementById('mermaid-fs-overlay').classList.add('visible');
+  }
+  function closeMermaidFullscreen() {
+    document.getElementById('mermaid-fs-overlay').classList.remove('visible');
+  }
+  document.getElementById('btn-mermaid-expand').addEventListener('click', openMermaidFullscreen);
+  document.getElementById('btn-mermaid-fs-close').addEventListener('click', closeMermaidFullscreen);
+  document.getElementById('mermaid-fs-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('mermaid-fs-overlay')) closeMermaidFullscreen();
+  });
+  document.getElementById('btn-mermaid-fs-zoom-in').addEventListener('click', () => {
+    _fsZoom = Math.min(MERMAID_ZOOM_MAX, +(_fsZoom + MERMAID_ZOOM_STEP).toFixed(2));
+    _applyFsZoom();
+  });
+  document.getElementById('btn-mermaid-fs-zoom-out').addEventListener('click', () => {
+    _fsZoom = Math.max(MERMAID_ZOOM_MIN, +(_fsZoom - MERMAID_ZOOM_STEP).toFixed(2));
+    _applyFsZoom();
+  });
+  document.getElementById('btn-mermaid-fs-zoom-reset').addEventListener('click', () => {
+    _fsZoom = 1.0;
+    _applyFsZoom();
+  });
+  const _fsBody = document.getElementById('mermaid-fs-body');
+  _fsBody.addEventListener('wheel', e => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? MERMAID_ZOOM_STEP : -MERMAID_ZOOM_STEP;
+    _fsZoom = Math.min(MERMAID_ZOOM_MAX, Math.max(MERMAID_ZOOM_MIN, +(_fsZoom + delta).toFixed(2)));
+    _applyFsZoom();
+  }, { passive: false });
+
+  let _fsDragging = false, _fsDragX = 0, _fsDragY = 0, _fsDragSL = 0, _fsDragST = 0;
+  _fsBody.addEventListener('mousedown', e => {
+    _fsDragging = true;
+    _fsDragX = e.clientX; _fsDragY = e.clientY;
+    _fsDragSL = _fsBody.scrollLeft; _fsDragST = _fsBody.scrollTop;
+    _fsBody.classList.add('dragging');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!_fsDragging) return;
+    _fsBody.scrollLeft = _fsDragSL - (e.clientX - _fsDragX);
+    _fsBody.scrollTop  = _fsDragST - (e.clientY - _fsDragY);
+  });
+  document.addEventListener('mouseup', () => {
+    if (_fsDragging) { _fsDragging = false; _fsBody.classList.remove('dragging'); }
+  });
+
   document.getElementById('btn-fit').addEventListener('click', () =>
     network?.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } }));
   document.getElementById('btn-hierarchical').addEventListener('click', rerenderLayout);
@@ -2350,6 +2467,10 @@ function setupKeyboard() {
     // Escape: cancel lasso first, then close overlays
     if (e.key === 'Escape') {
       if (_lassoActive) { deactivateLasso(); return; }
+      if (document.getElementById('mermaid-fs-overlay').classList.contains('visible')) {
+        document.getElementById('mermaid-fs-overlay').classList.remove('visible');
+        return;
+      }
       document.getElementById('suggestions-overlay').classList.remove('visible');
       document.getElementById('note-overlay').classList.remove('visible');
       if (document.getElementById('merge-overlay').classList.contains('visible')) {

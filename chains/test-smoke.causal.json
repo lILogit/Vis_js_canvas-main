@@ -4,7 +4,7 @@
     "name": "test-smoke",
     "domain": "custom",
     "created_at": "2026-03-19T22:55:49.101457",
-    "updated_at": "2026-04-20T11:06:18.392976",
+    "updated_at": "2026-04-22T13:34:24.935967",
     "version": 1,
     "author": "",
     "description": "+ přesouvání hodnot mezi trhy CNB\n"
@@ -889,6 +889,34 @@
       "created_at": "2026-04-17T11:39:44.689Z",
       "source": "llm",
       "deprecated": true,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "fe6368b2",
+      "label": "Supply-Demand Imbalance",
+      "description": "The condition where demand for gold rises without a commensurate increase in supply, creating upward price pressure.",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.85,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "6ab58385",
+      "label": "Gold Price Increase",
+      "description": "A rise in the spot price of gold resulting from excess demand over available supply.",
+      "type": "event",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm",
+      "deprecated": false,
       "flagged": false,
       "chain_link": null
     }
@@ -2028,6 +2056,86 @@
       "flagged": false,
       "version": 1,
       "created_at": "2026-04-17T11:39:44.689Z",
+      "source": "llm"
+    },
+    {
+      "id": "c262ff4b",
+      "from": "96219566",
+      "to": "fe6368b2",
+      "relation": "CAUSES",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "The note states that rising demand, when not matched by supply, creates an imbalance — demand is the active cause of the imbalance",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm"
+    },
+    {
+      "id": "686cc81e",
+      "from": "55e51eff",
+      "to": "fe6368b2",
+      "relation": "REDUCES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "The note says a supply increase would offset demand pressure; conversely, insufficient supply perpetuates the imbalance — mining supply reduces the imbalance when it rises",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm"
+    },
+    {
+      "id": "de9f036e",
+      "from": "fe6368b2",
+      "to": "6ab58385",
+      "relation": "CAUSES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "The note's core causal claim: a supply-demand imbalance (demand > supply) directly causes the gold price to increase",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm"
+    },
+    {
+      "id": "3382c37a",
+      "from": "6ab58385",
+      "to": "fbaea850",
+      "relation": "TRIGGERS",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "A gold price increase is one of the primary signals aggregated in the price discovery process, triggering further market repricing",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-22T11:34:24.892Z",
+      "source": "llm"
+    },
+    {
+      "id": "79a40c46",
+      "from": "fbaea850",
+      "to": "6ab58385",
+      "relation": "INSTANTIATES",
+      "weight": 0.7,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Price discovery is the formal market mechanism that instantiates the observed price increase as a concrete quoted price",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-22T11:34:24.892Z",
       "source": "llm"
     }
   ],
@@ -3692,6 +3800,62 @@
       "payload": {
         "id": "ad05a5bb",
         "deprecated": true
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "fe6368b2"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "node_add",
+      "actor": "llm",
+      "payload": {
+        "node_id": "6ab58385"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "c262ff4b"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "686cc81e"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "de9f036e"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "3382c37a"
+      }
+    },
+    {
+      "timestamp": "2026-04-22T11:34:24.892Z",
+      "action": "edge_add",
+      "actor": "llm",
+      "payload": {
+        "edge_id": "79a40c46"
       }
     }
   ],

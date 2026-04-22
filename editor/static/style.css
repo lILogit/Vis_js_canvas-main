@@ -14,7 +14,7 @@
   --toolbar-h: 44px;
   --filter-h: 38px;
   --status-h: 28px;
-  --panel-w: 320px;
+  --panel-w: 380px;
 }
 
 body {
@@ -288,10 +288,17 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
 }
 #llm-response.visible { display: block; }
 
-/* ── Chain Structure (CCF) ───────────────────────────────────── */
+/* ── Causal Structure (Mermaid) ──────────────────────────────── */
 #chain-ccf-details {
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+  min-height: 0;
+}
+#chain-ccf-details[open] {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 #chain-ccf-details summary {
   padding: 7px 12px;
@@ -318,25 +325,89 @@ a.btn-toolbar:hover { background: var(--accent); border-color: var(--accent); co
 #chain-ccf-body {
   position: relative;
   padding: 0 12px 10px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
-#chain-ccf-pre {
-  font-size: 10px;
-  line-height: 1.5;
-  color: #a78bfa;
+#chain-mermaid-render {
   background: #0d0d1a;
   border: 1px solid #2d1b4e;
   border-radius: 4px;
-  padding: 8px 10px;
+  padding: 8px;
   margin: 0 0 6px;
-  overflow-x: auto;
-  white-space: pre;
-  max-height: 220px;
-  overflow-y: auto;
+  overflow: auto;
+  flex: 1;
+  min-height: 140px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: zoom-in;
 }
-#btn-ccf-copy {
+#chain-mermaid-render svg {
+  max-width: 100%;
+  height: auto;
+}
+.ccf-actions {
+  display: flex;
+  gap: 6px;
+}
+#btn-ccf-copy, #btn-mermaid-download, #btn-mermaid-zoom-in,
+#btn-mermaid-zoom-out, #btn-mermaid-zoom-reset, #btn-mermaid-expand {
   font-size: 10px;
   padding: 2px 8px;
   min-width: unset;
+}
+
+/* ── Mermaid fullscreen overlay ──────────────────────────────── */
+#mermaid-fs-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+#mermaid-fs-overlay.visible { display: flex; }
+#mermaid-fs-panel {
+  background: #0d0d1a;
+  border: 1px solid #2d1b4e;
+  border-radius: 8px;
+  width: 90vw;
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#mermaid-fs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #2d1b4e;
+  flex-shrink: 0;
+}
+#mermaid-fs-header span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a78bfa;
+  flex: 1;
+}
+#mermaid-fs-body {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+}
+#mermaid-fs-body.dragging { cursor: grabbing; }
+#mermaid-fs-body svg {
+  max-width: 100%;
+  height: auto;
 }
 
 .node-badge {
