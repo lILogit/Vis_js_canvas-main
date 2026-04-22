@@ -81,6 +81,58 @@ def _subgraph(chain_data: dict, node_ids: list) -> dict:
     return {"meta": chain_data.get("meta", {}), "nodes": nodes, "edges": edges}
 
 
+def _patch_isolated_nodes(result: dict, chain_data: dict, llm_client) -> dict:
+    """
+    Check the merge result for new nodes with no edges.
+    If any are found, make one follow-up LLM call to generate connecting edges,
+    then merge those edges into the result.
+    """
+    from llm.prompts import NOTE_CONNECT_ISOLATED
+
+    new_nodes = [n for n in result.get("nodes", []) if n.get("_status") == "new"]
+    if not new_nodes:
+        return result
+
+    # Collect every node id referenced by any edge (existing or new)
+    referenced = set()
+    for e in result.get("edges", []):
+        referenced.add(e.get("from", ""))
+        referenced.add(e.get("to", ""))
+
+    isolated = [n for n in new_nodes if n.get("id", "") not in referenced]
+    if not isolated:
+        return result
+
+    # Build context for the follow-up call
+    existing_nodes = [
+        {"id": n["id"], "label": n["label"], "type": n.get("type", "state")}
+        for n in chain_data.get("nodes", [])
+    ]
+    connected_new = [n for n in new_nodes if n not in isolated]
+    existing_e_count = sum(
+        1 for e in result.get("edges", [])
+        if str(e.get("id", "")).startswith("_new_e")
+    )
+
+    prompt = NOTE_CONNECT_ISOLATED.format(
+        isolated_json=json.dumps(isolated, indent=2),
+        existing_nodes_json=json.dumps(existing_nodes, indent=2),
+        new_nodes_json=json.dumps(connected_new, indent=2),
+        edge_id_start=existing_e_count,
+    )
+
+    try:
+        extra = llm_client.call(prompt, max_tokens=800)
+        extra_edges = extra.get("edges", [])
+        if extra_edges:
+            result["edges"] = result.get("edges", []) + extra_edges
+            result["_auto_connected"] = len(isolated)
+    except Exception:
+        pass  # best-effort: return original result if follow-up fails
+
+    return result
+
+
 def _mime(path: str) -> str:
     ext = os.path.splitext(path)[1].lower()
     return {
@@ -290,6 +342,8 @@ class Handler(BaseHTTPRequestHandler):
             self._llm_import_text()
         elif path == "/llm/ingest-note":
             self._llm_ingest_note()
+        elif path == "/llm/note-chain":
+            self._llm_note_chain()
         elif path == "/llm/summarize":
             self._llm_summarize()
         elif path == "/api/summary/save":
@@ -976,6 +1030,31 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             self._send_error(str(exc))
 
+
+    def _llm_note_chain(self):
+        body = self._body()
+        try:
+            from llm import client as llm_client
+            from llm.prompts import NOTE_MERGE_CHAIN
+            text = body.get("text", "").strip()
+            domain = body.get("domain", "").strip()
+            if not text:
+                self._send_error("No text provided")
+                return
+            with _chain_lock:
+                chain_data = chain_io.to_dict(_chain) if _chain else {}
+            chain_data["nodes"] = [n for n in chain_data["nodes"] if not n.get("deprecated")]
+            chain_data["edges"] = [e for e in chain_data["edges"] if not e.get("deprecated")]
+            prompt = NOTE_MERGE_CHAIN.format(
+                chain_json=json.dumps(chain_data, indent=2),
+                domain=domain or "(not specified)",
+                note_text=text,
+            )
+            result = llm_client.call(prompt, max_tokens=2500)
+            result = _patch_isolated_nodes(result, chain_data, llm_client)
+            self._send_json(result)
+        except Exception as exc:
+            self._send_error(str(exc))
 
     def _llm_summarize(self):
         body = self._body()

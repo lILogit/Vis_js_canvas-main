@@ -3,7 +3,7 @@
  * Handles rendering, visual encoding, selection, edit interactions,
  * enrich preview, and soft-delete.
  */
-import { markDirty, isDirty, saveChain, loadChain, loadChainCcf, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, importChain, logout } from './sync.js';
+import { markDirty, isDirty, saveChain, loadChain, loadChainCcf, listChains, switchChain, resetDemo, llmAsk, llmExplain, llmContradict, llmEnrichPreview, llmIngestNote, llmNoteChain, llmSummarize, saveSummary, deleteSummary, listSummaryFiles, readSummaryFile, exportSummaryFile, createChain, deleteChain, importChain, logout } from './sync.js';
 
 // ── Visual encoding constants ─────────────────────────────────────────────
 
@@ -220,10 +220,28 @@ let _previewNodeIds = [];
 let _previewEdgeIds = [];
 let _pendingSuggestions = [];
 
+// Merge preview state (note-chain full-diff shown in graph)
+let _mergeNewNodeIds = [];
+let _mergeNewEdgeIds = [];
+let _mergeModNodeIds = [];   // existing node ids that are shown with amber overlay
+let _mergeModEdgeIds = [];   // existing edge ids that are shown with amber overlay
+let _mergePending = null;    // { newNodes, modNodes, newEdges, modEdges, newIdMap, summary }
+
 // Cluster state
 let _clusteringEnabled = false;
 let _layerState = {};           // { role: { nodeIds: string[] } }
 let _preclusterPositions = {};  // { nodeId: {x,y} } — saved before layer snap
+
+// RCDE path highlight state
+let _rcdeHighlightEnabled = false;
+
+const RCDE_HIGHLIGHT = {
+  root_cause: { bg: '#7f1d1d', border: '#ef4444', font: '#fca5a5' },
+  pathway:    { bg: '#1e3a5f', border: '#3b82f6', font: '#93c5fd' },
+  decision:   { bg: '#164e63', border: '#06b6d4', font: '#67e8f9' },
+  effect:     { bg: '#14532d', border: '#22c55e', font: '#86efac' },
+  questions:  { bg: '#422006', border: '#f59e0b', font: '#fcd34d' },
+};
 
 // Lasso selection state
 let _lassoActive = false;
@@ -285,6 +303,7 @@ async function init() {
   setupFilters();
   setupKeyboard();
   setupSuggestionsPanel();
+  setupMergePanel();
   setupLasso();
 
   // Load current provider from server and sync the select
@@ -306,11 +325,20 @@ async function init() {
 }
 
 function renderGraph(data) {
-  // Reset clustering before layout so clusters don't interfere with hierarchical recalc
+  // Reset preview state — DataSets are about to be cleared
+  _previewNodeIds = []; _previewEdgeIds = []; _pendingSuggestions = [];
+  _mergeNewNodeIds = []; _mergeNewEdgeIds = [];
+  _mergeModNodeIds = []; _mergeModEdgeIds = [];
+  _mergePending = null;
+  document.getElementById('merge-overlay')?.classList.remove('visible');
+
+  // Reset clustering and path highlight before layout
   _clusteringEnabled = false;
   _layerState = {};
   _preclusterPositions = {};
+  _rcdeHighlightEnabled = false;
   document.getElementById('btn-cluster')?.classList.remove('active');
+  document.getElementById('btn-path')?.classList.remove('active');
 
   const visNodes = (data.nodes || []).filter(n => !n.deprecated).map(nodeToVis);
   const visEdges = (data.edges || []).filter(e => !e.deprecated).map(edgeToVis);
@@ -370,8 +398,7 @@ function renderGraph(data) {
 
   network.on('selectNode', ({ nodes: sel }) => {
     if (!sel.length) return;
-    // Ignore clicks on preview nodes
-    if (String(sel[0]).startsWith('_preview_')) return;
+    if (String(sel[0]).startsWith('_preview_') || String(sel[0]).startsWith('_merge_')) return;
     selectedId = sel[0];
     selectedType = 'node';
     const raw = chainData.nodes.find(n => n.id === selectedId);
@@ -381,7 +408,7 @@ function renderGraph(data) {
   network.on('selectEdge', ({ edges: sel, nodes: selNodes }) => {
     if (selNodes.length > 0) return;
     if (!sel.length) return;
-    if (String(sel[0]).startsWith('_preview_')) return;
+    if (String(sel[0]).startsWith('_preview_') || String(sel[0]).startsWith('_merge_')) return;
     selectedId = sel[0];
     selectedType = 'edge';
     const raw = chainData.edges.find(e => e.id === selectedId);
@@ -403,10 +430,10 @@ function renderGraph(data) {
   // Double-click → open edit modal for node or edge
   network.on('doubleClick', ({ nodes: sel, edges: esel }) => {
     if (sel.length > 0) {
-      if (String(sel[0]).startsWith('_preview_')) return;
+      if (String(sel[0]).startsWith('_preview_') || String(sel[0]).startsWith('_merge_')) return;
       network.editNode();   // triggers editNode manipulation callback
     } else if (esel.length > 0) {
-      if (String(esel[0]).startsWith('_preview_')) return;
+      if (String(esel[0]).startsWith('_preview_') || String(esel[0]).startsWith('_merge_')) return;
       const raw = chainData.edges.find(e => e.id === esel[0]);
       if (!raw) return;
       _openEdgeModal(
@@ -607,6 +634,7 @@ function applyNodeEdits(nodeId) {
   node.confidence  = parseFloat(document.getElementById('pi-conf').value);
   node.chain_link  = document.getElementById('pi-chain-link').value || null;
   nodes.update(nodeToVis(node));
+  if (_rcdeHighlightEnabled) { _rcdeHighlightEnabled = false; document.getElementById('btn-path')?.classList.remove('active'); _clearRcdeHighlight(); }
   markDirty();
   updateStatusBar();
 }
@@ -619,6 +647,7 @@ function applyEdgeEdits(edgeId) {
   edge.evidence = document.getElementById('pe-evidence').value;
   edge.condition = document.getElementById('pe-condition').value || null;
   edges.update(edgeToVis(edge));
+  if (_rcdeHighlightEnabled) { _rcdeHighlightEnabled = false; document.getElementById('btn-path')?.classList.remove('active'); _clearRcdeHighlight(); }
   markDirty();
 }
 
@@ -683,6 +712,7 @@ function deleteSelected(id = null, type = null) {
   selectedId = null;
   selectedType = null;
   clearInfoPanel();
+  if (_rcdeHighlightEnabled) { _rcdeHighlightEnabled = false; document.getElementById('btn-path')?.classList.remove('active'); }
   markDirty();
   updateStatusBar();
 }
@@ -1131,6 +1161,7 @@ async function applyPreviewSuggestions(selectedIndices) {
   updateStatusBar();
 
   // Re-run hierarchical layout so new nodes get proper positions, then fit
+  if (_rcdeHighlightEnabled) { _rcdeHighlightEnabled = false; document.getElementById('btn-path')?.classList.remove('active'); }
   rerenderLayout();
 
   // Auto-save immediately
@@ -1147,7 +1178,7 @@ async function runEnrich(mode = 'gaps') {
   clearPreviewItems();
   document.getElementById('suggestions-overlay').classList.remove('visible');
 
-  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
+  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_') && !String(id).startsWith('_merge_'));
   const scope = selIds.length ? `${selIds.length} selected node${selIds.length > 1 ? 's' : ''}` : 'chain';
   showLlmLoading(`Analyzing ${scope} (mode: ${mode})...`);
   try {
@@ -1168,32 +1199,333 @@ async function runEnrich(mode = 'gaps') {
 }
 
 
-async function runIngestNote(noteData) {
+// ── Note → full merge-chain preview ───────────────────────────────────────
+
+function clearMergePreview() {
+  try { nodes.remove(_mergeNewNodeIds); } catch (_) {}
+  try { edges.remove(_mergeNewEdgeIds); } catch (_) {}
+  // Restore modified nodes to their original vis appearance
+  for (const id of _mergeModNodeIds) {
+    const n = chainData?.nodes?.find(n => n.id === id && !n.deprecated);
+    if (n) nodes.update(nodeToVis(n));
+  }
+  for (const id of _mergeModEdgeIds) {
+    const e = chainData?.edges?.find(e => e.id === id && !e.deprecated);
+    if (e) edges.update(edgeToVis(e));
+  }
+  _mergeNewNodeIds = [];
+  _mergeNewEdgeIds = [];
+  _mergeModNodeIds = [];
+  _mergeModEdgeIds = [];
+  _mergePending = null;
+}
+
+function addMergePreviewToGraph(result) {
+  clearMergePreview();
+  clearPreviewItems();
+
+  const ACTIONABLE = new Set(['task', 'decision', 'gate', 'goal', 'asset']);
+  const allNodes = result.nodes || [];
+  const allEdges = result.edges || [];
+
+  // Build map: LLM _new_N id → preview vis id
+  const newIdToVis = {};
+
+  // Add new nodes (green preview)
+  allNodes.filter(n => n._status === 'new').forEach((n, i) => {
+    const visId = `_merge_new_${i}`;
+    newIdToVis[n.id] = visId;
+    nodes.add({
+      id: visId,
+      label: `⟨new⟩ ${n.label}`,
+      title: n.description || n.label,
+      shape: TYPE_SHAPE[n.type] || 'box',
+      color: { background: '#0a2a0a', border: '#22c55e', highlight: { background: '#0d3a0d', border: '#4ade80' } },
+      borderWidth: 2,
+      borderDashes: [6, 3],
+      font: { size: 13, face: 'Courier New', color: '#4ade80' },
+    });
+    _mergeNewNodeIds.push(visId);
+  });
+
+  // Overlay modified nodes (amber border, ⟨mod⟩ label prefix)
+  allNodes.filter(n => n._status === 'modified').forEach(n => {
+    if (!network.body.nodes[n.id]) return;
+    const orig = nodes.get(n.id);
+    nodes.update({
+      id: n.id,
+      label: `⟨mod⟩ ${n.label}`,
+      borderWidth: 3,
+      borderDashes: [5, 3],
+      color: { border: '#f59e0b', highlight: { border: '#fbbf24' } },
+    });
+    _mergeModNodeIds.push(n.id);
+  });
+
+  // Helper: resolve node ref (existing id or _new_N) to actual vis id
+  const resolveId = ref => newIdToVis[ref] ?? ref;
+
+  // Add new edges (green preview)
+  allEdges.filter(e => e._status === 'new').forEach((e, i) => {
+    const fromId = resolveId(e.from);
+    const toId   = resolveId(e.to);
+    if (!fromId || !toId) return;
+    const visId = `_merge_e_${i}`;
+    edges.add({
+      id: visId, from: fromId, to: toId,
+      label: e.relation || 'CAUSES',
+      color: { color: '#22c55e', inherit: false },
+      dashes: [6, 3],
+      width: Math.max(1, (e.weight || 0.7) * 4),
+      font: { size: 10, color: '#4ade80' },
+      arrows: { to: { enabled: true, type: e.relation === 'BLOCKS' ? 'bar' : 'arrow' } },
+    });
+    _mergeNewEdgeIds.push(visId);
+  });
+
+  // Overlay modified edges (amber)
+  allEdges.filter(e => e._status === 'modified').forEach(e => {
+    if (!network.body.edges[e.id]) return;
+    edges.update({
+      id: e.id,
+      dashes: [5, 3],
+      color: { color: '#f59e0b', inherit: false },
+    });
+    _mergeModEdgeIds.push(e.id);
+  });
+
+  // ── Isolation guard: remove any new node that has no edge in the vis DataSet ──
+  // edges.add() silently drops edges whose from/to node doesn't exist,
+  // so check reachability after all add operations have run.
+  const referencedByEdge = new Set();
+  edges.get().forEach(e => {
+    referencedByEdge.add(String(e.from));
+    referencedByEdge.add(String(e.to));
+  });
+
+  const isolatedVisIds = new Set(_mergeNewNodeIds.filter(id => !referencedByEdge.has(id)));
+  if (isolatedVisIds.size) {
+    nodes.remove([...isolatedVisIds]);
+    _mergeNewNodeIds = _mergeNewNodeIds.filter(id => !isolatedVisIds.has(id));
+  }
+
+  // Stash for apply step — exclude isolated nodes from the checklist
+  let newNodes = allNodes.filter(n => n._status === 'new');
+  if (isolatedVisIds.size) {
+    newNodes = newNodes.filter((_, i) => !isolatedVisIds.has(`_merge_new_${i}`));
+  }
+  const modNodes = allNodes.filter(n => n._status === 'modified');
+  const newEdges = allEdges.filter(e => e._status === 'new');
+  const modEdges = allEdges.filter(e => e._status === 'modified');
+  _mergePending = { newNodes, modNodes, newEdges, modEdges, newIdToVis, summary: result.summary || '' };
+}
+
+function showMergeOverlay(result) {
+  const overlay = document.getElementById('merge-overlay');
+  const list    = document.getElementById('merge-list');
+  const summaryEl = document.getElementById('merge-summary');
+
+  const autoNote = result._auto_connected
+    ? ` ⚡ ${result._auto_connected} isolated node(s) were auto-connected.`
+    : '';
+  summaryEl.textContent = (result.summary || '') + autoNote;
+
+  const ACTIONABLE = new Set(['task', 'decision', 'gate', 'goal', 'asset']);
+
+  const renderNode = (n, kind, idx) => {
+    const isAction = ACTIONABLE.has(n.type);
+    const badge = kind === 'new'
+      ? `<span class="m-badge-new">new</span>`
+      : `<span class="m-badge-mod">modified</span>`;
+    const typeBadge = `<span class="m-badge-type">${esc(n.type)}</span>`;
+    const pin = isAction ? `<span class="m-badge-actionable">▶</span>` : '';
+    const changes = n._changes ? `<div class="m-changes">${esc(n._changes)}</div>` : '';
+    return `
+      <div class="merge-item">
+        <label>
+          <input type="checkbox" class="m-check" data-kind="${kind}_node" data-idx="${idx}" checked>
+          <span class="m-label">${esc(n.label)}</span>
+          ${badge}${typeBadge}${pin}
+        </label>
+        <div class="m-reason">${esc(n._reasoning || n.description || '')}</div>
+        ${changes}
+      </div>`;
+  };
+
+  const renderEdge = (e, kind, idx) => {
+    const fromLabel = _labelOf(e.from) || e.from;
+    const toLabel   = _labelOf(e.to)   || e.to;
+    const badge = kind === 'new'
+      ? `<span class="m-badge-new">new</span>`
+      : `<span class="m-badge-mod">modified</span>`;
+    const changes = e._changes ? `<div class="m-changes">${esc(e._changes)}</div>` : '';
+    return `
+      <div class="merge-item">
+        <label>
+          <input type="checkbox" class="m-check" data-kind="${kind}_edge" data-idx="${idx}" checked>
+          <span class="m-label">${esc(fromLabel)} —[${esc(e.relation || 'CAUSES')}]→ ${esc(toLabel)}</span>
+          ${badge}
+        </label>
+        <div class="m-reason">${esc(e._reasoning || '')}</div>
+        ${changes}
+      </div>`;
+  };
+
+  const { newNodes=[], modNodes=[], newEdges=[], modEdges=[] } = _mergePending || {};
+  let html = '';
+
+  if (newNodes.length) {
+    html += `<div class="merge-group-label">New nodes (${newNodes.length})</div>`;
+    html += newNodes.map((n, i) => renderNode(n, 'new', i)).join('');
+  }
+  if (modNodes.length) {
+    html += `<div class="merge-group-label">Modified nodes (${modNodes.length})</div>`;
+    html += modNodes.map((n, i) => renderNode(n, 'mod', i)).join('');
+  }
+  if (newEdges.length) {
+    html += `<div class="merge-group-label">New edges (${newEdges.length})</div>`;
+    html += newEdges.map((e, i) => renderEdge(e, 'new', i)).join('');
+  }
+  if (modEdges.length) {
+    html += `<div class="merge-group-label">Modified edges (${modEdges.length})</div>`;
+    html += modEdges.map((e, i) => renderEdge(e, 'mod', i)).join('');
+  }
+
+  if (!html) html = '<p style="color:var(--text-dim);font-size:11px;padding:8px 0">No changes proposed.</p>';
+  list.innerHTML = html;
+  overlay.classList.add('visible');
+}
+
+function _labelOf(idOrRef) {
+  if (!idOrRef) return '';
+  // Check new preview nodes map
+  if (_mergePending?.newIdToVis) {
+    const visId = _mergePending.newIdToVis[idOrRef];
+    if (visId) {
+      const n = _mergePending.newNodes?.find(n => _mergePending.newIdToVis[n.id] === visId);
+      if (n) return n.label;
+    }
+  }
+  // Existing chain node
+  const existing = chainData?.nodes?.find(n => n.id === idOrRef && !n.deprecated);
+  return existing?.label || idOrRef;
+}
+
+async function applyMergeSelections() {
+  if (!_mergePending) return;
+  const now = new Date().toISOString();
+  const checks = document.querySelectorAll('.m-check');
+  const selected = { new_node: new Set(), mod_node: new Set(), new_edge: new Set(), mod_edge: new Set() };
+  checks.forEach(cb => { if (cb.checked) selected[cb.dataset.kind]?.add(parseInt(cb.dataset.idx)); });
+
+  const { newNodes, modNodes, newEdges, modEdges, newIdToVis } = _mergePending;
+
+  // Build _new_N → real id map as we create new nodes
+  const newIdToReal = {};
+
+  // Apply selected new nodes
+  for (const idx of selected.new_node) {
+    const n = newNodes[idx];
+    if (!n) continue;
+    const id = shortId();
+    newIdToReal[n.id] = id;
+    const node = {
+      id, label: n.label, description: n.description || '', type: n.type || 'state',
+      archetype: n.archetype || null, confidence: parseFloat(n.confidence) || 0.7,
+      source: 'llm', deprecated: false, flagged: false, tags: [], created_at: now,
+    };
+    chainData.nodes.push(node);
+    nodes.add(nodeToVis(node));
+    chainData.history.push({ timestamp: now, action: 'node_add', actor: 'llm', payload: { node_id: id } });
+  }
+
+  // Apply selected modified nodes (update in-place)
+  for (const idx of selected.mod_node) {
+    const n = modNodes[idx];
+    if (!n) continue;
+    const existing = chainData.nodes.find(cn => cn.id === n.id && !cn.deprecated);
+    if (!existing) continue;
+    Object.assign(existing, {
+      label: n.label || existing.label,
+      description: n.description || existing.description,
+      type: n.type || existing.type,
+      archetype: n.archetype || existing.archetype,
+      confidence: parseFloat(n.confidence) || existing.confidence,
+    });
+    nodes.update(nodeToVis(existing));
+    chainData.history.push({ timestamp: now, action: 'node_edit', actor: 'llm', payload: { node_id: n.id } });
+  }
+
+  // Resolve helper: _new_N → real id; existing id passes through
+  const resolve = ref => newIdToReal[ref] ?? ref;
+
+  // Apply selected new edges
+  for (const idx of selected.new_edge) {
+    const e = newEdges[idx];
+    if (!e) continue;
+    const fromId = resolve(e.from);
+    const toId   = resolve(e.to);
+    if (!fromId || !toId) continue;
+    const edge = {
+      id: shortId(), from: fromId, to: toId, relation: e.relation || 'CAUSES',
+      weight: parseFloat(e.weight) || 0.7, confidence: 0.7, direction: 'forward',
+      condition: null, evidence: e._reasoning || '', deprecated: false, flagged: false,
+      version: 1, source: 'llm', created_at: now,
+    };
+    chainData.edges.push(edge);
+    edges.add(edgeToVis(edge));
+    chainData.history.push({ timestamp: now, action: 'edge_add', actor: 'llm', payload: { edge_id: edge.id } });
+  }
+
+  // Apply selected modified edges
+  for (const idx of selected.mod_edge) {
+    const e = modEdges[idx];
+    if (!e) continue;
+    const existing = chainData.edges.find(ce => ce.id === e.id && !ce.deprecated);
+    if (!existing) continue;
+    Object.assign(existing, {
+      relation: e.relation || existing.relation,
+      weight: parseFloat(e.weight) || existing.weight,
+    });
+    edges.update(edgeToVis(existing));
+    chainData.history.push({ timestamp: now, action: 'edge_edit', actor: 'llm', payload: { edge_id: e.id } });
+  }
+
+  clearMergePreview();
+  updateStatusBar();
+  if (_rcdeHighlightEnabled) { _rcdeHighlightEnabled = false; document.getElementById('btn-path')?.classList.remove('active'); }
+  rerenderLayout();
+
+  setStatus('saving…', 'dirty');
+  try {
+    await saveChain(chainData);
+    setStatus('saved');
+  } catch (err) {
+    setStatus('save error: ' + err.message, 'error');
+  }
+}
+
+async function runNoteMerge(noteData) {
+  clearMergePreview();
   clearPreviewItems();
   document.getElementById('suggestions-overlay').classList.remove('visible');
+  document.getElementById('merge-overlay').classList.remove('visible');
 
-  showLlmLoading('Ingesting note…');
+  showLlmLoading('Building full merge preview…');
   try {
-    const r = await llmIngestNote(noteData);
-    _pendingSuggestions = r.suggestions || [];
-    const ws = r.w_score ?? 0;
-    const classification = r.classification || {};
-
-    if (!_pendingSuggestions.length) {
-      showLlmResult('No new graph elements generated from this note.');
+    const r = await llmNoteChain(noteData.domain || '', noteData.text);
+    const total = (r.nodes || []).filter(n => n._status !== 'existing').length
+                + (r.edges || []).filter(e => e._status !== 'existing').length;
+    if (!total) {
+      showLlmResult('No new changes proposed for this chain.');
       return;
     }
-
-    addPreviewToGraph(_pendingSuggestions);
-
-    // Highlight known entities in graph
-    const knownIds = (classification.known || [])
-      .map(k => k.node_id)
-      .filter(id => id && network.body.nodes[id]);
-    if (knownIds.length) network.selectNodes(knownIds);
-
-    showSuggestionsOverlay(_pendingSuggestions, ws);
-    showLlmResult(`W-score: ${ws.toFixed(2)} | ${_pendingSuggestions.length} item(s) proposed.`);
+    addMergePreviewToGraph(r);
+    showMergeOverlay(r);
+    const newN = (r.nodes||[]).filter(n=>n._status==='new').length;
+    const modN = (r.nodes||[]).filter(n=>n._status==='modified').length;
+    const newE = (r.edges||[]).filter(e=>e._status==='new').length;
+    showLlmResult(`Merge preview: ${newN} new node(s), ${modN} modified, ${newE} new edge(s).`);
   } catch (e) {
     showLlmResult('Error: ' + e.message);
   }
@@ -1225,6 +1557,8 @@ function showSuggestionsOverlay(suggestions, wScore = null) {
     return n ? n.label : id;
   };
 
+  const ACTIONABLE_TYPES = new Set(['task', 'decision', 'gate', 'goal', 'asset']);
+
   list.innerHTML = suggestions.map((s, i) => {
     const isEdge = s.kind === 'edge';
     const kindLabel = s.kind === 'gap_node' ? 'gap node' : s.kind;
@@ -1232,9 +1566,22 @@ function showSuggestionsOverlay(suggestions, wScore = null) {
     const klassTag = s.klass ? `<span class="klass-badge klass-${s.klass.toLowerCase()}">${s.klass}</span>` : '';
     const archetypeTag = s.archetype ? `<span class="s-badge" style="opacity:0.7">${s.archetype}</span>` : '';
 
+    // For import_node items show node_type badge with actionable highlight
+    const nodeType = s.node_type || s.type;
+    const isActionable = nodeType && ACTIONABLE_TYPES.has(nodeType);
+    const nodeTypeTag = nodeType
+      ? `<span class="s-badge" style="background:${isActionable ? '#1e3a5f' : '#2a2a3a'};color:${isActionable ? '#60a5fa' : '#888'};font-weight:${isActionable ? '700' : '400'}">${nodeType}</span>`
+      : '';
+    const actionablePin = isActionable ? `<span title="Actionable" style="color:#22c55e;font-size:10px;margin-left:2px">▶</span>` : '';
+
     let displayLabel, connectsHtml;
     if (isEdge && s.connects_from && s.connects_to) {
       displayLabel = `${esc(nodeLabel(s.connects_from))} —[${esc(s.relation || 'CAUSES')}]→ ${esc(nodeLabel(s.connects_to))}`;
+      connectsHtml = '';
+    } else if (s.kind === 'import_edge' && (s.connects_from_label || s.connects_to_label)) {
+      const fl = s.connects_from_label || s.connects_from || '';
+      const tl = s.connects_to_label || s.connects_to || '';
+      displayLabel = `${esc(fl)} —[${esc(s.relation || 'CAUSES')}]→ ${esc(tl)}`;
       connectsHtml = '';
     } else {
       displayLabel = esc(s.label);
@@ -1252,7 +1599,7 @@ function showSuggestionsOverlay(suggestions, wScore = null) {
         <label>
           <input type="checkbox" class="s-check" data-idx="${i}" checked>
           <span class="s-label">${displayLabel}</span>
-          ${kindTag}${archetypeTag}${klassTag}
+          ${kindTag}${nodeTypeTag}${actionablePin}${archetypeTag}${klassTag}
         </label>
         ${connectsHtml}
         <div class="s-reason">${esc(s.reasoning || '')}</div>
@@ -1283,6 +1630,30 @@ function setupSuggestionsPanel() {
 
   document.getElementById('btn-s-close').addEventListener('click', () => {
     document.getElementById('suggestions-overlay').classList.remove('visible');
+  });
+}
+
+function setupMergePanel() {
+  document.getElementById('btn-merge-accept').addEventListener('click', async () => {
+    document.getElementById('merge-overlay').classList.remove('visible');
+    const counts = {
+      n: document.querySelectorAll('.m-check[data-kind$="_node"]:checked').length,
+      e: document.querySelectorAll('.m-check[data-kind$="_edge"]:checked').length,
+    };
+    showLlmLoading(`Applying merge (${counts.n} node(s), ${counts.e} edge(s))…`);
+    await applyMergeSelections();
+    showLlmResult(`Merge applied — ${counts.n} node(s), ${counts.e} edge(s) saved.`);
+  });
+
+  document.getElementById('btn-merge-discard').addEventListener('click', () => {
+    clearMergePreview();
+    document.getElementById('merge-overlay').classList.remove('visible');
+    showLlmResult('Merge discarded.');
+  });
+
+  document.getElementById('btn-merge-close').addEventListener('click', () => {
+    clearMergePreview();
+    document.getElementById('merge-overlay').classList.remove('visible');
   });
 }
 
@@ -1410,7 +1781,7 @@ function finishLasso() {
   const canvasPoly = _lassoPoints.map(pt => network.DOMtoCanvas({ x: pt.x, y: pt.y }));
 
   // Get all real (non-preview) node IDs
-  const allIds = nodes.getIds().filter(id => !String(id).startsWith('_preview_'));
+  const allIds = nodes.getIds().filter(id => !String(id).startsWith('_preview_') && !String(id).startsWith('_merge_'));
   const positions = network.getPositions(allIds); // canvas coords
 
   const matched = allIds.filter(id => {
@@ -1500,6 +1871,54 @@ function _buildLayerState() {
       .map(n => n.id);
     _layerState[role] = { nodeIds };
   }
+}
+
+function _highlightRcdePath() {
+  if (!network || !chainData) return;
+  const { inDeg, outDeg } = _computeDegrees();
+  const roleOf = {};
+  (chainData.nodes || []).filter(n => !n.deprecated && !String(n.id).startsWith('_preview_')).forEach(n => {
+    roleOf[n.id] = _nodeRole(n, inDeg, outDeg);
+  });
+  // Nodes — chain entry (inDeg=0) and exit (outDeg=0) get a glow halo
+  (chainData.nodes || []).filter(n => !n.deprecated && !String(n.id).startsWith('_preview_')).forEach(n => {
+    const col = RCDE_HIGHLIGHT[roleOf[n.id]];
+    if (!col) return;
+    const isStart = inDeg[n.id] === 0;
+    const isEnd   = outDeg[n.id] === 0;
+    nodes.update({
+      id: n.id,
+      color: { background: col.bg, border: col.border, highlight: { background: col.bg, border: '#fff' } },
+      font: { color: col.font },
+      opacity: 1,
+      borderWidth: (isStart || isEnd) ? 4 : 2,
+      shadow: (isStart || isEnd)
+        ? { enabled: true, color: col.border, size: 20, x: 0, y: 0 }
+        : { enabled: false },
+    });
+  });
+  // Edges — on-path edges are thicker; off-path edges dim to near-invisible
+  (chainData.edges || []).filter(e => !e.deprecated && !String(e.id).startsWith('_preview_')).forEach(e => {
+    const onPath = roleOf[e.from] && roleOf[e.to];
+    if (onPath) {
+      const c = RELATION_COLOR[e.relation] || '#94a3b8';
+      const w = Math.min(8, Math.max(2, (e.weight ?? 0.5) * 6 + 2));
+      edges.update({ id: e.id, color: { color: c, highlight: c }, opacity: 1, width: w });
+    } else {
+      edges.update({ id: e.id, color: { color: '#1a1a2e' }, opacity: 0.12 });
+    }
+  });
+}
+
+function _clearRcdeHighlight() {
+  if (!chainData) return;
+  (chainData.nodes || []).filter(n => !n.deprecated && !String(n.id).startsWith('_preview_')).forEach(n => {
+    // Explicitly reset shadow since vis.js merges updates (omitted props keep old values)
+    nodes.update({ ...nodeToVis(n), shadow: { enabled: false } });
+  });
+  (chainData.edges || []).filter(e => !e.deprecated && !String(e.id).startsWith('_preview_')).forEach(e => {
+    edges.update(edgeToVis(e));
+  });
 }
 
 // Save current node positions, then move every node into its RCDE band as a vertical column
@@ -1666,6 +2085,17 @@ function setupToolbar() {
       setStatus('Nodes organized by RCDE layer — click ⊞ Cluster again to restore');
     }
   });
+  document.getElementById('btn-path').addEventListener('click', () => {
+    _rcdeHighlightEnabled = !_rcdeHighlightEnabled;
+    document.getElementById('btn-path').classList.toggle('active', _rcdeHighlightEnabled);
+    if (_rcdeHighlightEnabled) {
+      _highlightRcdePath();
+      setStatus('RCDE path highlighted — R root cause · C pathway · D decision · E effect');
+    } else {
+      _clearRcdeHighlight();
+      setStatus('Path highlight cleared');
+    }
+  });
   document.getElementById('btn-enrich').addEventListener('click', () => runEnrich('gaps'));
   document.getElementById('btn-suggest').addEventListener('click', () => runEnrich('suggest'));
   document.getElementById('btn-critique').addEventListener('click', () => runEnrich('critique'));
@@ -1703,7 +2133,7 @@ function setupToolbar() {
   const closeNote = () => {
     noteOverlay.classList.remove('visible');
     document.getElementById('note-text').value = '';
-    document.getElementById('note-seeds').value = '';
+    document.getElementById('note-domain').value = '';
     noteConf.value = 0.5; noteUrg.value = 0.3;
     noteConfVal.textContent = '0.5'; noteUrgVal.textContent = '0.3';
     updateWscoreBadge();
@@ -1715,86 +2145,15 @@ function setupToolbar() {
   document.getElementById('btn-note-submit').addEventListener('click', () => {
     const text = document.getElementById('note-text').value.trim();
     if (!text) return;
-    const seedsRaw = document.getElementById('note-seeds').value.trim();
-    const seeds = seedsRaw ? seedsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const domain = document.getElementById('note-domain').value.trim();
     const noteData = {
-      type: document.getElementById('note-type').value,
+      domain,
       text,
-      seed_entities: seeds,
       confidence: parseFloat(noteConf.value),
       urgency: parseFloat(noteUrg.value),
     };
     closeNote();
-    runIngestNote(noteData);
-  });
-
-  // Note example presets
-  const NOTE_EXAMPLES = {
-    cold_swim: {
-      type: 'observation', confidence: 0.75, urgency: 0.5,
-      seeds: 'cold swim, focus, cortisol',
-      text: "I've noticed that on days I do a 3-minute cold swim in the morning, my focus is noticeably sharper for the first 3 hours. This might be because cold exposure acutely lowers cortisol and triggers a norepinephrine spike that primes attention circuits.",
-    },
-    caffeine_loop: {
-      type: 'hypothesis', confidence: 0.6, urgency: 0.4,
-      seeds: 'Poor sleep quality, Reduced focus',
-      text: "High caffeine intake late in the day (after 2pm) worsens sleep quality the following night, creating a feedback loop where poor focus leads to more caffeine consumption which further degrades sleep. This loop may be broken by enforcing a caffeine cutoff time.",
-    },
-    deadline_stress: {
-      type: 'observation', confidence: 0.5, urgency: 0.3,
-      seeds: '',
-      text: "Stress from deadlines appears to cause sleep fragmentation even when total hours look adequate. The perceived urgency keeps the nervous system activated at bedtime.",
-    },
-    // RCDE node-type samples
-    task_cold_protocol: {
-      type: 'decision', confidence: 0.82, urgency: 0.75,
-      seeds: 'cold swim, norepinephrine spike, acute cortisol reduction',
-      text: "I have decided to formalise the cold swim into a repeatable morning protocol: exactly 10 minutes in water at or below 15°C, performed within 30 minutes of waking, every weekday. This converts the incidental cold swim event into a deliberate TASK that an agent triggers intentionally with the specific intent to produce the norepinephrine spike and acute cortisol reduction already in the chain. The task only fires if its asset requirements are met — cold water access and a usable time slot before the first meeting.",
-    },
-    goal_cognitive_peak: {
-      type: 'hypothesis', confidence: 0.78, urgency: 0.65,
-      seeds: 'sustained focus window, Working memory impairment, norepinephrine spike',
-      text: "The terminal outcome I am trying to engineer is a sustained cognitive peak: focus and working memory both above personal baseline for at least 90 uninterrupted minutes each morning, measured by zero task-switching in the first deep-work block. This should be modelled as a GOAL node — the single desired future STATE that anchors the entire chain. The sustained focus window is a direct precondition of this goal. Working memory impairment is its negation and should remain as the risk case.",
-    },
-    gate_intervention_fork: {
-      type: 'decision', confidence: 0.70, urgency: 0.80,
-      seeds: 'norepinephrine spike, acute cortisol reduction, sustained focus window',
-      text: "I am at a formal fork: two mutually exclusive intervention strategies compete to produce the norepinephrine spike and cortisol reduction the chain already models. Path A is the cold swim protocol (behavioural, zero cost, time-costly). Path B is a low-dose L-tyrosine + ashwagandha stack taken on waking (pharmacological, recurring cost, time-cheap). I cannot run both for measurement reasons. This fork should be modelled as a GATE node with two DIVERGES_TO edges. The gate scores Path A higher on cost and Path B higher on time-efficiency. The gate stays open until a 4-week trial of Path A concludes.",
-    },
-    asset_cold_water_access: {
-      type: 'evidence', confidence: 0.90, urgency: 0.60,
-      seeds: 'cold swim',
-      text: "The cold swim task cannot execute without physical access to cold water at or below 15°C within 30 minutes of waking. This is a hard prerequisite — an ASSET node, not a causal state. Concretely: a working cold tap capable of reaching ≤15°C, or an outdoor body of water within 5 minutes, or a chest freezer bath. At my current location the tap reaches 12°C in winter and 18°C in summer. In summer a secondary asset (ice bag supply, ≥2kg per session) is required. The ASSET connects to the cold swim TASK via a REQUIRES edge. If absent, a Discovery Task should be generated upstream.",
-    },
-    // Mixed taxonomy samples
-    cognitive_mechanisms: {
-      type: 'hypothesis', confidence: 0.72, urgency: 0.60,
-      seeds: 'norepinephrine spike, sustained focus window, acute cortisol reduction, Working memory impairment',
-      text: "Attentional resource theory holds that the brain allocates a finite pool of executive bandwidth across competing tasks, and that norepinephrine acts as the primary modulator of pool size. This should be modelled as a CONCEPT node that frames how the norepinephrine spike connects to the sustained focus window and why cortisol reduction amplifies that effect. There is an unresolved QUESTION blocking the current chain: does the focus window reliably extend beyond 90 minutes under chronic protocol, or does receptor downregulation cap the effect? This question directly blocks the goal of a 90-minute cognitive peak. Additionally, the mechanism by which cold exposure calibrates the HPA axis response differently on high-stress vs. low-stress days is a BLACKBOX — internal process unknown, flagged for review — and it causes day-to-day variance in the magnitude of acute cortisol reduction.",
-    },
-    decision_and_requirements: {
-      type: 'decision', confidence: 0.80, urgency: 0.70,
-      seeds: 'sustained focus window, Working memory impairment, 4-week cold swim trial, intervention strategy gate',
-      text: "I have decided to adopt a biometric measurement protocol for the duration of the trial: resting HRV via chest strap and a 3-minute choice reaction-time benchmark every morning. This DECISION node sits downstream of the intervention strategy gate. The decision REQUIRES two assets before it can execute: a validated HRV chest strap and a standardised cognitive benchmark app. Without both assets the decision fires in name only. The sustained focus window is a direct PRECONDITION_OF the goal of a 90-minute cognitive peak — the window must be present and measurable before the goal can be claimed as achieved. This decision also resolves the open question about focus window duration by generating daily reaction-time series data.",
-    },
-    full_taxonomy_demo: {
-      type: 'evidence', confidence: 0.85, urgency: 0.55,
-      seeds: 'cold swim, norepinephrine spike, acute cortisol reduction, sustained focus window, Working memory impairment, intervention strategy gate, 4-week cold swim trial, L-tyrosine + ashwagandha stack',
-      text: "Full-chain synthesis covering all node types and edge relations. STATE nodes (acute cortisol reduction, sustained focus window, Working memory impairment) are persistent conditions. EVENT: cold swim is a discrete occurrence. TASK: 4-week cold swim trial is a deliberate agent-triggered intervention. ASSET: L-tyrosine + ashwagandha stack connects to its task via REQUIRES. GATE: intervention strategy gate is a formally scored fork with DIVERGES_TO branches. GOAL: 90-minute cognitive peak is the terminal anchor. CONCEPT: attentional resource theory FRAMES the norepinephrine spike and impairment nodes. QUESTION: whether the focus window exceeds 90 minutes BLOCKS the goal. DECISION: adopting biometric measurement REQUIRES specific assets and RESOLVES the open question. BLACKBOX: HPA axis calibration variance causes noise in cortisol reduction magnitude. Edge inventory: CAUSES (cold swim → cortisol reduction), TRIGGERS (cold swim → norepinephrine spike), ENABLES (spike → focus window), AMPLIFIES (spike → memory capacity), REDUCES (cortisol → impairment risk), FRAMES (concept → spike), BLOCKS (question → goal), REQUIRES (task → asset), PRECONDITION_OF (focus window → goal), INSTANTIATES (trial → cold swim event), RESOLVES (decision → question), DIVERGES_TO (gate → each branch).",
-    },
-  };
-
-  document.getElementById('note-example').addEventListener('change', e => {
-    const key = e.target.value;
-    if (!key || !NOTE_EXAMPLES[key]) return;
-    const ex = NOTE_EXAMPLES[key];
-    document.getElementById('note-type').value = ex.type;
-    document.getElementById('note-text').value = ex.text;
-    document.getElementById('note-seeds').value = ex.seeds;
-    noteConf.value = ex.confidence; noteUrg.value = ex.urgency;
-    noteConfVal.textContent = ex.confidence.toFixed(2);
-    noteUrgVal.textContent = ex.urgency.toFixed(2);
-    updateWscoreBadge();
+    runNoteMerge(noteData);
   });
 
   updateWscoreBadge();
@@ -1913,8 +2272,9 @@ function setupToolbar() {
         renderGraph(chainData);
         document.getElementById('chain-name').textContent = r.chain.meta?.name || 'Demo chain';
       }
-      clearPreviewItems();
+      clearPreviewItems(); clearMergePreview();
       document.getElementById('suggestions-overlay').classList.remove('visible');
+      document.getElementById('merge-overlay').classList.remove('visible');
       setStatus('Demo reset — ' + (r.reset || []).join(', '));
     } catch (e) {
       setStatus('Reset failed: ' + e.message, 'error');
@@ -1953,8 +2313,9 @@ function setupToolbar() {
       chainData = r.chain;
       renderGraph(chainData);
       document.getElementById('chain-name').textContent = r.chain.meta?.name || file.name;
-      clearPreviewItems();
+      clearPreviewItems(); clearMergePreview();
       document.getElementById('suggestions-overlay').classList.remove('visible');
+      document.getElementById('merge-overlay').classList.remove('visible');
       refreshChainCcf();
       setStatus('Imported: ' + r.filename);
     } catch (e) {
@@ -1991,6 +2352,11 @@ function setupKeyboard() {
       if (_lassoActive) { deactivateLasso(); return; }
       document.getElementById('suggestions-overlay').classList.remove('visible');
       document.getElementById('note-overlay').classList.remove('visible');
+      if (document.getElementById('merge-overlay').classList.contains('visible')) {
+        clearMergePreview();
+        document.getElementById('merge-overlay').classList.remove('visible');
+        return;
+      }
       document.getElementById('chain-switcher-overlay').classList.remove('visible');
       document.getElementById('new-chain-overlay').classList.remove('visible');
       document.getElementById('summary-overlay').classList.remove('visible');
@@ -2086,7 +2452,7 @@ async function _generateSummary(overlay, body, headline, saveBtn) {
   _summaryHistoryMode = false;
   document.getElementById('btn-summary-history').classList.remove('active');
 
-  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_'));
+  const selIds = (network?.getSelectedNodes() || []).filter(id => !String(id).startsWith('_preview_') && !String(id).startsWith('_merge_'));
   const scope = selIds.length ? selIds : null;
   const scopeLabel = scope ? `${scope.length} selected node${scope.length > 1 ? 's' : ''}` : null;
   saveBtn.style.display = 'none';

@@ -195,7 +195,7 @@ Return JSON:
     {{"entity": "...", "node_id": "...", "similarity": 0.0}}
   ],
   "delta": [
-    {{"entity": "...", "description": "...", "suggested_type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate"}}
+    {{"entity": "...", "description": "...", "suggested_type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate", "actionable": true}}
   ],
   "structural_role": "root_cause|mechanism|effect|moderator|evidence|question",
   "reasoning": "<one sentence>"
@@ -205,7 +205,11 @@ Rules:
 - known: concepts already represented by non-deprecated nodes (match by label or semantic similarity ≥ 0.7)
 - delta: concepts genuinely absent from the graph
 - structural_role: the primary role this note plays relative to existing graph structure
-- node_id must be an exact id from the chain JSON"""
+- node_id must be an exact id from the chain JSON
+- For delta suggested_type, prefer actionable types when the note implies intent, agency, or intervention:
+  task > decision > gate > goal > asset > event > state
+  Use "state" only when no action or intent is implied by the text
+- Set actionable=true for task/decision/gate/goal/asset nodes, false otherwise"""
 
 NOTE_TO_GRAPH = """Given this causal chain context (known nodes):
 {context_json}
@@ -213,24 +217,40 @@ NOTE_TO_GRAPH = """Given this causal chain context (known nodes):
 New entities to integrate (ΔDATA):
 {delta_json}
 
+Note type: {note_type}
 Structural role of this addition: {structural_role}
 Note confidence W-score: {w_score}
 
 Generate nodes and edges to integrate the ΔDATA into the graph.
+Bias strongly toward actionable node types — nodes that represent things an agent can DO or DECIDE.
+
+ACTIONABILITY RULES (apply strictly):
+- note_type "decision"  → prefer DECISION or GATE; use PRECONDITION_OF, DIVERGES_TO, or RESOLVES edges
+- note_type "hypothesis" → prefer TASK or EVENT; use CAUSES, TRIGGERS, or ENABLES edges
+- note_type "observation" → prefer EVENT or STATE; use CAUSES or ENABLES edges; add a TASK if a clear intervention is implied
+- note_type "evidence"  → prefer ASSET or STATE; use REQUIRES or ENABLES edges
+- note_type "question"  → prefer QUESTION node; use BLOCKS or FRAMES edges
+- Prefer task > decision > gate > goal > asset > event over bare state/concept/blackbox
+- A TASK must connect via REQUIRES to at least one known ASSET or STATE node (resource or precondition)
+- A GOAL must receive at least one PRECONDITION_OF or INSTANTIATES edge from an existing or new node
+- A DECISION must produce ≥2 branches (DIVERGES_TO or paired CAUSES/ENABLES edges to different outcomes)
+- A GATE is appropriate when the note describes a mutually exclusive fork between ≥2 interventions
 
 Return JSON:
 {{
   "nodes": [
     {{"label": "...", "type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate",
       "archetype": "root_cause|mechanism|effect|moderator|evidence|question",
-      "description": "one sentence"}}
+      "description": "one sentence",
+      "confidence": 0.7,
+      "reasoning": "one sentence: why this type and archetype"}}
   ],
   "edges": [
     {{"from_ref": "<existing node_id or ΔDATA label>",
       "to_ref": "<existing node_id or ΔDATA label>",
       "relation": "CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO",
       "weight": 0.7,
-      "evidence": "..."}}
+      "evidence": "one sentence rationale"}}
   ]
 }}
 
@@ -238,7 +258,8 @@ Rules:
 - from_ref/to_ref: use exact node_id for known nodes, exact label string for ΔDATA nodes
 - archetype must be one of: root_cause|mechanism|effect|moderator|evidence|question
 - weight should reflect the W-score confidence level
-- connect ΔDATA nodes to the most relevant known nodes"""
+- connect ΔDATA nodes to the most relevant known nodes
+- confidence should match W-score for direct observations; reduce by 0.1 for inferred nodes"""
 
 TEXT_TO_CHAIN = """Decompose the following text into a causal chain using epistemic classification.
 
@@ -385,6 +406,102 @@ Rules:
 - open_questions: QUESTION-type nodes and flagged nodes; omit section if none
 - confidence.overall: weighted mean of active edge confidences; weakest_link must name a specific element
 - plain language throughout: no node ids, no graph jargon, write for a smart non-expert"""
+
+NOTE_MERGE_CHAIN = """Given this existing causal chain:
+{chain_json}
+
+Domain context: {domain}
+Note text:
+{note_text}
+
+Produce a complete merged causal chain that integrates the note into the existing chain.
+Include EVERY existing node and edge (status="existing") PLUS new/modified elements from the note.
+
+ACTIONABILITY BIAS (for new/modified elements):
+- Prefer task > decision > gate > goal > asset > event over bare state/concept
+- A TASK needs at least one REQUIRES or PRECONDITION_OF edge
+- A GOAL needs at least one PRECONDITION_OF or INSTANTIATES edge
+- A DECISION or GATE needs ≥2 outbound branches
+
+CONNECTIVITY CONSTRAINT (mandatory — violations will be rejected):
+- EVERY new node MUST appear in at least one edge (as from or to)
+- A new node with no edges is forbidden — always create the connecting edge in the same response
+- If you add a new node, immediately add the edge(s) that anchor it to the graph
+- Prefer connecting new nodes to the most causally relevant existing node, not a random one
+
+Return JSON:
+{{
+  "nodes": [
+    {{
+      "id": "<existing id unchanged, or _new_0 / _new_1 / ... for new>",
+      "label": "...",
+      "type": "state|event|decision|concept|question|blackbox|goal|task|asset|gate",
+      "archetype": "root_cause|mechanism|effect|moderator|evidence|question",
+      "description": "one sentence",
+      "confidence": 0.7,
+      "_status": "existing|new|modified",
+      "_reasoning": "one sentence why this type and role",
+      "_changes": "for modified only: what specifically is being updated"
+    }}
+  ],
+  "edges": [
+    {{
+      "id": "<existing id unchanged, or _new_e0 / _new_e1 / ... for new>",
+      "from": "<node id or _new_N>",
+      "to": "<node id or _new_N>",
+      "relation": "CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO",
+      "weight": 0.7,
+      "_status": "existing|new|modified",
+      "_reasoning": "one sentence rationale",
+      "_changes": "for modified only: what is changing"
+    }}
+  ],
+  "summary": "one sentence: what this note adds to the chain"
+}}
+
+Rules:
+- Every non-deprecated existing node and edge MUST appear with _status="existing"
+- New node ids: _new_0, _new_1, ... ; new edge ids: _new_e0, _new_e1, ...
+- Edge from/to may reference existing node ids OR new node ids (_new_N)
+- "modified" keeps the original id; only use it when the note provides substantively better info
+- Confidence for new elements = note confidence; reduce 0.1 for each inference step away from text
+- ISOLATED NEW NODES ARE FORBIDDEN — check your edges list before responding"""
+
+NOTE_CONNECT_ISOLATED = """The following new nodes were proposed for a causal chain but have no connecting edges.
+Every node in a causal chain must connect to at least one other node.
+
+Isolated nodes requiring connections:
+{isolated_json}
+
+Existing chain nodes available to connect to:
+{existing_nodes_json}
+
+Other new nodes already in the merge (may also be used as connection targets):
+{new_nodes_json}
+
+For EACH isolated node, create 1–2 edges that anchor it causally to the most relevant node.
+Use the most precise relation type available.
+Start new edge ids from _new_e{edge_id_start}.
+
+Return JSON:
+{{
+  "edges": [
+    {{
+      "id": "_new_e{edge_id_start}",
+      "from": "<node id or _new_N>",
+      "to": "<node id or _new_N>",
+      "relation": "CAUSES|ENABLES|BLOCKS|TRIGGERS|REDUCES|REQUIRES|AMPLIFIES|PRECONDITION_OF|RESOLVES|FRAMES|INSTANTIATES|DIVERGES_TO",
+      "weight": 0.7,
+      "_status": "new",
+      "_reasoning": "one sentence: why this connection makes causal sense"
+    }}
+  ]
+}}
+
+Rules:
+- Every isolated node MUST appear in at least one edge as from or to
+- from/to must be an existing node id, an isolated node id, or another _new_N id from the merge
+- Choose the most causally meaningful connection, not the nearest label alphabetically"""
 
 MERGE_OVERLAP = """Given two causal chains:
 Chain A: {chain_a_json}

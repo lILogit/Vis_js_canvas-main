@@ -1,0 +1,507 @@
+{
+  "meta": {
+    "id": "badb24ae",
+    "name": "Capital Personal",
+    "domain": "custom",
+    "created_at": "2026-04-21T15:20:05.613191",
+    "updated_at": "2026-04-21T15:23:50.426933",
+    "version": 1,
+    "author": "",
+    "description": "Created from text decomposition."
+  },
+  "nodes": [
+    {
+      "id": "5831648b",
+      "label": "Skills & Employability",
+      "description": "Human capital in the form of skills and competencies that determine market employability",
+      "type": "state",
+      "archetype": "root_cause",
+      "tags": [],
+      "confidence": 0.92,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "624031d9",
+      "label": "Income Generation",
+      "description": "The process of earning money through labor or services (salary or freelance)",
+      "type": "event",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.95,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "cc60300d",
+      "label": "Cash Inflow",
+      "description": "Positive monetary flow entering an individual's financial system as a result of income",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.93,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "fe9b1a36",
+      "label": "Capital Allocation Decision",
+      "description": "The deliberate choice of how to distribute available cash across competing financial uses",
+      "type": "decision",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.91,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "00da3950",
+      "label": "Consumption (Expenses)",
+      "description": "Spending on goods and services that sustains current lifestyle but depletes cash",
+      "type": "state",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "73a80afb",
+      "label": "Savings (Buffer)",
+      "description": "Liquid cash reserve held as a financial safety buffer against volatility or emergencies",
+      "type": "asset",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "c2e017db",
+      "label": "Investment (Growth)",
+      "description": "Deployment of capital into assets expected to appreciate or generate future returns",
+      "type": "asset",
+      "archetype": "mechanism",
+      "tags": [],
+      "confidence": 0.91,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "05493e71",
+      "label": "Lifestyle State",
+      "description": "The quality and standard of living maintained through ongoing consumption expenditure",
+      "type": "state",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.88,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "ce012192",
+      "label": "Cash Reserve",
+      "description": "Accumulated liquid savings providing financial security and resilience",
+      "type": "state",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.89,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "b7150e71",
+      "label": "Asset Base",
+      "description": "Portfolio of owned assets built through investment that can generate future income streams",
+      "type": "asset",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.9,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "06a8f782",
+      "label": "Future Income Capacity",
+      "description": "Enhanced ability to generate income in future periods, driven by security and asset returns",
+      "type": "goal",
+      "archetype": "effect",
+      "tags": [],
+      "confidence": 0.85,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    },
+    {
+      "id": "8b790d65",
+      "label": "Lifestyle-Skills Feedback",
+      "description": "personal finance domain → human capital domain bridge: consumption quality reinforces skill development capacity",
+      "type": "concept",
+      "archetype": "moderator",
+      "tags": [],
+      "confidence": 0.8,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm",
+      "deprecated": false,
+      "flagged": false,
+      "chain_link": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "b141a6ba",
+      "from": "5831648b",
+      "to": "624031d9",
+      "relation": "ENABLES",
+      "weight": 0.92,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Human capital is a precondition for participating in labor markets and generating earnings",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "b46fa325",
+      "from": "624031d9",
+      "to": "cc60300d",
+      "relation": "CAUSES",
+      "weight": 0.95,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Labor or freelance activity directly produces monetary inflows",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "6430e8b8",
+      "from": "cc60300d",
+      "to": "fe9b1a36",
+      "relation": "TRIGGERS",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Available cash necessitates a decision on how to deploy it across uses",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "0708c8e3",
+      "from": "fe9b1a36",
+      "to": "00da3950",
+      "relation": "DIVERGES_TO",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "A portion of allocated capital is directed toward current consumption",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "67acacf0",
+      "from": "fe9b1a36",
+      "to": "73a80afb",
+      "relation": "DIVERGES_TO",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "A portion of allocated capital is retained as liquid savings buffer",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "9355b10e",
+      "from": "fe9b1a36",
+      "to": "c2e017db",
+      "relation": "DIVERGES_TO",
+      "weight": 0.85,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "A portion of allocated capital is deployed into growth-oriented assets",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "111d3ffa",
+      "from": "00da3950",
+      "to": "05493e71",
+      "relation": "CAUSES",
+      "weight": 0.88,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Ongoing expenditure on goods/services sustains and defines lifestyle quality",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "d1872945",
+      "from": "73a80afb",
+      "to": "ce012192",
+      "relation": "CAUSES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Consistent saving behavior accumulates into a measurable cash reserve",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "6ced8fa7",
+      "from": "c2e017db",
+      "to": "b7150e71",
+      "relation": "CAUSES",
+      "weight": 0.9,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Invested capital compounds into an asset portfolio over time",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "14df35d3",
+      "from": "ce012192",
+      "to": "06a8f782",
+      "relation": "ENABLES",
+      "weight": 0.8,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Financial security buffer reduces risk and enables pursuit of higher-yield opportunities",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "7c6038ab",
+      "from": "b7150e71",
+      "to": "06a8f782",
+      "relation": "CAUSES",
+      "weight": 0.88,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Assets generate returns, dividends, or passive income streams that augment future earnings",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "fae0c58c",
+      "from": "06a8f782",
+      "to": "624031d9",
+      "relation": "AMPLIFIES",
+      "weight": 0.82,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Compound returns and passive income reinforce the income generation cycle",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "05430895",
+      "from": "05493e71",
+      "to": "8b790d65",
+      "relation": "INSTANTIATES",
+      "weight": 0.75,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Lifestyle quality influences access to resources that maintain or enhance skill development",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    },
+    {
+      "id": "3f560dc5",
+      "from": "8b790d65",
+      "to": "5831648b",
+      "relation": "AMPLIFIES",
+      "weight": 0.72,
+      "confidence": 0.7,
+      "direction": "forward",
+      "condition": null,
+      "evidence": "Better lifestyle conditions can reinforce investment in education and skill maintenance",
+      "deprecated": false,
+      "flagged": false,
+      "version": 1,
+      "created_at": "2026-04-21T15:20:05.613191",
+      "source": "llm"
+    }
+  ],
+  "history": [],
+  "summaries": [
+    {
+      "id": "rfekwi89",
+      "created_at": "2026-04-21T13:23:40.989Z",
+      "headline": "Building personal capital through security and asset returns is the foundational lever for expanding future income capacity.",
+      "scope": null,
+      "data": {
+        "headline": "Building personal capital through security and asset returns is the foundational lever for expanding future income capacity.",
+        "goal": {
+          "label": "Future Income Capacity",
+          "plain": "Success looks like a person who has measurably greater ability to generate income in future periods than they do today, because their financial security is solid and their assets are producing returns.",
+          "success_signal": "A sustained increase in recurring income streams (wages, investment returns, business income) that exceeds the baseline income available at the starting point of the plan."
+        },
+        "next_action": {
+          "label": "Define and audit current personal capital assets",
+          "why_now": "The graph has a destination but no mapped path or inputs — the immediate unblocked step is to inventory the security and asset-return drivers that the goal depends on, which gates everything else.",
+          "expected_effect": "Identifying which assets (skills, savings, investments, relationships) are already present versus missing will reveal the first real bottleneck and allow a prioritized action plan to be built."
+        },
+        "reasoning": {
+          "root_cause": "The absence of a defined starting asset base — specifically, the security and asset-return inputs that are described as driving Future Income Capacity but are not yet mapped in the chain.",
+          "causal_pathway": "Financial and human capital (security plus income-generating assets) must first be accumulated or identified. Those assets then produce returns — through employment, investment, or enterprise — and that return flow compounds over time into an enhanced capacity to generate income in future periods. Without the upstream inputs being specified, the goal remains aspirational rather than achievable.",
+          "decision_point": null,
+          "effect": "If the chain fires correctly, the individual progressively unlocks higher and more resilient income streams, reducing dependence on any single source and increasing optionality over time.",
+          "why_this_chain_holds": "The core assumption is that security and asset returns are both necessary and sufficient inputs to future income capacity — that is, financial stability creates the platform from which assets can be deployed and compounded."
+        },
+        "critical_path": [
+          {
+            "step": 1,
+            "label": "Personal Security Foundation",
+            "role": "root_cause",
+            "edge_in": null,
+            "plain": "A stable financial and personal security base (emergency savings, stable housing, health coverage) is the prerequisite that prevents disruption from destroying accumulation progress."
+          },
+          {
+            "step": 2,
+            "label": "Asset Accumulation",
+            "role": "mechanism",
+            "edge_in": "ENABLES",
+            "plain": "Security frees resources and attention to be directed toward building income-generating assets such as skills, investments, or business equity."
+          },
+          {
+            "step": 3,
+            "label": "Asset Returns",
+            "role": "mechanism",
+            "edge_in": "CAUSES",
+            "plain": "Accumulated assets begin producing returns — interest, dividends, salary growth, or business profit — which feed back into the system."
+          },
+          {
+            "step": 4,
+            "label": "Future Income Capacity",
+            "role": "effect",
+            "edge_in": "AMPLIFIES",
+            "plain": "Compounding returns and a growing asset base translate directly into an enhanced ability to generate income in future periods, which is the stated goal."
+          }
+        ],
+        "leverage_points": [
+          {
+            "label": "Asset Returns feeding back into Asset Accumulation",
+            "plain": "The reinvestment of returns into further asset-building is the compounding loop at the heart of this chain — small improvements to return rates or reinvestment discipline produce outsized long-term effects on future income capacity."
+          },
+          {
+            "label": "Personal Security Foundation",
+            "plain": "Security is the enabler of everything downstream; shocks to security (job loss, health crisis, debt crisis) collapse the entire chain, making it the highest-leverage point to protect."
+          }
+        ],
+        "assumptions": [
+          {
+            "plain": "Security and asset returns are the primary — and sufficient — drivers of future income capacity; other factors like health, relationships, or macroeconomic conditions are assumed stable or secondary.",
+            "risk": "If macro conditions deteriorate sharply (recession, inflation) or personal factors intervene (illness, family obligations), asset returns may not translate into income capacity growth even when the inputs are present."
+          },
+          {
+            "plain": "The individual has sufficient time horizon for compounding to work — this chain implicitly assumes a multi-year or multi-decade window.",
+            "risk": "If the time horizon is short (months rather than years), the chain may not have time to produce measurable improvements in income capacity."
+          },
+          {
+            "plain": "Assets held are liquid or deployable enough to generate returns — illiquid or stranded capital does not feed the chain.",
+            "risk": "Capital locked in non-productive or depreciating assets will fail to generate the returns needed to advance toward the goal."
+          }
+        ],
+        "falsifiers": [
+          "Asset returns are positive and security is maintained, yet future income capacity stagnates or declines — this would indicate a missing mechanism or a broken link between returns and income capacity.",
+          "Security is established but assets fail to accumulate, suggesting the ENABLES link between security and asset-building does not hold in practice.",
+          "Income capacity improves without security or asset returns being the driver, which would indicate the causal attribution in this chain is wrong and other factors are the real cause."
+        ],
+        "open_questions": [
+          "What specific assets are in scope — human capital (skills, education), financial capital (savings, investments), or social capital (network, reputation)? The chain does not specify.",
+          "What does 'security' mean operationally — is it an emergency fund threshold, stable employment, insurance coverage, or some combination?",
+          "What is the target time horizon over which Future Income Capacity should be measured, and what quantitative improvement counts as success?",
+          "Are there known blockers or risks (debt, dependents, career ceiling) that could interrupt the chain and need to be mapped as BLOCKS edges?",
+          "Is there a feedback loop — does increased future income capacity reinvest into further security and asset accumulation, or is this a one-time linear chain?"
+        ],
+        "confidence": {
+          "overall": 0.4,
+          "weakest_link": "The entire causal spine between the implicit inputs (security, asset returns) and the goal node is inferred rather than encoded — there are no edges at all in this graph, meaning every causal link is assumed rather than evidenced, making the chain as a whole the weakest element."
+        }
+      }
+    }
+  ]
+}

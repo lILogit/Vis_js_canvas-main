@@ -25,6 +25,7 @@
   <button id="btn-fit">Fit</button>
   <button id="btn-hierarchical">Layout ↕</button>
   <button id="btn-cluster" title="Cluster nodes by RCDE layer (Root Cause / Pathway / Decision / Effect / Questions)">⊞ Cluster</button>
+  <button id="btn-path" title="Highlight major causal path by RCDE role (Root cause / Causal pathway / Decision point / Effect)">⊸ Path</button>
   <div class="sep"></div>
   <button id="btn-enrich">Find gaps</button>
   <button id="btn-suggest">Suggest</button>
@@ -136,6 +137,26 @@
   </div>
 </div>
 
+<!-- ── Merge preview overlay ───────────────────────────────────────────── -->
+<div id="merge-overlay">
+  <div id="merge-panel">
+    <div class="merge-header">
+      <h3>Merge preview</h3>
+      <button id="btn-merge-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="merge-summary"></div>
+    <p class="merge-hint">
+      <span style="color:#22c55e;font-weight:700">■ new</span> &nbsp;
+      <span style="color:#f59e0b;font-weight:700">■ modified</span> &nbsp;·&nbsp; uncheck to skip
+    </p>
+    <div id="merge-list"></div>
+    <div class="merge-actions">
+      <button id="btn-merge-accept" class="success">Apply selected</button>
+      <button id="btn-merge-discard" class="danger">Discard all</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Chain switcher modal ────────────────────────────────────────────── -->
 <div id="chain-switcher-overlay">
   <div id="chain-switcher-panel">
@@ -156,44 +177,12 @@
       <button id="btn-note-close" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer">✕</button>
     </div>
     <div class="note-field">
-      <label>Load example <span class="note-hint">(fills form below)</span></label>
-      <select id="note-example">
-        <option value="">— type your own —</option>
-        <optgroup label="Original samples">
-          <option value="cold_swim">Cold swim → focus (observation, W=0.65)</option>
-          <option value="caffeine_loop">Caffeine-sleep feedback loop (hypothesis, W=0.52)</option>
-          <option value="deadline_stress">Deadline stress → sleep fragmentation (observation, W=0.42)</option>
-        </optgroup>
-        <optgroup label="RCDE single-type">
-          <option value="task_cold_protocol">TASK — formalise cold swim protocol (decision, W=0.79)</option>
-          <option value="goal_cognitive_peak">GOAL — 90-min cognitive peak anchor (hypothesis, W=0.73)</option>
-          <option value="gate_intervention_fork">GATE — cold swim vs. nootropic fork (decision, W=0.74)</option>
-          <option value="asset_cold_water_access">ASSET — cold water access ≤15°C (evidence, W=0.78)</option>
-        </optgroup>
-        <optgroup label="Mixed taxonomy">
-          <option value="cognitive_mechanisms">CONCEPT + QUESTION + BLACKBOX · FRAMES, BLOCKS (hypothesis, W=0.67)</option>
-          <option value="decision_and_requirements">DECISION · REQUIRES, PRECONDITION_OF, RESOLVES (decision, W=0.76)</option>
-          <option value="full_taxonomy_demo">All 10 node types · All 12 edge relations (evidence, W=0.73)</option>
-        </optgroup>
-      </select>
+      <label>Domain <span class="note-hint">(e.g. Personal finance, Health, Product strategy)</span></label>
+      <input type="text" id="note-domain" placeholder="e.g. Personal finance">
     </div>
     <div class="note-field">
-      <label>Type</label>
-      <select id="note-type">
-        <option value="observation">observation</option>
-        <option value="hypothesis">hypothesis</option>
-        <option value="decision">decision</option>
-        <option value="question">question</option>
-        <option value="evidence">evidence</option>
-      </select>
-    </div>
-    <div class="note-field">
-      <label>Text</label>
-      <textarea id="note-text" rows="5" placeholder="Describe your observation, hypothesis, or finding..."></textarea>
-    </div>
-    <div class="note-field">
-      <label>Seed entities <span class="note-hint">(comma-separated node labels)</span></label>
-      <input type="text" id="note-seeds" placeholder="e.g. stress, sleep quality, focus">
+      <label>Text <span class="note-hint">(actions, decisions, and interventions → task/decision/gate nodes)</span></label>
+      <textarea id="note-text" rows="6" placeholder="Describe what you observed, decided, or plan to do. Mention actions, resources, goals, or forks — the AI will suggest the most probable actionable node types."></textarea>
     </div>
     <div class="note-field">
       <label>Confidence: <span id="note-conf-val">0.5</span></label>
@@ -208,7 +197,7 @@
       <span class="note-hint">(confidence × 0.6 + urgency × 0.4)</span>
     </div>
     <div class="note-actions">
-      <button id="btn-note-submit" class="success">Ingest note</button>
+      <button id="btn-note-submit" class="success">Preview merge</button>
       <button id="btn-note-cancel">Cancel</button>
     </div>
   </div>

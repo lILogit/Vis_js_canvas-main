@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "6a2042e3",
+    "name": "Income",
+    "domain": "custom",
+    "created_at": "2026-04-21T14:59:46.051756",
+    "updated_at": "2026-04-21T14:59:46.051811",
+    "version": 1,
+    "author": "",
+    "description": ""
+  },
+  "nodes": [],
+  "edges": [],
+  "history": [],
+  "summaries": []
+}

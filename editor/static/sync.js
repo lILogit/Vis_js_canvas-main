@@ -124,6 +124,10 @@ export async function llmIngestNote(noteData) {
   return _llmPost('/llm/ingest-note', noteData);
 }
 
+export async function llmNoteChain(domain, text) {
+  return _llmPost('/llm/note-chain', { domain, text });
+}
+
 export async function createChain(name, domain) {
   const resp = await fetch('/api/chain/new', {
     method: 'POST',

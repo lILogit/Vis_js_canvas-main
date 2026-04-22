@@ -38,6 +38,7 @@ def evolve_graph(chain: CausalChain, classification: dict, note: NoteInput) -> l
     prompt = NOTE_TO_GRAPH.format(
         context_json=json.dumps(context, indent=2),
         delta_json=json.dumps(delta, indent=2),
+        note_type=note.type,
         structural_role=classification.get("structural_role", "mechanism"),
         w_score=round(classification.get("w_score", 0.5), 3),
     )
@@ -60,7 +61,8 @@ def evolve_graph(chain: CausalChain, classification: dict, note: NoteInput) -> l
             "node_type": n.get("type", "state"),
             "description": n.get("description", ""),
             "archetype": n.get("archetype", classification.get("structural_role", "mechanism")),
-            "reasoning": "",
+            "confidence": float(n.get("confidence", 0.7)),
+            "reasoning": n.get("reasoning", ""),
         })
 
     # Edges (import_edge kind) — resolve from_ref / to_ref

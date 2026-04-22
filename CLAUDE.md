@@ -89,8 +89,8 @@ editor/
   decompose.html        ← standalone Knowledge Decomposer page (/decompose route)
   grammar.html          ← standalone Chain Grammar System page (/grammar route)
   static/
-    editor.js           ← vis-network init, visual encoding, enrich/import/ingest preview, RCDE cluster, summary save/history, CCF panel
-    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, importChain, loadChainCcf, etc.)
+    editor.js           ← vis-network init, visual encoding, enrich/import/merge preview, RCDE cluster, summary save/history, CCF panel
+    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, importChain, loadChainCcf, llmNoteChain, etc.)
     style.css           ← dark theme
     decompose.js        ← Knowledge Decomposer vis-network; epistemic class coloring
     decompose.css       ← Decomposer layout + klass badge styles
@@ -104,7 +104,7 @@ src/
 llm/
   client.py             ← Claude API wrapper; strips markdown; parses JSON
   prompts.py            ← all prompt templates: ENRICH, GAP, TEXT_TO_CHAIN,
-                           NOTE_CLASSIFY, NOTE_TO_GRAPH
+                           NOTE_CLASSIFY, NOTE_TO_GRAPH, NOTE_MERGE_CHAIN, NOTE_CONNECT_ISOLATED
   enrichment.py         ← gap/weight enrichment pipelines with apply helpers
 note/
   schema.py             ← NoteInput dataclass; ARCHETYPES, NOTE_TYPES constants
@@ -142,21 +142,33 @@ tests/                  ← pytest; 42 tests across schema, validate, io, note
 - `POST /llm/contradict` — contradiction detection
 - `POST /llm/enrich-preview` — gap/suggest candidates (no write); mode: `gaps|suggest`
 - `POST /llm/import-text` — convert free text to nodes/edges (preview only)
-- `POST /llm/ingest-note` — full note ingestion pipeline; body: NoteInput fields; returns `{suggestions, classification, w_score}`
+- `POST /llm/ingest-note` — legacy note ingestion pipeline (CLI only); body: NoteInput fields; returns `{suggestions, classification, w_score}`
+- `POST /llm/note-chain` — Note merge preview (browser); body: `{domain, text}`; calls `NOTE_MERGE_CHAIN`, runs `_patch_isolated_nodes()`, returns full merged chain with `_status` tags and optional `_auto_connected` count
 - `POST /llm/summarize` — structured briefing; optional `node_ids` for selection scope
 
-**Enrich/import/ingest preview flow (browser):**
+**Enrich/import preview flow (browser):**
 Any LLM action that produces graph items → preview nodes/edges added with `_preview_*` ids (purple dashed, `⟨new⟩` label) → suggestions overlay with checkboxes and optional W-score badge → `Accept selected` → `applyPreviewSuggestions()` → `rerenderLayout()` → auto-save
 
-## Note ingestion pipeline
+**Note merge preview flow (browser):**
+`📝 Note` → user enters Domain + text + confidence/urgency sliders → `Preview merge` → `POST /llm/note-chain` → `addMergePreviewToGraph()` overlays the current graph with colour-coded diffs → merge overlay checklist → `Apply selected` → `applyMergeSelections()` → `rerenderLayout()` → auto-save
+
+- **New nodes** — `_merge_new_*` ids; dark green bg `#0a2a0a`, dashed border `#22c55e`, `⟨new⟩` label prefix; node type badge highlighted blue for actionable types (task/decision/gate/goal/asset) with `▶` pin
+- **Modified nodes** — existing id retained; amber dashed border `#f59e0b`, `⟨mod⟩` label prefix; original appearance restored on discard via `nodeToVis()`
+- **New edges** — `_merge_e_*` ids; green `#22c55e` dashed
+- **Modified edges** — existing id retained; amber `#f59e0b` dashed; restored on discard via `edgeToVis()`
+- **Isolation guard** — after all vis `add()` calls, any `_merge_new_*` node not referenced by any edge is removed from vis and from `_mergePending.newNodes`; vis.js silently drops edges whose endpoint doesn't exist so the guard runs after, not before
+- **Server-side patch** — `_patch_isolated_nodes(result, chain_data, llm_client)` in `serve.py`: detects new nodes with no edges, calls `NOTE_CONNECT_ISOLATED` as a follow-up LLM call, merges returned edges into the result; sets `result["_auto_connected"] = N`; best-effort (silent no-op on failure, client-side guard catches remainder)
+- **`_mergePending`** state — `{newNodes, modNodes, newEdges, modEdges, newIdToVis, summary}`; `newIdToVis` maps LLM `_new_N` ids to vis `_merge_new_N` ids; cleared on chain switch, import, new chain, demo reset, and `renderGraph()`
+
+## Note ingestion pipeline (CLI / legacy browser)
 
 **W-score** = `confidence × 0.6 + urgency × 0.4` — priority gating for ingestion.
 
 **Stage 0 — parse** (`note/parser.py`): Splits YAML front matter (--- fences or ```yaml block) from free text. Falls back to plain text with defaults. Stdlib only.
 
-**Stage 1 — classify** (`note/classifier.py`): Calls `NOTE_CLASSIFY` prompt. Returns `{known: [{entity, node_id, similarity}], delta: [{entity, suggested_type, description}], structural_role, reasoning}`. Seed entities resolve against existing node labels; unmatched text entities are extracted heuristically.
+**Stage 1 — classify** (`note/classifier.py`): Calls `NOTE_CLASSIFY` prompt. Returns `{known: [{entity, node_id, similarity}], delta: [{entity, suggested_type, description, actionable}], structural_role, reasoning}`. Prefers actionable delta types: `task > decision > gate > goal > asset > event > state`.
 
-**Stage 2 — evolve** (`note/evolution.py`): Calls `NOTE_TO_GRAPH` prompt with known context + ΔDATA. Returns `import_node`/`import_edge` suggestions. `from_ref`/`to_ref` can be existing `node_id` or a ΔDATA label — resolved in Python, never in the LLM.
+**Stage 2 — evolve** (`note/evolution.py`): Calls `NOTE_TO_GRAPH` prompt with `note_type`, known context + ΔDATA. Returns `import_node`/`import_edge` suggestions with `confidence` and `reasoning` per node. `from_ref`/`to_ref` can be existing `node_id` or a ΔDATA label — resolved in Python, never in the LLM.
 
 **Stage 3 — apply**: Two-pass: nodes first (building `label→id` map), then edges (remapping labels to real IDs). Same pattern used in both CLI (`cmd_ingest`) and browser (`applyPreviewSuggestions`).
 
@@ -176,7 +188,7 @@ Free text body.
 
 ## Browser UI features
 
-Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `⬆ Import` (upload `.causal.json`) | `⬇ Export` (download `.causal.json`) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `⊞ Cluster` | `Save ⌘S`
+Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `⬆ Import` (upload `.causal.json`) | `⬇ Export` (download `.causal.json`) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `⊞ Cluster` | `⊸ Path` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `Save ⌘S`
 
 **Chain switcher** — lists all non-seed chains from `GET /api/chains` as cards; clicking one calls `POST /api/chain/switch` and re-renders the graph without page reload. Hover a card to reveal a 🗑 delete button (backs up then removes the file; seed files are protected).
 
@@ -188,11 +200,13 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty ch
 
 **Reset demo** — `↺ Reset demo` button calls `POST /api/demo/reset`; backs up current chain then restores from `*-seed.causal.json`. Seed files are excluded from the chain switcher and cannot be switched to directly.
 
-**Note modal** — type dropdown, text area, seed entities, confidence/urgency sliders with live W-score badge (green ≥0.7, yellow ≥0.4, red <0.4); "Load example" dropdown pre-fills with 3 predefined demo notes. Submit calls `/llm/ingest-note`, known entities highlighted via `network.selectNodes()`.
+**Note modal** — Domain text input (e.g. "Personal finance") + free-text area + confidence/urgency sliders with live W-score badge (green ≥0.7, yellow ≥0.4, red <0.4). `Preview merge` button calls `POST /llm/note-chain`; domain value is prepended to note text as `[Domain: ...]` context. Opens the **merge overlay** (green-accented right panel, separate from suggestions overlay) showing grouped checklist of new and modified elements.
 
 **Knowledge Decomposer** (`⊕ Decompose` → opens `/decompose` in new tab) — standalone page that runs the `TEXT_TO_CHAIN` pipeline on pasted text. Nodes are coloured by epistemic class instead of confidence: `KK` blue (abstract parametric mechanism), `KU` yellow (known category, specific instance value), `UU` red (post-cutoff/proprietary, flagged for human review), `UK` purple (cross-domain bridge pattern). Result can be saved as a new `.causal.json` chain via `Save as chain`.
 
 **Summary modal** — `📋 Summary` opens a choice screen when saved summaries exist: `⚡ Generate new` (calls `POST /llm/summarize`) or `📂 Open from history`. When no history exists, generates immediately. Result is a structured briefing (headline, goal, critical path, tasks, decisions, risks, open questions) in colour-coded sections. `💾 Save` persists the snapshot to `chain.summaries` via `POST /api/summary/save`. `📂 History` lists all snapshots; each entry can be viewed, exported as `.md`, or deleted. Operates on selected nodes if any are selected, otherwise the full chain.
+
+**RCDE Path highlight** — `⊸ Path` toggles colour-coding of every node and edge by its RCDE role: root_cause (red), pathway (blue), decision (cyan), effect (green), questions (amber). Off-path edges dim to near-invisible. Node colours override confidence colours for the duration; clicking again restores them via `nodeToVis`/`edgeToVis`. Auto-clears on chain switch, import, new chain, node/edge edit, delete, and accepting preview suggestions. Works independently of cluster positioning.
 
 **RCDE Cluster view** — `⊞ Cluster` toggles a layer-snap layout. Nodes are assigned to RCDE roles (`root_cause` → top, `pathway`, `decision`, `effect`, `questions` → bottom) by `_nodeRole()` using type, archetype, and in/out degree. `_snapToLayers()` saves current positions to `_preclusterPositions` then moves all nodes to vertical columns at fixed Y bands; `_restorePositions()` reverts. `afterDrawing` draws labelled colour bands each frame. No `network.cluster()` API is used — pure `moveNode()`.
 
@@ -219,14 +233,22 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty ch
 - ALWAYS backup `.causal.json` before any write (`.bak` sidecar)
 - ALWAYS strip markdown from LLM responses before JSON parsing
 - Preview nodes/edges use ids prefixed `_preview_` — never persisted to chainData or disk
+- Merge preview nodes/edges use ids prefixed `_merge_new_` / `_merge_e_` — never persisted; cleared by `clearMergePreview()` and `renderGraph()`
+- Isolated merge-preview nodes are forbidden — `addMergePreviewToGraph()` removes any `_merge_new_*` node not referenced by any edge after all vis DataSet operations complete
 
 ## LLM enrichment
 
-Model: `claude-sonnet-4-6` | Max tokens: 1000 per call
+Model: `claude-sonnet-4-6` | Max tokens: 1000 per call (2500 for `note-chain`, 800 for `_patch_isolated_nodes` follow-up)
 All prompts are named constants in `llm/prompts.py`. System prompt always includes: `"Return only valid JSON. No preamble. No markdown."`
 
 CLI enrichment modes (`python3 cli.py enrich <file> --mode`): `full | gaps | weights | scope`
 Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both use preview flow. `📋 Summary` uses a separate read-only modal (no preview nodes). All three are selection-scoped when nodes are selected (`POST /llm/enrich-preview` and `POST /llm/summarize` accept optional `node_ids`; server calls `_subgraph()` to filter chain data).
+
+**Note prompts** (`llm/prompts.py`):
+- `NOTE_MERGE_CHAIN` — takes `{chain_json, domain, note_text}`; returns full merged chain with `_status: existing|new|modified` on every node/edge, `_reasoning`, `_changes`; enforces no-isolated-node rule
+- `NOTE_CONNECT_ISOLATED` — follow-up prompt; takes `{isolated_json, existing_nodes_json, new_nodes_json, edge_id_start}`; returns `{edges}` connecting each isolated node to the most causally relevant target
+- `NOTE_CLASSIFY` — takes `{chain_json, note_type, note_text, seed_entities}`; delta items include `actionable` flag; type priority: `task > decision > gate > goal > asset > event > state`
+- `NOTE_TO_GRAPH` — takes `{context_json, delta_json, note_type, structural_role, w_score}`; returns nodes with `confidence` and `reasoning` fields; actionability rules keyed to `note_type`
 
 ## CCF v1 — Causal Compact Format
 
@@ -291,7 +313,9 @@ Source values: `user | llm | import`
 **Node font color** = dark `#1a1a2e` for all types except `event` → white `#ffffff`
 **Node border** = source (user→solid `#555`, llm→dashed `#8b5cf6`, flagged→solid `#ef4444`)
 **Node tooltip** = rich HTML: label, description, type·archetype, confidence·source, flagged/deprecated
-**Preview nodes** = dark purple bg `#2d1b4e`, dashed border `#8b5cf6`, label prefixed `⟨new⟩`
+**Preview nodes** = dark purple bg `#2d1b4e`, dashed border `#8b5cf6`, label prefixed `⟨new⟩` (enrich/suggest flow)
+**Merge-new nodes** = dark green bg `#0a2a0a`, dashed border `#22c55e`, label prefixed `⟨new⟩` (note merge flow)
+**Merge-modified nodes** = existing node overlaid with amber dashed border `#f59e0b`, label prefixed `⟨mod⟩`
 **Edge color** = relation (CAUSES `#94a3b8`, ENABLES `#22c55e`, BLOCKS `#ef4444`, TRIGGERS `#f59e0b`, REDUCES `#4a9eed`, REQUIRES `#8b5cf6`, AMPLIFIES `#ec4899`, PRECONDITION_OF `#06b6d4`, RESOLVES `#10b981`, FRAMES `#a78bfa`, INSTANTIATES `#fbbf24`, DIVERGES_TO `#fb923c`)
 **Edge width** = `weight × 6` (min 1, max 8) | deprecated→dashes+opacity 0.35 | BLOCKS→arrowhead `bar` | DIVERGES_TO→arrowhead `vee`
 **Edge tooltip** = rich HTML: relation, weight·confidence, condition, evidence, flagged/deprecated
@@ -317,5 +341,7 @@ Auto-backup triggers: before enrich/contradict/merge, before restore, every 10th
 - Never show raw JSON to user in browser — always render in vis-network
 - Never use `physics: true` as default layout
 - Never persist preview nodes/edges (`_preview_*` ids) — they are display-only until accepted
+- Never persist merge preview nodes/edges (`_merge_new_*` / `_merge_e_*` ids) — display-only until `applyMergeSelections()` creates real ids
+- Never add isolated nodes to the merge preview — the isolation guard in `addMergePreviewToGraph()` enforces this; do not remove it
 - Never list or switch to `*-seed.causal.json` files — they are reset-demo templates only
 - Never save to `_chain_path` if it points to a seed file
