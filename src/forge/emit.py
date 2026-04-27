@@ -184,12 +184,16 @@ def forge_chain(chain: dict) -> str:
     # ENTRY POINT section
     line(_banner("ENTRY POINT"))
     line()
+    line("from simulate.runner import print_comparison")
+    line()
     line('if __name__ == "__main__":')
     line(f'    print("Chain : {chain_name}")')
     line(f'    print("Source: chains/{chain_id}.causal.json")')
     line(f'    print("Hash  : {src_hash}")')
-    line('    result = simulate(CHAIN, mode="monte_carlo", n=10_000, seed=42)')
-    line('    print(f"Simulation result: {result}")')
+    if last_enrichment:
+        line(f'    print("Last enrichment: {last_enrichment}")')
+    line('    result = simulate(CHAIN, mode="deterministic")')
+    line('    print_comparison(result)')
     line()
 
     return "\n".join(L)
