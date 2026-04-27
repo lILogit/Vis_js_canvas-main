@@ -519,3 +519,37 @@ Return JSON:
     {{"edge_a_id": "...", "edge_b_id": "...", "conflict_type": "..."}}
   ]
 }}"""
+
+
+# ── T5 Enrichment extraction ──────────────────────────────────────────────────
+
+TEXT_EXTRACT = """You are extracting evidence events from a financial news article for a Czech mortgage risk model.
+
+The causal model tracks these measurable quantities. Only extract events for these exact target IDs:
+- AltBankOffer.rate       — competing bank's mortgage rate (current: {alt_rate:.4f})
+- RenewalOffer.rate       — current bank's renewal rate   (current: {renewal_rate:.4f})
+- MortgageActive.annual_rate — active mortgage rate        (current: {annual_rate:.4f})
+- FixationEndingSoon      — urgency/timing of fixation end
+- RateRegime2028          — future rate environment uncertainty
+- MonthlyIncome           — borrower monthly income
+- SavingsReserve          — borrower liquid savings
+
+Article text:
+{article_text}
+
+Extract every factual, quantitative claim that updates one of the target IDs above.
+If no such claim exists, return {{"events": []}}.
+
+For each event return:
+  class           — E1 (quantitative value update) | E2 (new entity) | E3 (edge change) | E4 (archetype/type) | E5 (deprecation) | E6 (contradiction)
+  target_node_id  — must be one of the enum values above
+  direction       — "down" | "up" | "neutral"
+  magnitude       — relative change magnitude 0-1 (e.g. 0.025 for a ~2.5% move)
+  new_value_hint  — absolute new value if stated (e.g. 0.0395 for "3.95 %")
+  extraction_confidence — your confidence 0-1
+  text_span       — verbatim quote from article (≤500 chars)
+  reasoning       — one sentence explanation (≤500 chars)
+
+Return JSON: {{"events": [...]}}"""
+
+URL_EXTRACT = TEXT_EXTRACT  # alias kept for spec compatibility

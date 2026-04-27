@@ -632,6 +632,60 @@ def cmd_forge(args):
         print(code)
 
 
+def cmd_enrich_text(args):
+    """Extract E1-E6 evidence events from a text file and apply E1 events to the chain."""
+    import json as _json
+    src_path = os.path.join(os.path.dirname(__file__), "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    from enrichment import extract_events, run_gates, apply_event, get_source_credibility
+
+    # Load chain
+    chain = _load(args.file)
+    import chain.io as chain_io
+    chain_data = chain_io.to_dict(chain)
+
+    # Read article text
+    text_file = args.text_file
+    if not os.path.exists(text_file):
+        print(f"  Text file not found: {text_file}")
+        sys.exit(1)
+    with open(text_file, encoding="utf-8") as f:
+        article_text = f.read()
+
+    source = args.source or "unknown"
+    print(f"  Extracting events from: {text_file}")
+    print(f"  Source: {source}")
+
+    events = extract_events(article_text, chain=chain_data)
+    print(f"  Extracted {len(events)} event(s)")
+
+    if not events:
+        print("  Nothing to apply.")
+        return
+
+    sc = get_source_credibility(source)
+    applied = 0
+    for ev in events:
+        result = run_gates(ev, chain_data, source=source)
+        if result.passed and ev.get("auto_apply"):
+            chain_data = apply_event(chain_data, ev, result, source, sc)
+            applied += 1
+            print(f"  Applied {ev['class']} → {ev['target_node_id']} "
+                  f"({ev.get('old_value', '?')} → {result.new_value})")
+        else:
+            print(f"  Blocked {ev['class']} ({result.reason})")
+
+    if applied:
+        import chain.io as chain_io  # noqa: F811
+        # Write updated chain back to file (with backup)
+        updated = chain_io.from_dict(chain_data)
+        chain_io.save(updated, args.file)
+        print(f"  Saved enriched chain to {args.file}")
+
+    print(f"  Done — {applied}/{len(events)} event(s) applied.")
+
+
 def cmd_reset_demo(args):
     """Restore demo chain(s) to their pristine seed state."""
     import shutil
@@ -766,6 +820,12 @@ def build_parser():
     s.add_argument("file", help="Chain .causal.json path")
     s.add_argument("--out", help="Output .py path (default: stdout)")
 
+    # enrich-text
+    s = sub.add_parser("enrich-text", help="Extract E1-E6 events from a text file and apply E1s")
+    s.add_argument("file", help="Chain .causal.json path")
+    s.add_argument("--text-file", required=True, help="Path to article text file")
+    s.add_argument("--source", default="unknown", help="Source domain (e.g. hn.cz, cnb.cz)")
+
     # reset-demo
     sub.add_parser("reset-demo", help="Restore demo chains to pristine seed state")
 
@@ -793,6 +853,7 @@ COMMANDS = {
     "classify": cmd_classify,
     "ingest": cmd_ingest,
     "forge": cmd_forge,
+    "enrich-text": cmd_enrich_text,
     "reset-demo": cmd_reset_demo,
 }
 

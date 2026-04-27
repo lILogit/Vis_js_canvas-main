@@ -61,6 +61,22 @@ def load(path: str) -> CausalChain:
     return CausalChain(meta=meta, nodes=nodes, edges=edges, history=data.get("history", []), summaries=data.get("summaries", []))
 
 
+def from_dict(data: dict) -> "CausalChain":
+    """Construct a CausalChain from a plain dict (same logic as load, without file I/O)."""
+    import io as _io  # noqa: PLC0415
+    import tempfile, json as _json  # noqa: PLC0415, E401
+    # Reuse load() by round-tripping through a temp file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json",
+                                     delete=False, encoding="utf-8") as tf:
+        _json.dump(data, tf)
+        tmp_path = tf.name
+    try:
+        return load(tmp_path)
+    finally:
+        import os as _os  # noqa: PLC0415
+        _os.unlink(tmp_path)
+
+
 def to_dict(chain: CausalChain) -> dict:
     nodes = []
     for n in chain.nodes:
