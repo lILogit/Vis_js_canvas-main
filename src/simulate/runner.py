@@ -1,6 +1,6 @@
 """
-simulate() — deterministic branch comparison for a mortgage causal chain.
-Replaces the stub in forge/runtime.py (T2).
+simulate() — branch comparison for a mortgage causal chain.
+Supports deterministic (T3) and monte_carlo (T4) modes.
 """
 from __future__ import annotations
 
@@ -16,27 +16,40 @@ def simulate(
     initial_state: dict | None = None,
 ) -> dict:
     """
-    Run deterministic branch comparison for the mortgage MVP chain.
+    Run branch comparison for the mortgage MVP chain.
 
     Args:
-        chain:         CHAIN list from a forged module (used in T4; ignored here)
-        mode:          "deterministic" (T3) or "monte_carlo" (T4 — falls back to deterministic)
-        n:             Monte Carlo sample count (T4)
-        seed:          RNG seed (T4)
+        chain:         CHAIN list from a forged module (graph structure; used by MC path builder)
+        mode:          "deterministic" or "monte_carlo"
+        n:             Monte Carlo sample count
+        seed:          RNG seed (Monte Carlo)
         initial_state: Override scenario parameters; defaults to REFERENCE_SCENARIO
 
     Returns:
-        {mode, scenario, branches: [payoff_dict, ...], recommendations: [rec_dict, ...]}
+        {mode, scenario, branches, recommendations}
+        Monte Carlo mode adds: {path_probabilities, sensitivity}
     """
     scenario = initial_state if initial_state is not None else REFERENCE_SCENARIO
     branches = [compute_branch(bid, scenario) for bid in BRANCH_IDS]
     recs     = _recommend(branches, scenario)
-    return {
-        "mode":            "deterministic",
+
+    result: dict = {
+        "mode":            mode,
         "scenario":        scenario,
         "branches":        branches,
         "recommendations": recs,
     }
+
+    if mode == "monte_carlo":
+        from .montecarlo import get_registry_certainties, monte_carlo  # noqa: PLC0415
+        from .sensitivity import branch_exposures, sensitivity_analysis  # noqa: PLC0415
+
+        certs = get_registry_certainties()
+        result["path_probabilities"] = monte_carlo(n=n, seed=seed, node_certainties=certs)
+        result["sensitivity"]        = sensitivity_analysis(node_certainties=certs)
+        result["branch_exposures"]   = branch_exposures(node_certainties=certs)
+
+    return result
 
 
 def print_comparison(result: dict) -> None:
