@@ -13,7 +13,7 @@ _forge_meta = {
     "source_chain":  "mortgage-mvp",
     "source_hash":   "sha256:7687a4326e1315ecf2e17eb8c5ee1ab851af15e486d0bddab6cfb83aa92120e0",
     "forge_version": "1.0.0",
-    "timestamp":     "2026-04-27T11:36:14Z",
+    "timestamp":     "2026-04-27T13:05:27Z",
 }
 
 # ─── STATES ────────────────────────────────────────────────────────────────────
@@ -176,9 +176,11 @@ CHAIN = [
 
 # ─── ENTRY POINT ───────────────────────────────────────────────────────────────
 
+from simulate.runner import print_comparison
+
 if __name__ == "__main__":
     print("Chain : Mortgage Strategy MVP")
     print("Source: chains/mortgage-mvp.causal.json")
     print("Hash  : sha256:7687a4326e1315ecf2e17eb8c5ee1ab851af15e486d0bddab6cfb83aa92120e0")
-    result = simulate(CHAIN, mode="monte_carlo", n=10_000, seed=42)
-    print(f"Simulation result: {result}")
+    result = simulate(CHAIN, mode="deterministic")
+    print_comparison(result)
