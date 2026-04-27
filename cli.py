@@ -657,7 +657,11 @@ def cmd_enrich_text(args):
     print(f"  Extracting events from: {text_file}")
     print(f"  Source: {source}")
 
-    events = extract_events(article_text, chain=chain_data)
+    try:
+        events = extract_events(article_text, chain=chain_data)
+    except Exception as exc:
+        print(f"  LLM extraction failed: {exc}")
+        sys.exit(1)
     print(f"  Extracted {len(events)} event(s)")
 
     if not events:
@@ -684,6 +688,75 @@ def cmd_enrich_text(args):
         print(f"  Saved enriched chain to {args.file}")
 
     print(f"  Done — {applied}/{len(events)} event(s) applied.")
+
+
+def cmd_reforge(args):
+    """Re-forge a chain after enrichment; show semantic diff vs previous runtime."""
+    import json as _json
+    src_path = os.path.join(os.path.dirname(__file__), "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    from forge import forge_chain, diff_chains, diff_forge_output, format_diff
+
+    chain_path = args.file
+    chain_obj  = _load(chain_path)
+    import chain.io as chain_io
+    chain_data = chain_io.to_dict(chain_obj)
+
+    # Determine output path
+    chain_id  = chain_data.get("meta", {}).get("id", "chain")
+    out_path  = args.out or os.path.join(
+        os.path.dirname(__file__), "runtime", f"{chain_id}.py"
+    )
+
+    # Read previous source (for diff) if it exists
+    prev_src = None
+    if os.path.exists(out_path):
+        with open(out_path, encoding="utf-8") as f:
+            prev_src = f.read()
+
+    new_src = forge_chain(chain_data)
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(new_src)
+    print(f"  Forged → {out_path}")
+
+    if prev_src:
+        diff = diff_forge_output(prev_src, new_src)
+        if diff:
+            print("\n  Forge diff (semantic changes only):")
+            for line in diff:
+                print("  " + line, end="")
+        else:
+            print("  No semantic changes (only timestamp/hash updated).")
+
+        # Load before chain from seed if present, else treat previous forge as baseline
+        seed_path = chain_path.replace(".causal.json", "-seed.causal.json")
+        if os.path.exists(seed_path):
+            with open(seed_path, encoding="utf-8") as f:
+                before_data = _json.load(f)
+        else:
+            before_data = chain_data  # fallback: compare to self
+
+        semantic = diff_chains(before_data, chain_data)
+        text = format_diff(semantic)
+        if text.strip() != "No changes.":
+            print("\n  Semantic chain diff:")
+            for line in text.splitlines():
+                print(f"  {line}")
+
+        # Write diff file to runs/
+        if args.diff_out:
+            diff_path = args.diff_out
+        else:
+            from datetime import datetime, timezone
+            ts = datetime.now(tz=timezone.utc).strftime("%Y%m%dT%H%M%S")
+            runs_dir  = os.path.join(os.path.dirname(__file__), "runs")
+            os.makedirs(runs_dir, exist_ok=True)
+            diff_path = os.path.join(runs_dir, f"diff_{chain_id}_{ts}.txt")
+        with open(diff_path, "w", encoding="utf-8") as f:
+            f.write("".join(diff) if diff else "(no semantic changes)\n")
+        print(f"  Diff saved → {diff_path}")
 
 
 def cmd_reset_demo(args):
@@ -826,6 +899,12 @@ def build_parser():
     s.add_argument("--text-file", required=True, help="Path to article text file")
     s.add_argument("--source", default="unknown", help="Source domain (e.g. hn.cz, cnb.cz)")
 
+    # reforge
+    s = sub.add_parser("reforge", help="Re-forge a chain and show semantic diff vs previous runtime")
+    s.add_argument("file", help="Chain .causal.json path")
+    s.add_argument("--out", help="Output .py path (default: runtime/<chain_id>.py)")
+    s.add_argument("--diff-out", help="Diff output path (default: runs/diff_<chain>_<ts>.txt)")
+
     # reset-demo
     sub.add_parser("reset-demo", help="Restore demo chains to pristine seed state")
 
@@ -853,6 +932,7 @@ COMMANDS = {
     "classify": cmd_classify,
     "ingest": cmd_ingest,
     "forge": cmd_forge,
+    "reforge": cmd_reforge,
     "enrich-text": cmd_enrich_text,
     "reset-demo": cmd_reset_demo,
 }

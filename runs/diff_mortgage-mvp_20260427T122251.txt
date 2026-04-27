@@ -1,0 +1,32 @@
+--- before
++++ after
+@@ -12,6 +12,7 @@
+ _forge_meta = {
+     "source_chain":  "mortgage-mvp",
+     "forge_version": "1.0.0",
++    "last_enrichment": "ev_2026-04-27_hn_cz_01",
+ }
+ 
+ # ─── STATES ────────────────────────────────────────────────────────────────────
+@@ -54,11 +55,11 @@
+ 
+ # ─── ASSETS ────────────────────────────────────────────────────────────────────
+ 
+-@ASSET(rcde_id="alt_bank_offer", certainty=0.7500, archetype="evidence")
++@ASSET(rcde_id="alt_bank_offer", certainty=0.7500, archetype="evidence", _evidence_refs=["ev_2026-04-27_hn_cz_01"])
+ @dataclass
+ class AltBankOffer:
+     """Competitor refinancing offer: 4.20% rate, processing fee 15 000 CZK, requires credit reapproval (~4 months)."""
+-    pass
++    rate: float = 0.0395
+ 
+ @ASSET(rcde_id="renewal_offer", certainty=0.8500, archetype="evidence")
+ @dataclass
+@@ -177,6 +178,6 @@
+ if __name__ == "__main__":
+     print("Chain : Mortgage Strategy MVP")
+     print("Source: chains/mortgage-mvp.causal.json")
+-    print("Hash  : sha256:4d5ae83fe615048cf3f4a14c028e5644b8937ac73a1850df0e88185035aeeffd")
++    print("Hash  : sha256:ff43e09b5492d1db225d1d4643c2daed9cc3d34eb7c5d01584b83d104be5faa3")
+     result = simulate(CHAIN, mode="monte_carlo", n=10_000, seed=42)
+     print(f"Simulation result: {result}")

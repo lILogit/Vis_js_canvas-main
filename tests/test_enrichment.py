@@ -32,7 +32,7 @@ from enrichment.apply import apply_event, apply_pending_or_reject
 # ── Shared fixtures ───────────────────────────────────────────────────────────
 
 _CHAIN_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "chains", "mortgage-mvp.causal.json"
+    os.path.dirname(__file__), "..", "chains", "mortgage-mvp-seed.causal.json"
 )
 
 _FIXTURE_PATH = os.path.join(

@@ -20,6 +20,7 @@ def load(path: str) -> CausalChain:
         version=meta_data.get("version", 1),
         author=meta_data.get("author", ""),
         description=meta_data.get("description", ""),
+        scenario_overrides=meta_data.get("scenario_overrides", {}),
     )
 
     nodes = []
@@ -37,6 +38,8 @@ def load(path: str) -> CausalChain:
             deprecated=n.get("deprecated", False),
             flagged=n.get("flagged", False),
             chain_link=n.get("chain_link", None),
+            enrichment_status=n.get("_status"),
+            evidence_ref=n.get("_evidence_ref"),
         ))
 
     edges = []
@@ -58,7 +61,13 @@ def load(path: str) -> CausalChain:
             source=e.get("source", "user"),
         ))
 
-    return CausalChain(meta=meta, nodes=nodes, edges=edges, history=data.get("history", []), summaries=data.get("summaries", []))
+    return CausalChain(
+        meta=meta, nodes=nodes, edges=edges,
+        history=data.get("history", []),
+        summaries=data.get("summaries", []),
+        evidence=data.get("evidence", []),
+        pending_review=data.get("pending_review", []),
+    )
 
 
 def from_dict(data: dict) -> "CausalChain":
@@ -80,7 +89,7 @@ def from_dict(data: dict) -> "CausalChain":
 def to_dict(chain: CausalChain) -> dict:
     nodes = []
     for n in chain.nodes:
-        nodes.append({
+        nd = {
             "id": n.id,
             "label": n.label,
             "description": n.description,
@@ -93,7 +102,12 @@ def to_dict(chain: CausalChain) -> dict:
             "deprecated": n.deprecated,
             "flagged": n.flagged,
             "chain_link": n.chain_link,
-        })
+        }
+        if n.enrichment_status is not None:
+            nd["_status"] = n.enrichment_status
+        if n.evidence_ref is not None:
+            nd["_evidence_ref"] = n.evidence_ref
+        nodes.append(nd)
 
     edges = []
     for e in chain.edges:
@@ -114,22 +128,31 @@ def to_dict(chain: CausalChain) -> dict:
             "source": e.source,
         })
 
-    return {
-        "meta": {
-            "id": chain.meta.id,
-            "name": chain.meta.name,
-            "domain": chain.meta.domain,
-            "created_at": chain.meta.created_at,
-            "updated_at": chain.meta.updated_at,
-            "version": chain.meta.version,
-            "author": chain.meta.author,
-            "description": chain.meta.description,
-        },
+    meta_dict = {
+        "id": chain.meta.id,
+        "name": chain.meta.name,
+        "domain": chain.meta.domain,
+        "created_at": chain.meta.created_at,
+        "updated_at": chain.meta.updated_at,
+        "version": chain.meta.version,
+        "author": chain.meta.author,
+        "description": chain.meta.description,
+    }
+    if chain.meta.scenario_overrides:
+        meta_dict["scenario_overrides"] = chain.meta.scenario_overrides
+
+    result = {
+        "meta": meta_dict,
         "nodes": nodes,
         "edges": edges,
         "history": chain.history,
         "summaries": chain.summaries,
     }
+    if chain.evidence:
+        result["evidence"] = chain.evidence
+    if chain.pending_review:
+        result["pending_review"] = chain.pending_review
+    return result
 
 
 def save(chain: CausalChain, path: str) -> None:

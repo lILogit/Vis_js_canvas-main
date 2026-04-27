@@ -12,6 +12,13 @@ from .canonical import chain_hash
 
 FORGE_VERSION = "1.0.0"
 
+# node_id → (dataclass_field_name, scenario_key) for nodes that carry numeric values
+_NODE_FIELDS: dict[str, tuple[str, str]] = {
+    "alt_bank_offer":  ("rate",        "alt_rate"),
+    "renewal_offer":   ("rate",        "renewal_rate"),
+    "mortgage_active": ("annual_rate", "annual_rate"),
+}
+
 # Node type → section banner name
 _SECTION_FOR: dict[str, str] = {
     "state":    "STATES",
@@ -98,10 +105,13 @@ def forge_chain(chain: dict) -> str:
             raise ForgeError(f"Edge '{eid}' has unknown relation '{e.get('relation')}'")
 
     # ── Metadata ─────────────────────────────────────────────────────────────
-    chain_name = meta.get("name", "Untitled")
-    chain_id   = meta.get("id", "unknown")
-    src_hash   = chain_hash(chain)
-    timestamp  = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    chain_name       = meta.get("name", "Untitled")
+    chain_id         = meta.get("id", "unknown")
+    src_hash         = chain_hash(chain)
+    timestamp        = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    scenario_ovr     = meta.get("scenario_overrides", {})
+    evidence_list    = chain.get("evidence", [])
+    last_enrichment  = evidence_list[-1]["id"] if evidence_list else None
 
     # ── Collect used symbols for imports ─────────────────────────────────────
     used_decorators = sorted({_DECORATOR_FOR[n["type"]] for n in nodes})
@@ -146,6 +156,8 @@ def forge_chain(chain: dict) -> str:
     line(f'    "source_hash":   "{src_hash}",')
     line(f'    "forge_version": "{FORGE_VERSION}",')
     line(f'    "timestamp":     "{timestamp}",')
+    if last_enrichment:
+        line(f'    "last_enrichment": "{last_enrichment}",')
     line("}")
     line()
 
@@ -157,7 +169,7 @@ def forge_chain(chain: dict) -> str:
         line(_banner(sec_name))
         line()
         for node in sec_nodes:
-            _emit_node(L, node)
+            _emit_node(L, node, scenario_overrides=scenario_ovr)
 
     # CHAIN section
     line(_banner("CHAIN"))
@@ -183,7 +195,7 @@ def forge_chain(chain: dict) -> str:
     return "\n".join(L)
 
 
-def _emit_node(L: list[str], node: dict) -> None:
+def _emit_node(L: list[str], node: dict, *, scenario_overrides: dict | None = None) -> None:
     nid        = node["id"]
     ntype      = node["type"]
     confidence = node.get("confidence", 0.7)
@@ -192,12 +204,27 @@ def _emit_node(L: list[str], node: dict) -> None:
     class_name = _to_pascal(nid)
     decorator  = _DECORATOR_FOR[ntype]
 
+    # Collect extra decorator kwargs
     arch_arg = f', archetype="{archetype}"' if archetype else ""
-    L.append(f'@{decorator}(rcde_id="{nid}", certainty={confidence:.4f}{arch_arg})')
+    evidence_ref = node.get("_evidence_ref")
+    ev_arg = f', _evidence_refs=["{evidence_ref}"]' if evidence_ref else ""
+
+    L.append(f'@{decorator}(rcde_id="{nid}", certainty={confidence:.4f}{arch_arg}{ev_arg})')
     L.append("@dataclass")
     L.append(f"class {class_name}:")
     if desc:
         L.append(f'    """{desc}"""')
+
+    # Emit numeric field when a scenario override exists for this node
+    field_info = _NODE_FIELDS.get(nid)
+    if field_info and scenario_overrides:
+        field_name, scenario_key = field_info
+        value = scenario_overrides.get(scenario_key)
+        if value is not None:
+            L.append(f"    {field_name}: float = {value!r}")
+            L.append("")
+            return
+
     if ntype == "blackbox":
         safe = desc.replace('"', '\\"')
         L.append(f'    symptom: str = "{safe}"')

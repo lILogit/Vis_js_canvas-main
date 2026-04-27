@@ -1,0 +1,10 @@
+--- before
++++ after
+@@ -177,6 +177,6 @@
+ if __name__ == "__main__":
+     print("Chain : Mortgage Strategy MVP")
+     print("Source: chains/mortgage-mvp.causal.json")
+-    print("Hash  : sha256:7687a4326e1315ecf2e17eb8c5ee1ab851af15e486d0bddab6cfb83aa92120e0")
++    print("Hash  : sha256:4d5ae83fe615048cf3f4a14c028e5644b8937ac73a1850df0e88185035aeeffd")
+     result = simulate(CHAIN, mode="monte_carlo", n=10_000, seed=42)
+     print(f"Simulation result: {result}")

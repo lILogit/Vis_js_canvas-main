@@ -22,6 +22,9 @@ class Node:
     deprecated: bool = False
     flagged: bool = False
     chain_link: Optional[str] = None  # filename of linked chain, e.g. "sleep-cognition.causal.json"
+    # Enrichment annotations (set by enrichment.apply; not part of core schema)
+    enrichment_status: Optional[str] = None   # "enriched" when an E1 was applied
+    evidence_ref: Optional[str] = None        # id of the evidence entry that modified this node
 
 
 @dataclass
@@ -52,6 +55,7 @@ class ChainMeta:
     version: int = 1
     author: str = ""
     description: str = ""
+    scenario_overrides: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -61,3 +65,5 @@ class CausalChain:
     edges: list = field(default_factory=list)
     history: list = field(default_factory=list)
     summaries: list = field(default_factory=list)
+    evidence: list = field(default_factory=list)
+    pending_review: list = field(default_factory=list)

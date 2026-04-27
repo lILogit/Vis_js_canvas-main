@@ -71,6 +71,11 @@ python3 cli.py parse-note notes/<note>.yaml          # parse + W-score
 python3 cli.py classify chains/<chain>.causal.json notes/<note>.yaml  # known vs. ΔDATA
 python3 cli.py ingest chains/<chain>.causal.json notes/<note>.yaml    # full pipeline
 
+# T5/T6 Living Code enrichment + re-forge (require ANTHROPIC_API_KEY)
+python3 cli.py enrich-text chains/<chain>.causal.json --text-file article.txt --source hn.cz
+python3 cli.py reforge chains/<chain>.causal.json           # re-emit runtime; show semantic diff
+python3 cli.py reforge chains/<chain>.causal.json --diff-out runs/my_diff.txt
+
 # Interactive demo harness (all pipeline stages with predefined chains/notes)
 python3 demo.py
 python3 demo.py --chain chains/sleep-cognition.causal.json --note notes/note_cold_swim.yaml --dry-run
@@ -113,14 +118,35 @@ note/
   evolution.py          ← evolve_graph() — calls NOTE_TO_GRAPH; returns import_node/import_edge
   ingest.py             ← ingest_note() — orchestrates parse→classify→evolve
 chain/
-  schema.py             ← CausalChain, Node, Edge, ChainMeta dataclasses
-  io.py                 ← load/save .causal.json with auto-backup (.bak)
+  schema.py             ← CausalChain, Node, Edge, ChainMeta dataclasses (includes enrichment fields)
+  io.py                 ← load/save .causal.json with auto-backup (.bak); preserves evidence/overrides
   diff.py               ← structural diff between two chains
   validate.py           ← runs before every save; returns list of issues
+src/
+  forge/
+    emit.py             ← forge_chain(chain) → deterministic .py; enrichment-aware (_evidence_refs, rate field)
+    canonical.py        ← chain_hash(chain) → sha256
+    diff.py             ← diff_chains, diff_forge_output, format_diff
+    runtime.py          ← STATE/ASSET/EVENT/… decorators + simulate() entry point
+  simulate/
+    payoff.py           ← REFERENCE_SCENARIO, compute_branch(branch_id, scenario) → dict
+    recommend.py        ← score_branch, recommend(results, scenario) → top-3
+    runner.py           ← simulate(chain, mode, n, seed) → {branches, recommendations, …}
+    montecarlo.py       ← path_probability, monte_carlo, sensitivity_analysis, branch_exposures
+    sensitivity.py      ← sensitivity_analysis, most_sensitive_node_for_branch
+    trace.py            ← TraceWriter context manager → JSONL in runs/
+  enrichment/
+    extract.py          ← extract_events(text, chain) → [event] via LLM + TEXT_EXTRACT prompt
+    classify.py         ← classify_event, ClassifyError, VALID_TARGET_IDS, E_CLASS_META
+    gate.py             ← run_gates (5-gate pipeline), GateResult, _TARGET_MAP, SOURCE_CREDIBILITY
+    apply.py            ← apply_event → chain+evidence+overrides; apply_pending_or_reject
+runtime/                ← forged Python modules (git-tracked for diffs)
+  mortgage-mvp.py       ← forged from chains/mortgage-mvp.causal.json
+runs/                   ← append-only JSONL traces and diff outputs
 chains/                 ← default storage directory
 chains/backups/         ← timestamped backup destination
 notes/                  ← sample note files for demo/testing
-tests/                  ← pytest; 42 tests across schema, validate, io, note
+tests/                  ← pytest; 141 tests (enrichment, forge, simulate, montecarlo, reforge, ccf, schema, validate, io, note)
 .env                    ← ANTHROPIC_API_KEY (gitignored)
 ```
 
