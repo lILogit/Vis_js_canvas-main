@@ -609,6 +609,29 @@ def cmd_ingest(args):
         print(f"failed\n  Error: {exc}")
 
 
+def cmd_forge(args):
+    """Emit deterministic Python from a chain."""
+    import chain.io as chain_io
+    src_path = os.path.join(os.path.dirname(__file__), "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    from forge.emit import forge_chain, ForgeError
+    chain = _load(args.file)
+    data  = chain_io.to_dict(chain)
+    try:
+        code = forge_chain(data)
+    except ForgeError as exc:
+        print(f"  Forge error: {exc}")
+        sys.exit(1)
+    if args.out:
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        with open(args.out, "w", encoding="utf-8") as f:
+            f.write(code)
+        print(f"  Forged: {args.out}")
+    else:
+        print(code)
+
+
 def cmd_reset_demo(args):
     """Restore demo chain(s) to their pristine seed state."""
     import shutil
@@ -738,6 +761,11 @@ def build_parser():
     s.add_argument("file", help="Chain .causal.json path")
     s.add_argument("note", help="Note file path or - for stdin")
 
+    # forge
+    s = sub.add_parser("forge", help="Emit deterministic Python from a chain")
+    s.add_argument("file", help="Chain .causal.json path")
+    s.add_argument("--out", help="Output .py path (default: stdout)")
+
     # reset-demo
     sub.add_parser("reset-demo", help="Restore demo chains to pristine seed state")
 
@@ -764,6 +792,7 @@ COMMANDS = {
     "parse-note": cmd_parse_note,
     "classify": cmd_classify,
     "ingest": cmd_ingest,
+    "forge": cmd_forge,
     "reset-demo": cmd_reset_demo,
 }
 
