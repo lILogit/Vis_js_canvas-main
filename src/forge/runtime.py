@@ -71,10 +71,13 @@ def requires(src: str, dst: str) -> tuple:
     return ("REQUIRES", src, dst)
 
 
-# ── Simulation stub ───────────────────────────────────────────────────────────
+# ── Simulation (delegates to simulate.runner when installed) ──────────────────
 
-def simulate(chain: list, mode: str = "deterministic",
-             n: int = 10_000, seed: int = 42,
-             initial_state: dict | None = None):
-    """Stub — full implementation in T4 (Monte Carlo + sensitivity)."""
-    return None
+try:
+    from simulate.runner import simulate  # T3+ real implementation
+except ImportError:
+    def simulate(chain: list, mode: str = "deterministic",  # type: ignore[misc]
+                 n: int = 10_000, seed: int = 42,
+                 initial_state: dict | None = None):
+        """Stub — install simulate package (T3) for real implementation."""
+        return None
