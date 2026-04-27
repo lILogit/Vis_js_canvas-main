@@ -30,7 +30,7 @@ lsof -ti:7331 | xargs kill -9 2>/dev/null; python3 cli.py open chains/<name>.cau
 # Create a new chain
 python3 cli.py new "My Chain" --domain science
 
-# Run tests
+# Run all tests (139 pass, 2 skip without API key)
 python3 -m pytest tests/ -v
 
 # Run a single test file
@@ -66,17 +66,20 @@ python3 cli.py explain chains/<name>.causal.json --node <id>
 # Reset demo chains to seed state
 python3 cli.py reset-demo
 
-# Note ingestion pipeline (Phase 1-3)
+# Note ingestion pipeline
 python3 cli.py parse-note notes/<note>.yaml          # parse + W-score
 python3 cli.py classify chains/<chain>.causal.json notes/<note>.yaml  # known vs. ΔDATA
 python3 cli.py ingest chains/<chain>.causal.json notes/<note>.yaml    # full pipeline
 
-# T5/T6 Living Code enrichment + re-forge (require ANTHROPIC_API_KEY)
+# Living Code — forge, enrich, re-forge
+python3 cli.py forge chains/<chain>.causal.json [--out runtime/<name>.py]
 python3 cli.py enrich-text chains/<chain>.causal.json --text-file article.txt --source hn.cz
-python3 cli.py reforge chains/<chain>.causal.json           # re-emit runtime; show semantic diff
-python3 cli.py reforge chains/<chain>.causal.json --diff-out runs/my_diff.txt
+python3 cli.py reforge chains/<chain>.causal.json [--out runtime/<name>.py] [--diff-out runs/d.txt]
 
-# Interactive demo harness (all pipeline stages with predefined chains/notes)
+# Full end-to-end Living Code demo (steps 1-4,6-8 work without API key)
+bash demo_mortgage_mvp.sh
+
+# Interactive demo harness (note ingestion pipeline)
 python3 demo.py
 python3 demo.py --chain chains/sleep-cognition.causal.json --note notes/note_cold_swim.yaml --dry-run
 ```
@@ -86,30 +89,26 @@ Environment: `ANTHROPIC_API_KEY` is loaded automatically from `.env` at project 
 ## Architecture
 
 ```
-cli.py                  ← entry point; dispatches subcommands; loads .env
-demo.py                 ← interactive demo/test harness for ingestion pipeline
+cli.py                  ← entry point; all subcommands; loads .env
+demo.py                 ← interactive harness for note ingestion pipeline
+demo_mortgage_mvp.sh    ← end-to-end Living Code demo (T1→T6, 8 steps)
 editor/
   serve.py              ← HTTPServer on port 7331; REST API + WebSocket upgrade
   template.html         ← vis.js editor UI (toolbar + graph + inspector + overlays)
   decompose.html        ← standalone Knowledge Decomposer page (/decompose route)
   grammar.html          ← standalone Chain Grammar System page (/grammar route)
   static/
-    editor.js           ← vis-network init, visual encoding, enrich/import/merge preview, RCDE cluster, summary save/history, CCF panel
-    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints (saveSummary, deleteSummary, importChain, loadChainCcf, llmNoteChain, etc.)
+    editor.js           ← vis-network init, visual encoding, enrich/import/merge preview,
+                           RCDE cluster, summary save/history, CCF panel
+    sync.js             ← fetch wrappers for /api/* and /llm/* endpoints
     style.css           ← dark theme
     decompose.js        ← Knowledge Decomposer vis-network; epistemic class coloring
     decompose.css       ← Decomposer layout + klass badge styles
-src/
-  ccf/
-    ccf.py              ← compress(graph) → CCF v1 string; restore(ccf) → dict; to_prompt()
-    defaults.py         ← NODE_DEFAULTS, EDGE_DEFAULTS, META_DEFAULTS
-    grammar.py          ← VALID_TYPES, VALID_ARCHETYPES, VALID_RELATIONS frozensets
-    cli.py              ← CLI: compress / restore / roundtrip / ratio
-    __init__.py         ← public API re-exports
 llm/
   client.py             ← Claude API wrapper; strips markdown; parses JSON
   prompts.py            ← all prompt templates: ENRICH, GAP, TEXT_TO_CHAIN,
-                           NOTE_CLASSIFY, NOTE_TO_GRAPH, NOTE_MERGE_CHAIN, NOTE_CONNECT_ISOLATED
+                           NOTE_CLASSIFY, NOTE_TO_GRAPH, NOTE_MERGE_CHAIN,
+                           NOTE_CONNECT_ISOLATED, TEXT_EXTRACT
   enrichment.py         ← gap/weight enrichment pipelines with apply helpers
 note/
   schema.py             ← NoteInput dataclass; ARCHETYPES, NOTE_TYPES constants
@@ -118,35 +117,58 @@ note/
   evolution.py          ← evolve_graph() — calls NOTE_TO_GRAPH; returns import_node/import_edge
   ingest.py             ← ingest_note() — orchestrates parse→classify→evolve
 chain/
-  schema.py             ← CausalChain, Node, Edge, ChainMeta dataclasses (includes enrichment fields)
-  io.py                 ← load/save .causal.json with auto-backup (.bak); preserves evidence/overrides
+  schema.py             ← CausalChain, Node, Edge, ChainMeta dataclasses; includes enrichment fields
+  io.py                 ← load/save .causal.json with auto-backup; preserves evidence/overrides
   diff.py               ← structural diff between two chains
   validate.py           ← runs before every save; returns list of issues
 src/
+  ccf/
+    ccf.py              ← compress(graph) → CCF v1 string; restore(ccf) → dict; to_prompt()
+    defaults.py         ← NODE_DEFAULTS, EDGE_DEFAULTS, META_DEFAULTS
+    grammar.py          ← VALID_TYPES, VALID_ARCHETYPES, VALID_RELATIONS frozensets
+    cli.py              ← CLI: compress / restore / roundtrip / ratio
+    __init__.py         ← public API re-exports
   forge/
-    emit.py             ← forge_chain(chain) → deterministic .py; enrichment-aware (_evidence_refs, rate field)
+    emit.py             ← forge_chain(chain) → deterministic .py; enrichment-aware:
+                           emits _evidence_refs, rate field, last_enrichment in meta
     canonical.py        ← chain_hash(chain) → sha256
     diff.py             ← diff_chains, diff_forge_output, format_diff
     runtime.py          ← STATE/ASSET/EVENT/… decorators + simulate() entry point
+    __init__.py         ← exports forge_chain, ForgeError, diff_chains, diff_forge_output, format_diff
   simulate/
     payoff.py           ← REFERENCE_SCENARIO, compute_branch(branch_id, scenario) → dict
     recommend.py        ← score_branch, recommend(results, scenario) → top-3
-    runner.py           ← simulate(chain, mode, n, seed) → {branches, recommendations, …}
-    montecarlo.py       ← path_probability, monte_carlo, sensitivity_analysis, branch_exposures
-    sensitivity.py      ← sensitivity_analysis, most_sensitive_node_for_branch
+    runner.py           ← simulate(chain, mode, n, seed) → {branches, recommendations, …};
+                           print_comparison(result) for CLI output
+    montecarlo.py       ← path_probability, monte_carlo, DEFAULT_CERTAINTIES, BRANCH_PATH_NODES
+    sensitivity.py      ← sensitivity_analysis, most_sensitive_node_for_branch, branch_exposures
     trace.py            ← TraceWriter context manager → JSONL in runs/
   enrichment/
     extract.py          ← extract_events(text, chain) → [event] via LLM + TEXT_EXTRACT prompt
-    classify.py         ← classify_event, ClassifyError, VALID_TARGET_IDS, E_CLASS_META
+    classify.py         ← classify_event, ClassifyError, VALID_TARGET_IDS, E_CLASS_META (E1-E6)
     gate.py             ← run_gates (5-gate pipeline), GateResult, _TARGET_MAP, SOURCE_CREDIBILITY
     apply.py            ← apply_event → chain+evidence+overrides; apply_pending_or_reject
-runtime/                ← forged Python modules (git-tracked for diffs)
-  mortgage-mvp.py       ← forged from chains/mortgage-mvp.causal.json
-runs/                   ← append-only JSONL traces and diff outputs
+    __init__.py         ← public API re-exports
+runtime/                ← forged Python modules (git-tracked for byte-level diffs)
+  mortgage_mvp.py       ← generated from chains/mortgage-mvp.causal.json (forge --out)
+  mortgage-mvp.py       ← generated by reforge command
+runs/                   ← append-only JSONL traces and diff outputs (gitignored except seeds)
 chains/                 ← default storage directory
+  mortgage-mvp-seed.causal.json  ← pristine seed for reset-demo
+  mortgage-mvp.causal.json       ← working copy (enrichable)
 chains/backups/         ← timestamped backup destination
-notes/                  ← sample note files for demo/testing
-tests/                  ← pytest; 141 tests (enrichment, forge, simulate, montecarlo, reforge, ccf, schema, validate, io, note)
+notes/                  ← sample note YAML files
+tests/                  ← pytest; 141 tests, 10 test files
+  test_ccf.py           ← CCF compress/restore round-trip
+  test_enrichment.py    ← classify/gate/apply unit tests + 2 LLM integration tests (skip w/o key)
+  test_forge.py         ← forge_chain determinism, section order, error handling
+  test_io.py            ← load/save/backup round-trip
+  test_montecarlo.py    ← path probability, Monte Carlo, sensitivity, trace
+  test_note.py          ← note parser, W-score, YAML formats
+  test_reforge.py       ← post-enrichment forge output, diff utilities, provenance completeness
+  test_schema.py        ← dataclass defaults and short_id
+  test_simulate.py      ← all 6 branch payoffs, recommendations, simulate() modes
+  test_validate.py      ← orphan edges, weight bounds, cycle detection
 .env                    ← ANTHROPIC_API_KEY (gitignored)
 ```
 
@@ -212,6 +234,33 @@ Free text body.
 
 **Archetype values** (set on nodes, string): `root_cause | mechanism | effect | moderator | evidence | question`
 
+## Living Code pipeline (T1–T6)
+
+The Mortgage MVP demonstrates a full Living Code loop: chain → forge → simulate → enrich → re-forge → diff.
+
+**T1 — Seed chain** (`chains/mortgage-mvp.causal.json`): 19 nodes, 25 edges, Czech mortgage scenario (2.4M CZK, 4.9%, 18y, income 85k, reserve 800k). Six decision branches.
+
+**T2 — Forge** (`cli.py forge`): `forge_chain(chain_dict) → str` emits a deterministic Python module. Two calls on the same chain produce byte-identical output (modulo timestamp). Uses `chain_hash()` (SHA-256) for provenance.
+
+**T3 — Simulate** (`src/simulate/`): `compute_branch(branch_id, scenario)` → `{monthly_payment, total_interest, interest_saved, months, reserve_after, dti}`. `recommend(results, scenario)` → top-3 scored branches. `print_comparison(result)` prints Czech comparison table.
+
+**T4 — Monte Carlo** (`src/simulate/montecarlo.py`, `sensitivity.py`, `trace.py`): Path probability = product of node certainties along causal spine + ENABLES predecessors. n=10,000 runs, seed=42 (deterministic). Sensitivity analysis ranks nodes by `|ΔP|/δ`. `TraceWriter` writes append-only JSONL to `runs/`.
+
+**T5 — Enrichment** (`src/enrichment/`): LLM extracts typed events (E1-E6) from financial news via `TEXT_EXTRACT` prompt. 5-gate validation pipeline: schema → credibility (`source_cred × extraction_conf ≥ 0.75`) → bounded shift (±0.10 max per cycle) → grammar re-check → circuit breaker (>15% payoff shift blocked). E1 events auto-apply to `chain.evidence[]` + `chain.meta.scenario_overrides`. E2-E6 go to `chain.pending_review[]`. Known sources: `hn.cz=0.88`, `cnb.cz=0.95`, `unknown=0.50`.
+
+**T6 — Re-forge** (`cli.py reforge`, `src/forge/diff.py`): Re-emits Python after enrichment. Changed nodes gain `_evidence_refs=[...]` in their decorator and a typed field (`rate: float = 0.0395`). `_forge_meta` gains `last_enrichment`. `diff_forge_output()` strips volatile lines (timestamp, hash) before diffing — only semantic mutations show. `diff_chains()` returns structured semantic diff with `changed_nodes`, `new_evidence`, `scenario_changes`.
+
+**Event classes (E1-E6):**
+- `E1` — value_update: specific numeric change to a named node parameter → auto-apply
+- `E2` — confidence_shift: source reliability or node probability changed → pending_review
+- `E3` — new_actor: new institution/entity enters the scenario → pending_review
+- `E4` — structural_change: causal pathway added or removed → pending_review
+- `E5` — deadline_update: time constraint introduced or changed → pending_review
+- `E6` — scenario_invalidation: entire branch or assumption invalidated → pending_review
+
+**Valid enrichment targets** (`VALID_TARGET_IDS` in `src/enrichment/classify.py`):
+`AltBankOffer.rate`, `RenewalOffer.rate`, `MortgageActive.annual_rate`, `FixationEndingSoon`, `RateRegime2028`, `MonthlyIncome`, `SavingsReserve`
+
 ## Browser UI features
 
 Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty chain) | `⬆ Import` (upload `.causal.json`) | `⬇ Export` (download `.causal.json`) | `↺ Reset demo` | `+ Node` | `+ Edge` | `Fit` | `Layout ↕` | `⊞ Cluster` | `⊸ Path` | `Find gaps` | `Suggest` | `Critique` | `📋 Summary` | `⬇ From text` | `📝 Note` | `⬡ Polygon` | `⊕ Decompose` | `📖 Grammar` | `Save ⌘S`
@@ -261,6 +310,7 @@ Toolbar buttons: `⎇ Chain` (chain switcher modal) | `＋ New` (create empty ch
 - Preview nodes/edges use ids prefixed `_preview_` — never persisted to chainData or disk
 - Merge preview nodes/edges use ids prefixed `_merge_new_` / `_merge_e_` — never persisted; cleared by `clearMergePreview()` and `renderGraph()`
 - Isolated merge-preview nodes are forbidden — `addMergePreviewToGraph()` removes any `_merge_new_*` node not referenced by any edge after all vis DataSet operations complete
+- Enrichment tests use the seed file (`mortgage-mvp-seed.causal.json`) as baseline — never the working copy
 
 ## LLM enrichment
 
@@ -275,6 +325,7 @@ Browser enrichment: `Find gaps` (mode=gaps) | `Suggest` (mode=suggest) — both 
 - `NOTE_CONNECT_ISOLATED` — follow-up prompt; takes `{isolated_json, existing_nodes_json, new_nodes_json, edge_id_start}`; returns `{edges}` connecting each isolated node to the most causally relevant target
 - `NOTE_CLASSIFY` — takes `{chain_json, note_type, note_text, seed_entities}`; delta items include `actionable` flag; type priority: `task > decision > gate > goal > asset > event > state`
 - `NOTE_TO_GRAPH` — takes `{context_json, delta_json, note_type, structural_role, w_score}`; returns nodes with `confidence` and `reasoning` fields; actionability rules keyed to `note_type`
+- `TEXT_EXTRACT` — takes `{alt_rate, renewal_rate, annual_rate, article_text}`; returns array of E1-E6 events with `class`, `target_node_id`, `direction`, `magnitude`, `new_value_hint`, `extraction_confidence`, `text_span`, `reasoning`; `URL_EXTRACT` is an alias
 
 ## CCF v1 — Causal Compact Format
 
@@ -304,12 +355,31 @@ python -m ccf ratio chains/<name>.causal.json        # print compression ratio
 
 ```json
 {
-  "meta": { "id", "name", "domain", "created_at", "updated_at", "version", "author", "description" },
-  "nodes": [{ "id", "label", "description", "type", "archetype", "tags", "confidence", "created_at", "source", "deprecated", "flagged" }],
-  "edges": [{ "id", "from", "to", "relation", "weight", "confidence", "direction", "condition",
-              "evidence", "deprecated", "flagged", "version", "created_at", "source" }],
+  "meta": {
+    "id", "name", "domain", "created_at", "updated_at", "version", "author", "description",
+    "scenario_overrides": {}       // enrichment: e.g. {"alt_rate": 0.0395}
+  },
+  "nodes": [{
+    "id", "label", "description", "type", "archetype", "tags", "confidence",
+    "created_at", "source", "deprecated", "flagged", "chain_link",
+    "_status": "enriched",         // set by enrichment.apply when E1 is applied
+    "_evidence_ref": "ev_..."      // id of the evidence entry that modified this node
+  }],
+  "edges": [{
+    "id", "from", "to", "relation", "weight", "confidence", "direction",
+    "condition", "evidence", "deprecated", "flagged", "version", "created_at", "source"
+  }],
   "history": [{ "timestamp", "action", "actor", "payload" }],
-  "summaries": [{ "id", "created_at", "headline", "scope", "data" }]
+  "summaries": [{ "id", "created_at", "headline", "scope", "data" }],
+  "evidence": [{                   // append-only enrichment ledger
+    "id", "timestamp", "source", "source_credibility", "extraction_confidence",
+    "text_span", "reasoning", "class", "target_node_id",
+    "old_value", "new_value", "shift_proposed", "shift_applied",
+    "shift_capped_by_bounds", "applied"
+  }],
+  "pending_review": [{             // E2-E6 and gate-blocked events
+    "id", "class", "event", "source", "gate_result", "added_at"
+  }]
 }
 ```
 
@@ -371,3 +441,4 @@ Auto-backup triggers: before enrich/contradict/merge, before restore, every 10th
 - Never add isolated nodes to the merge preview — the isolation guard in `addMergePreviewToGraph()` enforces this; do not remove it
 - Never list or switch to `*-seed.causal.json` files — they are reset-demo templates only
 - Never save to `_chain_path` if it points to a seed file
+- Never use `chains/mortgage-mvp.causal.json` as test fixture baseline — use the seed file
